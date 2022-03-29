@@ -6,6 +6,6 @@ Feel free to use it and adapt following your needs!
 Powershell version 5.1 required
 Required Disable Default Security (https://docs.microsoft.com/en-us/azure/active-directory/fundamentals/concept-fundamentals-security-defaults)
 
-### INFOS
+## INFOS
 Default Password for keepass is : Harden365
 After running debug.log trace modifications
