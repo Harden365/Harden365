@@ -340,7 +340,7 @@ $MessagingMenu = CreateMenu -MenuTitle "HARDEN 365 - MESSAGING" -MenuOptions @("
              Read-Host -Prompt "Press Enter to return_"
              MessagingMenu
       }
-    6{
+    5{
       HardenMenu
       }
     Default{
