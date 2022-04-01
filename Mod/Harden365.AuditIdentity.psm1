@@ -8,54 +8,13 @@
 ## Version: 01.00.000                                            ##
 ##  Author: contact@harden365.net                                ##
 ###################################################################
+
+# Cloud - GlobalAdmin - Enable - MFA - Licence
 Function Get-AADRolesAudit {
 
 #SCRIPT
 Write-LogSection 'AUDIT ROLES' -NoHostOutput
 $DomainOnM365=(Get-AzureADDomain | Where-Object { $_.IsInitial -match $true }).Name
-
-
-$header = @"
-<img src="$pwd\Config\Harden365.logohtml" alt="logoHarden365" class="centerImage" alt="CH Logo" height="167" width="500">
-<style>
-    h1 {
-        font-family: Arial, Helvetica, sans-serif;
-        color: #cc0000;
-        font-size: 28px;
-        text-align:center;
-    }
-    h2 {
-        font-family: Arial, Helvetica, sans-serif;
-        color: #000099;
-        font-size: 16px;
-        text-align:right;
-    }
-   table {
-        margin: auto;
-        font-size: 12px;
-		border: 0px; 
-		font-family: Arial, Helvetica, sans-serif;
-	} 
-    td {
-        padding: 4px;
-		margin: 0px;
-		border: 0;
-	}
-    th {
-        background: #395870;
-        background: linear-gradient(#49708f, #293f50);
-        color: #fff;
-        font-size: 11px;
-        text-transform: uppercase;
-        padding: 10px 15px;
-        vertical-align: middle;
-	}
-    tbody tr:nth-child(even) {
-        background: #f0f0f2;
-    }
-</style>
-"@
-
 
 $RolesCollection = @()
 $Roles = Get-AzureADDirectoryRole
@@ -111,7 +70,7 @@ $Export = $RolesCollection | Where-Object {$_.MemberType -ne $null}
 #GENERATE HTML
 mkdir -Force ".\Audit" | Out-Null
 $dateFileString = Get-Date -Format "FileDateTimeUniversal"
-$export | Sort-Object UserPrincipalName,RoleName | ConvertTo-Html -Property RoleName,Enabled,UserPrincipalName,Name,IsLicensed,PasswordNeverExpires,PasswordLastChange,MFAEnforced,MFAEnabled,MFAMethod,PhoneNumbers,WhenCreated `
+$export | Sort-Object UserPrincipalName,RoleName | ConvertTo-Html -Property RoleName,Enabled,UserPrincipalName,Name,WhenCreated,PasswordNeverExpires,PasswordLastChange,MFAEnforced,MFAEnabled,MFAMethod,PhoneNumbers `
     -PreContent "<h1>Audit Roles and Administrators</h1>" "<h2>$DomainOnM365</h2>" -Head $Header -Title "Harden 365 - Audit" -PostContent "<h2>$(Get-Date -UFormat "%d-%m-%Y %T ")</h2>"`
     | foreach {
     $PSItem -replace "<td>Global Administrator</td>", "<td style='color: #cc0000;font-weight: bold'>Global Administrator</td>"
@@ -122,3 +81,28 @@ Write-LogInfo "Audit Roles Administration generated"
 Write-LogSection '' -NoHostOutput
 }
 
+
+
+
+
+
+# CompanyDomain - Name - ADSync - PWDSync
+(Get-MsolCompanyInformation).DisplayName
+(Get-MsolCompanyInformation).InitialDomain
+(Get-MsolCompanyInformation).DirectorySynchronizationEnabled
+(Get-MsolCompanyInformation).DirSyncServiceAccount
+(Get-MsolCompanyInformation).LastDirSyncTime
+(Get-MsolCompanyInformation).PasswordSynchronizationEnabled
+(Get-MsolCompanyInformation).AuthorizedServiceInstances
+(Get-MsolCompanyInformation).DapEnabled
+
+(Get-MsolCompanyInformation).PasswordSynchronizationEnabled
+(Get-MsolCompanyInformation).UsersPermissionToCreateGroupsEnabled
+(Get-MsolCompanyInformation).UsersPermissionToCreateLOBAppsEnabled
+(Get-MsolCompanyInformation).UsersPermissionToUserConsentToAppEnabled
+(Get-MsolCompanyInformation).UsersPermissionToReadOtherUsersEnabled
+
+# version Azure AD Tenant
+Get-AzureADSubscribedSku
+
+x<dc

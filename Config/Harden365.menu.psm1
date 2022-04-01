@@ -18,6 +18,7 @@ Function CreateMenu (){
     While($EnterPressed -eq $False){
     $LogoData = Get-Content (".\Config\Harden365.logo")
         foreach ($line in $LogoData){Write-Host $line}
+ 
         Write-Host "            $MenuTitle" -ForegroundColor Red
         Write-Host "
             _________________________________________________________________________________________
@@ -104,6 +105,7 @@ $AuditMenu = CreateMenu -MenuTitle "HARDEN 365 - AUDIT" -MenuOptions @("Audit Mi
                 try {
                 Get-AzureADTenantDetail | Out-Null 
                 } catch {Connect-AzureAD | Out-Null} 
+                Connect-MsolService | Out-Null
 
                 $scriptFunctions=(Get-ChildItem function: | Where-Object { $_.source -match 'Get-AADRolesAudit'})
                 $scriptFunctions | ForEach-Object {

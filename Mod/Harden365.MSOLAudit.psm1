@@ -24,7 +24,7 @@ function Get-MsolUsersMFAStatusCSVExport {
     param(
         [Parameter(Mandatory = $true)]
         [String]$ExportName,
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $false)]
         [String]$DateFileString
     )
 
@@ -41,7 +41,7 @@ function Get-MsolUsersMFAStatusCSVExport {
 
     Write-LogInfo "$($msolUsersWithMFAStatus.Count) accounts found"
     
-    $exportFullPath = "$pwd\Audit\$ExportName\MsolUsersMFAStatus-$ExportName-$DateFileString.csv"
+    $exportFullPath = ".\Audit\MsolUsersMFAStatus.csv"
     Write-LogInfo "Export to CSV at $exportFullPath"
     $msolUsersWithMFAStatus | Export-Csv -Path $exportFullPath -Delimiter ';' -Encoding UTF8 -NoTypeInformation
 
