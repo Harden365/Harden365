@@ -24,7 +24,6 @@ Function Get-MSOAuditUsers {
 
 
 #SCRIPT
-Connect-MsolService
 
 $DomainOnM365=(Get-MsolDomain | Where-Object { $_.IsInitial -match $true }).Name
 
@@ -78,7 +77,7 @@ $header = @"
 
 
 
-$Users = Get-MsolUser -All | Where-Object {$_.IsLicensed -eq $true} | Select UserPrincipalName,WhenCreated,LastPasswordChangeTimestamp,PasswordNeverExpires,StrongAuthenticationMethods, `
+$Users = Get-MsolUser -All | Where-Object {$_.IsLicensed -eq $true} | Select UserPrincipalName,WhenCreated,ImmutableId,LastPasswordChangeTimestamp,PasswordNeverExpires,StrongAuthenticationMethods, `
                                                                         @{Name = 'PhoneNumbers'; Expression = {($_.StrongAuthenticationUserDetails).PhoneNumber}},
                                                                         @{Name = 'LicensePlans'; Expression = {(($_.licenses).Accountsku).SkupartNumber}}
 
@@ -119,6 +118,7 @@ $ExportUsers = @()
                 "Password LastChange" =  $user.LastPasswordChangeTimestamp
                 "Password NeverExpires" = $user.PasswordNeverExpires
                 "Licenses" = $LicenseNames
+                "ADSync" = if ($user.ImmutableId) {$True} else {$False}
                 "MFA Enabled" = if ($user.StrongAuthenticationMethods) {$True} else {$False}
                 "MFA Method" = $MFAMethod
                 "MFA Enforced" = if ($user.StrongAuthenticationRequirements) {$True} else {$False}
@@ -129,12 +129,12 @@ $ExportUsers = @()
      
 $dateFileString = Get-Date -Format "FileDateTimeUniversal"
 mkdir -Force ".\Audit" | Out-Null
-$ExportUsers | Sort-Object  UserPrincipalName,Licenses | Select-object UserPrincipalName,Licenses,"When Created","Password LastChange","Password NeverExpires","MFA Enabled","MFA Enforced","MFA Method",PhoneNumbers | Export-Csv -Path `
+$ExportUsers | Sort-Object  UserPrincipalName,Licenses | Select-object UserPrincipalName,Licenses,AdSync,"When Created","Password LastChange","Password NeverExpires","MFA Enabled","MFA Enforced","MFA Method",PhoneNumbers | Export-Csv -Path `
 ".\Audit\AuditUsersDetails$dateFileString.csv" -Delimiter ';' -Encoding UTF8 -NoTypeInformation
 
 
 #GENERATE HTML
-$ExportUsers | Sort-Object  UserPrincipalName,Licenses,"When Created","Password LastChange","Password NeverExpires","MFA Enabled","MFA Enforced","MFA Method",PhoneNumbers | ConvertTo-Html -Property  UserPrincipalName,Licenses,"When Created","Password LastChange","Password NeverExpires","MFA Enabled","MFA Enforced","MFA Method",PhoneNumbers `
+$ExportUsers | Sort-Object  UserPrincipalName,Licenses,ADSync,"When Created","Password LastChange","Password NeverExpires","MFA Enabled","MFA Enforced","MFA Method",PhoneNumbers | ConvertTo-Html -Property  UserPrincipalName,Licenses,ADSync,"When Created","Password LastChange","Password NeverExpires","MFA Enabled","MFA Enforced","MFA Method",PhoneNumbers `
     -PreContent "<h1>Audit Users Detail</h1>" "<h2>$DomainOnM365</h2>" -Head $Header -Title "OGIC - Audit" -PostContent "<h2>$(Get-Date)</h2>"`
     | Out-File .\Audit\Harden365-AuditUsersDetails$dateFileString.html
 

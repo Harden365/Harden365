@@ -53,6 +53,12 @@ $header = @"
     tbody tr:nth-child(even) {
         background: #f0f0f2;
     }
+    .footer
+    { color:green;
+    margin-left:25px;
+    font-family:Tahoma;
+    font-size:8pt;
+    }
 </style>
 "@
 
@@ -76,13 +82,14 @@ ForEach ($Role In $Roles){
 }
 
 $UsersCollection = @()
-$Users = Get-MsolUser -All | Select ObJectId,LastPasswordChangeTimestamp,PasswordNeverExpires,StrongAuthenticationMethods, `
+$Users = Get-MsolUser -All | Select ObJectId,LastPasswordChangeTimestamp,PasswordNeverExpires,ImmutableId,StrongAuthenticationMethods, `
                                                                         @{Name = 'PhoneNumbers'; Expression = {($_.StrongAuthenticationUserDetails).PhoneNumber}},
                                                                         @{Name = 'LicensePlans'; Expression = {(($_.licenses).Accountsku).SkupartNumber}}
           foreach ($user in $Users) {
           $objuser = New-Object PSObject -Property @{
           ObjectId = $user.ObjectId
           IsLicensed = if ($user.LicensePlans) {$True} else {$False}
+          ADSync = if ($user.ImmutableId) {$True} else {$False}
           PasswordNeverExpires = $user.PasswordNeverExpires
           PasswordLastChange =  $user.LastPasswordChangeTimestamp
           MFAEnforced = $(if ($user.StrongAuthenticationRequirements) {$True} else {$False})
@@ -98,6 +105,7 @@ foreach ($item in $RolesCollection) {
         $obj | Add-Member -MemberType NoteProperty -Name 'PasswordLastChange' -Value ($UsersCollection | Where-Object { $_.ObjectId -eq $obj.ObjectId }).PasswordLastChange
         $obj | Add-Member -MemberType NoteProperty -Name 'StrongAuthenticationMethod' -Value ($UsersCollection | Where-Object { $_.ObjectId -eq $obj.ObjectId }).StrongAuthenticationMethod
         $obj | Add-Member -MemberType NoteProperty -Name 'PasswordNeverExpires' -Value ($UsersCollection | Where-Object { $_.ObjectId -eq $obj.ObjectId }).PasswordNeverExpires
+        $obj | Add-Member -MemberType NoteProperty -Name 'ADSync' -Value ($UsersCollection | Where-Object { $_.ObjectId -eq $obj.ObjectId }).ADSync
         $obj | Add-Member -MemberType NoteProperty -Name 'MFAEnabled' -Value ($UsersCollection | Where-Object { $_.ObjectId -eq $obj.ObjectId }).MFAEnabled
         $obj | Add-Member -MemberType NoteProperty -Name 'MFAMethod' -Value ($UsersCollection | Where-Object { $_.ObjectId -eq $obj.ObjectId }).MFAMethod
         $obj | Add-Member -MemberType NoteProperty -Name 'MFAEnforced' -Value ($UsersCollection | Where-Object { $_.ObjectId -eq $obj.ObjectId }).MFAEnforced
@@ -106,16 +114,16 @@ foreach ($item in $RolesCollection) {
     }
 }
 
-$Export = $RolesCollection | Where-Object {$_.MemberType -ne $null}
+$Export = $RolesCollection | Where-Object {$_.MemberType -ne $null} | Sort-Object UserPrincipalName,RoleName
+
 
 #GENERATE HTML
 mkdir -Force ".\Audit" | Out-Null
 $dateFileString = Get-Date -Format "FileDateTimeUniversal"
-$export | Sort-Object UserPrincipalName,RoleName | ConvertTo-Html -Property RoleName,Enabled,UserPrincipalName,Name,IsLicensed,PasswordNeverExpires,PasswordLastChange,MFAEnforced,MFAEnabled,MFAMethod,PhoneNumbers,WhenCreated `
+$export | ConvertTo-Html -Property RoleName,Enabled,UserPrincipalName,Name,IsLicensed,ADSync,PasswordNeverExpires,PasswordLastChange,MFAEnforced,MFAEnabled,MFAMethod,PhoneNumbers,WhenCreated `
     -PreContent "<h1>Audit Roles and Administrators</h1>" "<h2>$DomainOnM365</h2>" -Head $Header -Title "Harden 365 - Audit" -PostContent "<h2>$(Get-Date -UFormat "%d-%m-%Y %T ")</h2>"`
-    | foreach {
-    $PSItem -replace "<td>Global Administrator</td>", "<td style='color: #cc0000;font-weight: bold'>Global Administrator</td>"
-    } | Out-File .\Audit\Harden365-AuditRoles$dateFileString.html
+    | foreach {$PSItem -replace "<td>Global Administrator</td>", "<td style='color: #cc0000;font-weight: bold'>Global Administrator</td>"}`
+    | Out-File .\Audit\Harden365-AuditRoles$dateFileString.html
 
 Invoke-Expression .\Audit\Harden365-AuditRoles$dateFileString.html
 Write-LogInfo "Audit Roles Administration generated"

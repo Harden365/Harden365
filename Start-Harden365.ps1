@@ -60,6 +60,12 @@ Import-AllScriptModules -OperationCount $currentCountOfOperations -OperationTota
 $currentCountOfOperations++
 start-sleep -Seconds 2
 
+## PREREQUISITES
+write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline
+Write-Host("PLEASE CONNECT ACCOUNT WITH GLOBAL ADMINISTRATOR ROLE WITHOUT MFA CONTROL") -ForegroundColor Red
+start-sleep -Seconds 1
+$Credential = Get-Credential
+
 ## RUN MAIN MENU
-MainMenu
+MainMenu -Credential $Credential
 

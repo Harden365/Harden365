@@ -93,11 +93,12 @@ Function Start-EOPAutoForwardGroup {
 
 #SCRIPT
 $DomainOnM365=(Get-AcceptedDomain | Where-Object { $_.InitialDomain -match $true}).Name
-$GroupEOL=(Get-DistributionGroup | Where-Object { $_.DisplayName -eq $Name}).Name
+$GroupEOL=(Get-UnifiedGroup | Where-Object { $_.DisplayName -eq $Name}).Name
     if (-not $GroupEOL)
         {
         Try {
-            New-DistributionGroup -Name $Name -Type "Security" -PrimarySmtpAddress $Alias@$DomainOnM365 | Set-DistributionGroup -HiddenFromAddressListsEnabled $true
+            New-UnifiedGroup -Name $name -DisplayName $Name  -Alias $Alias -AccessType Private -Confirm:$false | Out-Null
+            Set-UnifiedGroup -Identity $Name -HiddenFromAddressListsEnabled $true -HiddenFromExchangeClientsEnabled -UnifiedGroupWelcomeMessageEnabled:$false
             Write-LogInfo "Group '$Name' created"
             }
                  Catch {
@@ -133,11 +134,12 @@ Function Start-EOPAntispamGroupStrict {
 
 #SCRIPT
 $DomainOnM365=(Get-AcceptedDomain | Where-Object { $_.InitialDomain -match $true}).Name
-$GroupEOL=(Get-DistributionGroup | Where-Object { $_.DisplayName -eq $Name}).Name
+$GroupEOL=(Get-UnifiedGroup | Where-Object { $_.DisplayName -eq $Name}).Name
     if (-not $GroupEOL)
         {
         Try {
-            New-DistributionGroup -Name $Name -Type "Security" -PrimarySmtpAddress $Alias@$DomainOnM365 | Set-DistributionGroup -HiddenFromAddressListsEnabled $true
+            New-UnifiedGroup -Name $name -DisplayName $Name  -Alias $Alias -AccessType Private -Confirm:$false | Out-Null
+            Set-UnifiedGroup -Identity $Name -HiddenFromAddressListsEnabled $true -HiddenFromExchangeClientsEnabled -UnifiedGroupWelcomeMessageEnabled:$false
             Write-LogInfo "Group '$Name' created"
             }
                  Catch {
@@ -187,25 +189,31 @@ Function Start-EOPAntispamPolicyStrict {
 
 $DomainOnM365=(Get-AcceptedDomain | Where-Object { $_.InitialDomain -match $true}).Name
 
+
 #SCRIPT INBOUND
-    if ((Get-HostedContentFilterRule).Name -ne $RuleInboundName)
+    if ((Get-HostedContentFilterRule).Name -eq $RuleInboundName)
     {
-        Try { 
+            Write-LogWarning "$PolicyInboundName already created!"
+            
+    } else
+    {
+            Try { 
             New-HostedContentFilterPolicy -Name $PolicyInboundName -HighConfidenceSpamAction $HighConfidenceSpamAction -SpamAction $SpamAction -BulkThreshold $BulkThreshold -QuarantineRetentionPeriod $QuarantineRetentionPeriod -EnableEndUserSpamNotifications $EnableEndUserSpamNotifications -BulkSpamAction $BulkSpamAction -PhishSpamAction $PhishSpamAction
             write-LogInfo "$PolicyInboundName created"
             New-HostedContentFilterRule -Name $RuleInboundName -HostedContentFilterPolicy $PolicyInboundName -Priority $Priority -SentToMemberOf $GroupStrict
             Write-LogInfo "$RuleInboundName created"
-        } Catch {
+             } Catch {
                 Write-LogError "$PolicyInboundName not created!"
                 }
-    } else
-    {
-         Write-LogWarning "$PolicyInboundName already created!"
          }      
 
 
 #SCRIPT OUTBOUND
-    if ((Get-HostedOutboundSpamFilterRule).name -ne $RuleOutboundName)
+    if ((Get-HostedOutboundSpamFilterRule).name -eq $RuleOutboundName)
+    {
+        Write-LogWarning "$PolicyOutboundName already created!"
+        
+    } else
     {
         Try { 
             New-HostedOutboundSpamFilterPolicy -Name $PolicyOutboundName -RecipientLimitExternalPerHour $RecipientLimitExternalPerHour -RecipientLimitInternalPerHour $RecipientLimitInternalPerHour -RecipientLimitPerDay $RecipientLimitPerDay -ActionWhenThresholdReached $ActionWhenThresholdReached
@@ -215,9 +223,6 @@ $DomainOnM365=(Get-AcceptedDomain | Where-Object { $_.InitialDomain -match $true
         } Catch {
                 Write-LogError "$PolicyOutboundName not created!"
                 }
-    } else
-    {
-         Write-LogWarning "$PolicyOutboundName already created!"
          }
 }
 
@@ -260,9 +265,14 @@ Function Start-EOPAntispamPolicyStandard {
 $DomainOnM365=(Get-AcceptedDomain | Where-Object { $_.InitialDomain -match $true}).Name
 
 #SCRIPT INBOUND
-    if ((Get-HostedContentFilterRule).name -ne $RuleInboundName)
+    if ((Get-HostedContentFilterRule).name -eq $RuleInboundName)
     {
-        Try { 
+     
+        Write-LogWarning "$PolicyInboundName already created!"
+        
+    } else
+    {
+         Try { 
             Set-HostedContentFilterPolicy -Identity "Default" -HighConfidenceSpamAction $HighConfidenceSpamAction -SpamAction $SpamAction -BulkThreshold $BulkThreshold -QuarantineRetentionPeriod $QuarantineRetentionPeriod -EnableEndUserSpamNotifications $EnableEndUserSpamNotifications -BulkSpamAction $BulkSpamAction -PhishSpamAction $PhishSpamAction
             New-HostedContentFilterPolicy -Name $PolicyInboundName -HighConfidenceSpamAction $HighConfidenceSpamAction -SpamAction $SpamAction -BulkThreshold $BulkThreshold -QuarantineRetentionPeriod $QuarantineRetentionPeriod -EnableEndUserSpamNotifications $EnableEndUserSpamNotifications -BulkSpamAction $BulkSpamAction -PhishSpamAction $PhishSpamAction
             Write-LogInfo "$PolicyInboundName created"
@@ -271,15 +281,16 @@ $DomainOnM365=(Get-AcceptedDomain | Where-Object { $_.InitialDomain -match $true
         } Catch {
                 Write-LogError "$PolicyInboundName not created!"
                 }
-    } else
-    {
-         Write-LogWarning "$PolicyInboundName already created!"
          }
 
 #SCRIPT OUTBOUND
-    if ((Get-HostedOutboundSpamFilterRule).name -ne $RuleOutboundName)
+    if ((Get-HostedOutboundSpamFilterRule).name -eq $RuleOutboundName)
     {
-        Try { 
+        Write-LogWarning "$PolicyInboundName already created!"
+        
+    } else
+    {
+         Try { 
             Set-HostedOutboundSpamFilterPolicy -Identity "Default" -RecipientLimitExternalPerHour $RecipientLimitExternalPerHour -RecipientLimitInternalPerHour $RecipientLimitInternalPerHour -RecipientLimitPerDay $RecipientLimitPerDay -ActionWhenThresholdReached $ActionWhenThresholdReached
             New-HostedOutboundSpamFilterPolicy -Name $PolicyOutboundName -RecipientLimitExternalPerHour $RecipientLimitExternalPerHour -RecipientLimitInternalPerHour $RecipientLimitInternalPerHour -RecipientLimitPerDay $RecipientLimitPerDay -ActionWhenThresholdReached $ActionWhenThresholdReached
             Write-LogInfo "$PolicyOutboundName created"
@@ -291,9 +302,6 @@ $DomainOnM365=(Get-AcceptedDomain | Where-Object { $_.InitialDomain -match $true
         } Catch {
                 Write-LogError "$PolicyInboundName not created!"
                 }
-    } else
-    {
-         Write-LogWarning "$PolicyInboundName already created!"
          }
 }
 
@@ -436,7 +444,7 @@ Function Start-EOPAutoForwardRule {
 
 	param(
 	[Parameter(Mandatory = $false)]
-    [String]$RuleName = "Harden365 - Prevent auto forwarding of email to external domains",
+    [String]$RuleName = "Harden365 - Prevent autoforwarding of email to external domains",
     [String]$Mode = "Enforce",
     [Boolean]$Enabled = $false,
     [String]$RuleErrorAction = "Ignore",
