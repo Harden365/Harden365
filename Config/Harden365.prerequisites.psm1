@@ -59,7 +59,7 @@ function Test-UserIsAdministrator {
     if (!$isAdmin) {
         Write-LogError 'You must run this script as an administrator to update or install powershell module'
         Write-LogError 'Script execution cancelled'
-        break Script
+        Break
     }
 }
 
@@ -76,18 +76,17 @@ function Test-PowerShellModule {
     $installedPSModule = Get-InstalledModule $ModuleName -ErrorAction Ignore
     $installedPSModuleVersion = Get-InstalledModule $ModuleName -MinimumVersion $ModuleVersion -ErrorAction Ignore
     if($installedPSModule -eq $null){
-        write-host("Installing $ModuleName Powershell Module") -ForegroundColor Green -NoNewline
+        Write-LogInfo ("Installing $ModuleName Powershell Module")
         Check-UserIsAdministrator
         [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
         Install-Module $ModuleName -AllowClobber
-        write-host(' --> Done') -ForegroundColor Yellow
         Write-LogWarning "$ModuleName Powershell Module necessary"
     } elseif ($installedPSModuleVersion -eq $null) {
-        write-host("Updating $ModuleName Powershell Module") -ForegroundColor Green -NoNewline
-        Check-UserIsAdministrator
+        Write-LogInfo ("Updating $ModuleName Powershell Module")
+        Test-UserIsAdministrator
+        Pause
         [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
         Update-Module $ModuleName 
-        write-host(' --> Done') -ForegroundColor Yellow
         Write-LogInfo "$ModuleName Powershell Module updated"
     }
     Write-LogInfo "$ModuleName Powershell Module installed"
@@ -125,7 +124,7 @@ function Test-AllPrerequisites {
     $currentCountOfPrerequisitesCheck++
     Test-PowerShellModule -ModuleName 'MicrosoftTeams' -ModuleVersion '2.6' -OperationCount $currentCountOfPrerequisitesCheck -OperationTotal $numberOfPrerequisitesCheck
     $currentCountOfPrerequisitesCheck++
-    Test-PowerShellModule -ModuleName 'ORCA' -ModuleVersion '1.10' -OperationCount $currentCountOfPrerequisitesCheck -OperationTotal $numberOfPrerequisitesCheck
+    Test-PowerShellModule -ModuleName 'ORCA' -ModuleVersion '2.0' -OperationCount $currentCountOfPrerequisitesCheck -OperationTotal $numberOfPrerequisitesCheck
     $currentCountOfPrerequisitesCheck++
     Update-ProgressionBarInnerLoop -Activity 'Prerequisite check' -Status 'Complete' -OperationCount $currentCountOfPrerequisitesCheck -OperationTotal $numberOfPrerequisitesCheck
 

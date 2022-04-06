@@ -58,6 +58,7 @@ $DomainOnM365=(Get-AcceptedDomain | Where-Object { $_.InitialDomain -match $true
     if ((Get-AntiPhishRule).name -ne $RuleName)
     {
         Try { 
+            $WarningActionPreference = "SilentlyContinue"
             Set-AntiPhishPolicy -Identity "Office365 AntiPhish Default" -EnableMailboxIntelligenceProtection $EnableMailboxIntelligenceProtection -EnableMailboxIntelligence $EnableMailboxIntelligenceProtection -MailboxIntelligenceProtectionAction $MailboxIntelligenceProtectionAction -EnableSimilarDomainsSafetyTips $EnableSimilarDomainsSafetyTips -EnableSimilarUsersSafetyTips $EnableSimilarUsersSafetyTips -TargetedUserProtectionAction $TargetedUserProtectionAction -EnableTargetedUserProtection $EnableTargetedUserProtection -EnableTargetedDomainsProtection $EnableTargetedDomainsProtection -EnableOrganizationDomainsProtection $EnableOrganizationDomainsProtection -TargetedDomainProtectionAction $TargetedDomainProtectionAction -EnableUnusualCharactersSafetyTips $EnableUnusualCharactersSafetyTips -PhishThresholdLevel $PhishThresholdLevel
             New-AntiPhishPolicy -Name $PolicyName -AdminDisplayName $PolicyName -TargetedDomainsToProtect ((Get-AcceptedDomain).Name) -EnableMailboxIntelligenceProtection $EnableMailboxIntelligenceProtection -EnableMailboxIntelligence $EnableMailboxIntelligence -MailboxIntelligenceProtectionAction $MailboxIntelligenceProtectionAction -EnableSimilarDomainsSafetyTips $EnableSimilarDomainsSafetyTips -EnableSimilarUsersSafetyTips $EnableSimilarUsersSafetyTips -TargetedUserProtectionAction $TargetedUserProtectionAction -EnableTargetedUserProtection $EnableTargetedUserProtection -EnableTargetedDomainsProtection $EnableTargetedDomainsProtection -EnableOrganizationDomainsProtection $EnableOrganizationDomainsProtection -TargetedDomainProtectionAction $TargetedDomainProtectionAction -EnableUnusualCharactersSafetyTips $EnableUnusualCharactersSafetyTips -PhishThresholdLevel $PhishThresholdLevel
             New-AntiPhishRule -Name $RuleName -AntiPhishPolicy $PolicyName -Priority $Priority -RecipientDomainIs ((Get-AcceptedDomain).Name)
@@ -136,7 +137,7 @@ Function Start-DefenderO365P1SafeLinks {
     [Boolean]$ScanUrls = $true,
     [Boolean]$DeliverMessageAfterScan = $true,
     [Boolean]$EnableForInternalSenders = $true,
-    [Boolean]$DoNotAllowClickThrough = $true,
+    [Boolean]$AllowClickThrough = $false,
     [String]$DoNotRewriteUrls = $UrlSafeLinksExcept,
     [Boolean]$TrackClicks = $true,
     [Boolean]$EnableSafeLinksForO365Clients = $true,
@@ -150,8 +151,9 @@ $DomainOnM365=(Get-AcceptedDomain | Where-Object { $_.InitialDomain -match $true
     if ((Get-SafeLinksRule).name -ne $RuleName)
     {
         Try { 
-            New-SafeLinksPolicy -Name $PolicyName -IsEnabled $IsEnabled -EnableSafeLinksForTeams $EnableSafeLinksForTeams -ScanUrls $ScanUrls -DeliverMessageAfterScan $DeliverMessageAfterScan -EnableForInternalSenders $EnableForInternalSenders -DoNotRewriteUrls $DoNotRewriteUrls
+            New-SafeLinksPolicy -Name $PolicyName -IsEnabled $IsEnabled -EnableSafeLinksForTeams $EnableSafeLinksForTeams -ScanUrls $ScanUrls -DeliverMessageAfterScan $DeliverMessageAfterScan -EnableForInternalSenders $EnableForInternalSenders -DoNotRewriteUrls $DoNotRewriteUrls -AllowClickThrough $AllowClickThrough
             New-SafeLinksRule -Name $RuleName -SafeLinksPolicy $PolicyName -Priority $Priority -RecipientDomainIs ((Get-AcceptedDomain).Name)
+            $WarningActionPreference = "SilentlyContinue"
             Set-AtpPolicyForO365 -TrackClicks $TrackClicks -EnableSafeLinksForO365Clients $EnableSafeLinksForO365Clients
             Write-LogInfo "$PolicyName created"  
         } Catch {

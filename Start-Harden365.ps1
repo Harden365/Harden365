@@ -44,6 +44,7 @@ if ($reloadModules) {
     Remove-Module 'Harden365.prerequisites'
 }
 
+## INTERFACE
 write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline
 Write-Host("LOADING HARDEN 365") -ForegroundColor Red
 Import-Module '.\config\Harden365.debug.psm1'
@@ -60,11 +61,16 @@ Import-AllScriptModules -OperationCount $currentCountOfOperations -OperationTota
 $currentCountOfOperations++
 start-sleep -Seconds 2
 
-## PREREQUISITES
+## CREDENTIALS
 write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline
 Write-Host("PLEASE CONNECT ACCOUNT WITH GLOBAL ADMINISTRATOR ROLE WITHOUT MFA CONTROL") -ForegroundColor Red
 start-sleep -Seconds 1
-$Credential = Get-Credential
+$ErrorActionPreference = "SilentlyContinue"
+$Credential = Get-Credential -Message "Global Administrator without MFA Control"
+if ($Credential -eq $null){
+Write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; write-Host("ACTION STOPPED BY USER") -ForegroundColor Red
+Pause;Break
+}
 
 ## RUN MAIN MENU
 MainMenu -Credential $Credential

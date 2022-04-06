@@ -104,7 +104,7 @@ function Write-LogError {
     )
     if (!$NoHostOutput) {
         write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline
-        Write-Error $Text
+        Write-Host $Text -ForegroundColor Red
     }
     Write-LogInternal -Text $Text -InfoType '---! ERROR:'
 }

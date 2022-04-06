@@ -72,10 +72,18 @@ Function CreateMenu (){
 
 function MainMenu(){
     Param(
-        [System.Management.Automation.PSCredential]$Credential
+        [System.Management.Automation.PSCredential]$Credential,
+        [String]$TenantDisplayName,
+        [String]$TenantPrimaryDomain,
+        [String]$TenantDirectorySync
     )
 
+
+
 $MainMenu = CreateMenu -MenuTitle "HARDEN 365 - MENU" -MenuOptions @("Audit","Hardening","Quit")
+write-host "Tenant Name           : $TenantDisplayName"
+write-host "Tenant PrimaryDomain  : $TenantPrimaryDomain"
+write-host "Tenant Directory Sync : $TenantDirectorySync"
     switch($MainMenu){
     0{
       AuditMenu -Credential $Credential
@@ -102,7 +110,8 @@ $AuditMenu = CreateMenu -MenuTitle "HARDEN 365 - AUDIT" -MenuOptions @("Audit Mi
     0{
                 write-host $FrontStyle -ForegroundColor Red
                 write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; Write-Host "AUDIT TENANT With ORCA"-ForegroundColor Green	
-                Invoke-ORCA -Output HTML -OutputDirectory .\Audit\
+                mkdir -Force ".\Audit" | Out-Null
+                Invoke-ORCA -ExchangeEnvironmentName "O365Default" -Output HTML -OutputOptions @{HTML=@{OutputDirectory=".\Audit"}}
                 Read-Host -Prompt "Press Enter to return_"
                 AuditMenu -Credential $Credential
       }

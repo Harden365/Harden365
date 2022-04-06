@@ -22,6 +22,48 @@
         Create transport rules to block AutoForwarding mail out Organization
         Enable Unified Audit Log
 #>
+Function Start-EOEnableAuditLog {
+     <#
+        .Synopsis
+         Enable Unified Audit Log
+        
+        .Description
+         This function will enable Unified Audit Log
+
+        .Notes
+         Version: 01.00 -- 
+         
+    #>
+
+	param(
+)
+
+Write-LogSection 'EXCHANGE ONLINE PROTECTION' -NoHostOutput
+
+#SCRIPT
+        if ((Get-OrganizationConfig).isDehydrated -eq $true)
+    {
+        Try { 
+            Enable-OrganizationCustomization -ErrorAction SilentlyContinue
+            Set-AdminAuditLogConfig -UnifiedAuditLogIngestionEnabled $true -Force
+            Write-LogInfo "Unified Audit Log enable"
+        } Catch {
+                Write-LogError "Unified Audit Log not enabled!"
+                }
+
+    } elseif ((Get-AdminAuditLogConfig).UnifiedAuditLogIngestionEnabled -eq $False)
+    {
+        Try { 
+            Set-AdminAuditLogConfig -UnifiedAuditLogIngestionEnabled $true -Force
+            Write-LogInfo "Unified Audit Log enable"
+        } Catch {
+                Write-LogError "Unified Audit Log not enabled!"
+                }
+    } else
+    {
+         Write-LogWarning "Unified Audit Log already enabled!"
+         }
+}
 
 
 Function Start-EOPAlertsMailbox {
@@ -472,6 +514,7 @@ $DomainOnM365=(Get-AcceptedDomain | Where-Object { $_.InitialDomain -match $true
                 Write-LogError "$RuleName not created"
                 }
     }
+Write-LogSection '' -NoHostOutput
 }
 
 
@@ -492,67 +535,30 @@ Function Start-EOPCheckAutoForward {
 )
 
 #SCRIPT
-
-            # Check and add exclusion in group autoforwarding EOL CONSOLE
-            $Forwards=((Get-Mailbox -ResultSize Unlimited) | ? { ($_.DeliverToMailboxAndForward -eq $true) -or ($_.ForwardingAddress -ne $null) -or ($_.ForwardingsmtpAddress -ne $null)}) | ForEach-Object {
+            # Check autoforwarding in transport rule
+            Write-Loginfo "Check autoforwarding in transport rule"
+            $Forwards=Get-TransportRule | Where-Object {$_.RedirectMessageTo -ne $null} | ForEach-Object {
             if ($_ -ne $null) {
-            #Write-Host "Autoforwarding found in $($_.UserPrincipalName)  to $($_.ForwardingAddress -split "SMTP:") $($_.ForwardingSmtpAddress -split "SMTP:")"}}
+            Write-LogWarning "Autoforwarding found in rule $($_.Name)  to $($_.RedirectMessageTo)"
+            }
+            }
+
+            # Check autoforwarding in exchange admin mailbox setting
+            Write-LogInfo "Check autoforwarding in mailbox settings"
+            $Forwards=((Get-Mailbox -ResultSize Unlimited) | ? { ($_.ForwardingAddress -ne $null) -or ($_.ForwardingsmtpAddress -ne $null)}) | ForEach-Object {
+            if ($_ -ne $null) {
             Write-LogWarning "Autoforwarding found in $($_.UserPrincipalName)  to $($_.ForwardingAddress -split "SMTP:") $($_.ForwardingSmtpAddress -split "SMTP:")"
-            #Add-DistributionGroupMember -Identity "$GroupExclude@$DomainOnM365" -Member "$Forward"
-            #Write-LogInfo "Add $($_.UserPrincipalName) to member of group $GroupExclude"}
+            }
             }
                                     
             # Check autoforwarding in all inbox rule
-            Write-LogInfo "Check autoforwarding in all inbox rule"
-            $rules=Get-Mailbox -ResultSize Unlimited| ForEach-Object {Get-InboxRule -Mailbox $PSItem.primarysmtpaddress} | Out-Null
+            Write-LogInfo "Check autoforwarding in inbox rules"
+            $rules=Get-Mailbox -ResultSize Unlimited| ForEach-Object {
+            Get-InboxRule -Mailbox $PSItem.primarysmtpaddress -WarningAction:SilentlyContinue }
             $forwardingRules = $rules | Where-Object {($_.forwardto -ne $null) -or ($_.forwardsattachmentto -ne $null) -or ($_.Redirectto -ne $null)}
             foreach ($rule in $forwardingRules) {
-            #Write-Host "Mailbox '$($rule.MailboxOwnerId)' forward to '$($rule.ForwardTo)$($rule.RedirectTo)' in inbox rule '$($rule.Name)'"}
-            Write-LogWarning "Mailbox '$($rule.MailboxOwnerId)' forward to '$($rule.ForwardTo)$($rule.RedirectTo)' in inbox rule '$($rule.Name)'"
+            Write-LogWarning "Mailbox '$($rule.MailboxOwnerId)' forward to '$($rule.ForwardTo)$($rule.RedirectTo)'"
             }
+            
 }
-}
 
-
-Function Start-EOPEnableAuditLog {
-     <#
-        .Synopsis
-         Enable Unified Audit Log
-        
-        .Description
-         This function will enable Unified Audit Log
-
-        .Notes
-         Version: 01.00 -- 
-         
-    #>
-
-	param(
-)
-
-
-#SCRIPT
-        if ((Get-OrganizationConfig).isDehydrated -eq $true)
-    {
-        Try { 
-            Enable-OrganizationCustomization -ErrorAction SilentlyContinue
-            Set-AdminAuditLogConfig -UnifiedAuditLogIngestionEnabled $true -Force
-            Write-LogInfo "Unified Audit Log enable"
-        } Catch {
-                Write-LogError "Unified Audit Log not enabled!"
-                }
-
-    } elseif ((Get-AdminAuditLogConfig).UnifiedAuditLogIngestionEnabled -eq $False)
-    {
-        Try { 
-            Set-AdminAuditLogConfig -UnifiedAuditLogIngestionEnabled $true -Force
-            Write-LogInfo "Unified Audit Log enable"
-        } Catch {
-                Write-LogError "Unified Audit Log not enabled!"
-                }
-    } else
-    {
-         Write-LogWarning "Unified Audit Log already enabled!"
-         }
-Write-LogSection '' -NoHostOutput
-}
