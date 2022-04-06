@@ -137,7 +137,7 @@ foreach ($Domain in $Domains) {
             $exportcsvdmarc = $true
             Write-LogInfo "$Domain : No DMARC - Export csv"
             Write-LogWarning "$Domain : Please get file csv in folder .\Output and insert records in Domain Registrar"
-            $DMARCRecords.Add("_dmarc.$Domain","v=DMARC1; p=none; pct=100; rua=mailto:d@$Domain; ruf=mailto:d@$Domain; fo=1")
+            $DMARCRecords.Add("_dmarc.$Domain","v=DMARC1; p=none; pct=100; rua=mailto:d@$Domain; fo=1")
                         }
         }
 if ($exportcsvdmarc -eq $true) {

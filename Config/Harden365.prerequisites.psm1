@@ -59,7 +59,7 @@ function Test-UserIsAdministrator {
     if (!$isAdmin) {
         Write-LogError 'You must run this script as an administrator to update or install powershell module'
         Write-LogError 'Script execution cancelled'
-        Break
+        Pause;Break
     }
 }
 
