@@ -229,6 +229,8 @@ $IdentityMenu = CreateMenu -MenuTitle "HARDEN 365 - IDENTITY" -MenuOptions @("Em
                 try {
                 Get-AzureADTenantDetail | Out-Null 
                 } catch {Connect-AzureAD  -Credential $Credential | Out-Null} 
+                write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; Write-host ('Connecting to  MSOL Service') -ForegroundColor Green
+                Connect-MsolService  -Credential $Credential | Out-Null
                 $scriptFunctions=(Get-ChildItem function: | Where-Object { $_.source -match 'Harden365.CA'})
                 $scriptFunctions | ForEach-Object {
                 Try { 

@@ -161,7 +161,7 @@ Function Start-MFAAdmins {
 
 
 #SCRIPT
-$ExcludeCARoles = (Get-AzureADDirectoryRoleTemplate | Where-Object {$_.DisplayName -eq "Directory Synchronization Accounts" -or $_.DisplayName -eq "Hybrid Identity Administrator"}).ObjectId
+$ExcludeCARoles = (Get-AzureADDirectoryRoleTemplate | Where-Object {$_.DisplayName -eq "Directory Synchronization Accounts"}).ObjectId
 $DomainOnM365=(Get-AzureADDomain | Where-Object { $_.IsInitial -match $true }).Name
 $CondAccPol=Get-AzureADMSConditionalAccessPolicy | Where-Object DisplayName -eq $Name
 
@@ -212,6 +212,7 @@ Function Start-MFAUsers {
 
 #SCRIPT
 $ExcludeCAGroup = (Get-AzureADGroup -All $true | Where-Object DisplayName -eq $GroupExclude).ObjectId
+$DomainOnM365=(Get-AzureADDomain | Where-Object { $_.IsInitial -match $true }).Name
 $CondAccPol=Get-AzureADMSConditionalAccessPolicy | Where-Object DisplayName -eq $Name
 
     if (-not $CondAccPol){
@@ -219,9 +220,10 @@ $CondAccPol=Get-AzureADMSConditionalAccessPolicy | Where-Object DisplayName -eq 
             $conditions = New-Object -TypeName Microsoft.Open.MSGraph.Model.ConditionalAccessConditionSet
             $conditions.Applications = New-Object -TypeName Microsoft.Open.MSGraph.Model.ConditionalAccessApplicationCondition
             $conditions.Applications.IncludeApplications = "All"
+            $conditions.Applications.ExcludeApplications = (Get-AzureADServicePrincipal -Filter "DisplayName eq 'Microsoft Intune'").AppId,(Get-AzureADServicePrincipal -Filter "DisplayName eq 'Microsoft Intune Enrollment'").AppId
             $conditions.Users = New-Object -TypeName Microsoft.Open.MSGraph.Model.ConditionalAccessUserCondition
             $conditions.Users.IncludeUsers = "All"
-            $conditions.Users.ExcludeUsers = "GuestsOrExternalUsers"
+            $conditions.Users.ExcludeUsers = "GuestsOrExternalUsers",(Get-AzureADUser -Filter "userPrincipalName eq 'u-admin@$DomainOnM365'").ObjectId
             $conditions.Users.ExcludeGroups = $ExcludeCAGroup
             $conditions.Users.ExcludeRoles = (Get-AzureADDirectoryRoleTemplate).ObjectId
             $conditions.ClientAppTypes = @('Browser', 'MobileAppsAndDesktopClients')
@@ -244,3 +246,5 @@ $CondAccPol=Get-AzureADMSConditionalAccessPolicy | Where-Object DisplayName -eq 
  Write-LogSection '' -NoHostOutput
 
 }
+
+
