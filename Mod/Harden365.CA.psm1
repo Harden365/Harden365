@@ -19,8 +19,7 @@
         Create CA for legacy authentification
 #>
 
-Function Start-GroupMFAUsersExclude
-{
+Function Start-GroupMFAUsersExclude {
      <#
         .Synopsis
          Create group for exclude users.
@@ -58,9 +57,7 @@ $GroupAAD=Get-AzureADGroup -Filter "DisplayName eq '$Name'"
           }
 }
 
-
-Function Start-LegacyAuthGroupExclude
-{
+Function Start-LegacyAuthGroupExclude {
      <#
         .Synopsis
          Create group for legacy authentification.
@@ -97,9 +94,7 @@ $GroupAAD=Get-AzureADGroup -Filter "DisplayName eq '$Name'"
           }
 }
 
-
-Function Start-LegacyAuthPolicy
-{
+Function Start-LegacyAuthPolicy {
      <#
         .Synopsis
          Create CA for legacy authentification.
@@ -146,9 +141,7 @@ $CondAccPol=Get-AzureADMSConditionalAccessPolicy | Where-Object DisplayName -eq 
                   }
  }
 
-
-Function Start-MFAAdmins
-{
+Function Start-MFAAdmins {
      <#
         .Synopsis
          Create CA for admins connection.
@@ -168,7 +161,6 @@ Function Start-MFAAdmins
 
 
 #SCRIPT
-$ExcludeCAGroup = (Get-AzureADGroup -All $true | Where-Object DisplayName -eq $GroupExclude).ObjectId
 $ExcludeCARoles = (Get-AzureADDirectoryRoleTemplate | Where-Object {$_.DisplayName -eq "Directory Synchronization Accounts" -or $_.DisplayName -eq "Hybrid Identity Administrator"}).ObjectId
 $DomainOnM365=(Get-AzureADDomain | Where-Object { $_.IsInitial -match $true }).Name
 $CondAccPol=Get-AzureADMSConditionalAccessPolicy | Where-Object DisplayName -eq $Name
@@ -198,9 +190,7 @@ $CondAccPol=Get-AzureADMSConditionalAccessPolicy | Where-Object DisplayName -eq 
                   }
 }
 
-
-Function Start-MFAUsers
-{
+Function Start-MFAUsers {
      <#
         .Synopsis
          Create CA for users connection.
