@@ -138,6 +138,7 @@ Function Start-DefenderO365P1SafeLinks {
     [Boolean]$DeliverMessageAfterScan = $true,
     [Boolean]$EnableForInternalSenders = $true,
     [Boolean]$AllowClickThrough = $false,
+    [Boolean]$DoNotAllowClickThrough = $true,
     [String]$DoNotRewriteUrls = $UrlSafeLinksExcept,
     [Boolean]$TrackClicks = $true,
     [Boolean]$EnableSafeLinksForO365Clients = $true,
@@ -148,10 +149,11 @@ Function Start-DefenderO365P1SafeLinks {
 
 #SCRIPT
 $DomainOnM365=(Get-AcceptedDomain | Where-Object { $_.InitialDomain -match $true}).Name
+
     if ((Get-SafeLinksRule).name -ne $RuleName)
     {
         Try { 
-            New-SafeLinksPolicy -Name $PolicyName -IsEnabled $IsEnabled -EnableSafeLinksForTeams $EnableSafeLinksForTeams -ScanUrls $ScanUrls -DeliverMessageAfterScan $DeliverMessageAfterScan -EnableForInternalSenders $EnableForInternalSenders -DoNotRewriteUrls $DoNotRewriteUrls -AllowClickThrough $AllowClickThrough
+            New-SafeLinksPolicy -Name $PolicyName -IsEnabled $IsEnabled -EnableSafeLinksForTeams $EnableSafeLinksForTeams -ScanUrls $ScanUrls -DeliverMessageAfterScan $DeliverMessageAfterScan -EnableForInternalSenders $EnableForInternalSenders -DoNotRewriteUrls $DoNotRewriteUrls -AllowClickThrough $AllowClickThrough -DoNotAllowClickThrough $DoNotAllowClickThrough
             New-SafeLinksRule -Name $RuleName -SafeLinksPolicy $PolicyName -Priority $Priority -RecipientDomainIs ((Get-AcceptedDomain).Name)
             $WarningActionPreference = "SilentlyContinue"
             Set-AtpPolicyForO365 -TrackClicks $TrackClicks -EnableSafeLinksForO365Clients $EnableSafeLinksForO365Clients
