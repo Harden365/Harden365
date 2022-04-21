@@ -22,10 +22,10 @@
 Function Start-GroupMFAUsersExclude {
      <#
         .Synopsis
-         Create group for exclude users.
+         Create group to exclude users.
         
         .Description
-         This function will create new group for exclude MFA.
+         This function will create new group to exclude MFA.
 
         .Notes
          Version: 01.00 -- 
@@ -34,7 +34,7 @@ Function Start-GroupMFAUsersExclude {
 
 	param(
 	[Parameter(Mandatory = $false)]
-	[String]$Name = "Harden365 - MFA Users Exclude",
+	[String]$Name = "Harden365 - CA Exclusion - MFA Users Exclude",
     [String]$mailNickName = "H365-MFAExclude"
 )
 
@@ -60,10 +60,10 @@ $GroupAAD=Get-AzureADGroup -Filter "DisplayName eq '$Name'"
 Function Start-LegacyAuthGroupExclude {
      <#
         .Synopsis
-         Create group for legacy authentification.
+         Create group to legacy authentification.
         
         .Description
-         This function will create new group for exclude LegacyAuth .
+         This function will create new group to exclude LegacyAuth .
 
         .Notes
          Version: 01.00 -- 
@@ -72,7 +72,7 @@ Function Start-LegacyAuthGroupExclude {
 
 	param(
 	[Parameter(Mandatory = $false)]
-	[String]$Name = "Harden365 - Legacy Authentification Exclude",
+	[String]$Name = "Harden365 - CA Exclusion - Legacy Authentification Exclude",
     [String]$mailNickName = "H365-LegacyExclude"
 )
 
@@ -97,7 +97,7 @@ $GroupAAD=Get-AzureADGroup -Filter "DisplayName eq '$Name'"
 Function Start-LegacyAuthPolicy {
      <#
         .Synopsis
-         Create CA for legacy authentification.
+         Create CA to legacy authentification.
         
         .Description
          This function will create Conditional Access Block for Legacy auth.
@@ -110,7 +110,7 @@ Function Start-LegacyAuthPolicy {
 	param(
 	[Parameter(Mandatory = $false)]
 	[String]$Name = "Harden365 - Block Legacy Authentification",
-	[String]$GroupExclude = "Harden365 - Legacy Authentification Exclude"
+	[String]$GroupExclude = "Harden365 - CA Exclusion - Legacy Authentification Exclude"
 )
 
 
@@ -144,7 +144,7 @@ $CondAccPol=Get-AzureADMSConditionalAccessPolicy | Where-Object DisplayName -eq 
 Function Start-MFAAdmins {
      <#
         .Synopsis
-         Create CA for admins connection.
+         Create CA to admins connection.
         
         .Description
          This function will create Conditionnal Access MFA for Admin roles .
@@ -201,7 +201,7 @@ $CondAccPol=Get-AzureADMSConditionalAccessPolicy | Where-Object DisplayName -eq 
 Function Start-MFAUsers {
      <#
         .Synopsis
-         Create CA for users connection.
+         Create CA to users connection.
         
         .Description
          This function will create Conditional Access MFA for Users.
@@ -214,7 +214,7 @@ Function Start-MFAUsers {
 	param(
 	[Parameter(Mandatory = $false)]
 	[String]$Name = "Harden365 - MFA Users",
-	[String]$GroupExclude = "Harden365 - MFA Users Exclude"   
+	[String]$GroupExclude = "Harden365 - CA Exclusion - MFA Users Exclude"   
 )
 
 
@@ -263,7 +263,7 @@ $CondAccPol=Get-AzureADMSConditionalAccessPolicy | Where-Object DisplayName -eq 
 Function Start-BlockUnmanagedDownloads {
      <#
         .Synopsis
-         Create CA for block downloads in unmanaged devices.
+         Create CA to block downloads in unmanaged devices.
         
         .Description
          This function will create Conditional Access to block downloads in unmanaged devices.
@@ -276,7 +276,7 @@ Function Start-BlockUnmanagedDownloads {
 	param(
 	[Parameter(Mandatory = $false)]
 	[String]$Name = "Harden365 - Block Unmanaged File Downloads",
-	[String]$GroupExclude = "Harden365 - BlockUnmanagedDownloads Exclude"   
+	[String]$GroupExclude = "Harden365 - CA Exclusion - BlockUnmanagedDownloads Exclude"   
 )
 
 
@@ -315,7 +315,7 @@ $CondAccPol=Get-AzureADMSConditionalAccessPolicy | Where-Object DisplayName -eq 
 Function Start-UnsupportedDevicePlatforms {
      <#
         .Synopsis
-         Create CA for Unsupported Device Platforms.
+         Create CA to Unsupported Device Platforms.
         
         .Description
          This function will create Conditional Access to Unsupported Device Platforms.
@@ -328,7 +328,7 @@ Function Start-UnsupportedDevicePlatforms {
 	param(
 	[Parameter(Mandatory = $false)]
 	[String]$Name = "Harden365 - Unsupported Device Platforms",
-	[String]$GroupExclude = "Harden365 - Unsupported Device Platforms Exclude"   
+	[String]$GroupExclude = "Harden365 - CA Exclusion - Unsupported Device Platforms Exclude"   
 )
 
 
@@ -352,6 +352,112 @@ $CondAccPol=Get-AzureADMSConditionalAccessPolicy | Where-Object DisplayName -eq 
             $Controls = New-Object -TypeName Microsoft.Open.MSGraph.Model.ConditionalAccessGrantControls
             $Controls._Operator = "OR"
             $Controls.BuiltInControls = "Block"
+            New-AzureADMSConditionalAccessPolicy -DisplayName $Name -State "Disabled" -Conditions $conditions -GrantControls $controls
+            Write-LogInfo "Conditional Access '$Name' created"
+            }
+                 Catch {
+                        Write-LogError "Conditional Access '$Name' not created"
+                        }
+            }
+            else { 
+                  Write-LogWarning "Conditional Access '$Name' already created!"
+                  }
+ Write-LogSection '' -NoHostOutput
+
+}
+
+Function Start-MobileDeviceAccessRequirements {
+     <#
+        .Synopsis
+         Create CA to Mobile Device Access Requirements.
+        
+        .Description
+         This function will create Conditional Access to Mobile Device Access Requirements.
+        
+        .Notes
+         Version: 01.00 -- 
+         
+    #>
+
+	param(
+	[Parameter(Mandatory = $false)]
+	[String]$Name = "Harden365 - Mobile Device Access Requirements",
+	[String]$GroupExclude = "Harden365 - CA Exclusion - Mobile Device Access Requirements"   
+)
+
+
+#SCRIPT
+$ExcludeCAGroup = (Get-AzureADGroup -All $true | Where-Object DisplayName -eq $GroupExclude).ObjectId
+$DomainOnM365=(Get-AzureADDomain | Where-Object { $_.IsInitial -match $true }).Name
+$CondAccPol=Get-AzureADMSConditionalAccessPolicy | Where-Object DisplayName -eq $Name
+    if (-not $CondAccPol){
+        Try {
+            $conditions = New-Object -TypeName Microsoft.Open.MSGraph.Model.ConditionalAccessConditionSet
+            $conditions.Applications = New-Object -TypeName Microsoft.Open.MSGraph.Model.ConditionalAccessApplicationCondition
+            $conditions.Applications.IncludeApplications = "All"
+            $conditions.Applications.ExcludeApplications = (Get-AzureADServicePrincipal -Filter "DisplayName eq 'Microsoft Intune'").AppId,(Get-AzureADServicePrincipal -Filter "DisplayName eq 'Microsoft Intune Enrollment'").AppId
+            $conditions.Users = New-Object -TypeName Microsoft.Open.MSGraph.Model.ConditionalAccessUserCondition
+            $conditions.Users.IncludeUsers = "All"
+            $conditions.Users.ExcludeUsers = (Get-AzureADUser -Filter "userPrincipalName eq 'u-admin@$DomainOnM365'").ObjectId
+            $conditions.ClientAppTypes = 'MobileAppsAndDesktopClients'
+            $conditions.Platforms = New-Object -TypeName Microsoft.Open.MSGraph.Model.ConditionalAccessPlatformCondition
+            $conditions.Platforms.IncludePlatforms = @('Android','IOS')
+            $Controls = New-Object -TypeName Microsoft.Open.MSGraph.Model.ConditionalAccessGrantControls
+            $Controls._Operator = "OR"
+            $Controls.BuiltInControls = 'approvedApplication'
+            New-AzureADMSConditionalAccessPolicy -DisplayName $Name -State "Disabled" -Conditions $conditions -GrantControls $controls
+            Write-LogInfo "Conditional Access '$Name' created"
+            }
+                 Catch {
+                        Write-LogError "Conditional Access '$Name' not created"
+                        }
+            }
+            else { 
+                  Write-LogWarning "Conditional Access '$Name' already created!"
+                  }
+ Write-LogSection '' -NoHostOutput
+
+}
+
+Function Start-MobileAppsandDesktopClients {
+     <#
+        .Synopsis
+         Create CA to Mobile Apps and Desktop Clients.
+        
+        .Description
+         This function will create Conditional Access to Mobile Apps and Desktop Clients.
+        
+        .Notes
+         Version: 01.00 -- 
+         
+    #>
+
+	param(
+	[Parameter(Mandatory = $false)]
+	[String]$Name = "Harden365 - Mobile Apps and Desktop Clients",
+	[String]$GroupExclude = "Harden365 - CA Exclusion - Mobile Apps and Desktop Clients"   
+)
+
+
+#SCRIPT
+$ExcludeCAGroup = (Get-AzureADGroup -All $true | Where-Object DisplayName -eq $GroupExclude).ObjectId
+$DomainOnM365=(Get-AzureADDomain | Where-Object { $_.IsInitial -match $true }).Name
+$CondAccPol=Get-AzureADMSConditionalAccessPolicy | Where-Object DisplayName -eq $Name
+    if (-not $CondAccPol){
+        Try {
+            $conditions = New-Object -TypeName Microsoft.Open.MSGraph.Model.ConditionalAccessConditionSet
+            $conditions.Applications = New-Object -TypeName Microsoft.Open.MSGraph.Model.ConditionalAccessApplicationCondition
+            $conditions.Applications.IncludeApplications = "All"
+            $conditions.Applications.ExcludeApplications = (Get-AzureADServicePrincipal -Filter "DisplayName eq 'Microsoft Teams Services'").AppId
+            $conditions.Users = New-Object -TypeName Microsoft.Open.MSGraph.Model.ConditionalAccessUserCondition
+            $conditions.Users.IncludeUsers = "All"
+            $conditions.Users.ExcludeUsers = (Get-AzureADUser -Filter "userPrincipalName eq 'u-admin@$DomainOnM365'").ObjectId
+            $conditions.ClientAppTypes = 'MobileAppsAndDesktopClients'
+            $conditions.Platforms = New-Object -TypeName Microsoft.Open.MSGraph.Model.ConditionalAccessPlatformCondition
+            $conditions.Platforms.IncludePlatforms = @('Android','IOS')
+            $Controls = New-Object -TypeName Microsoft.Open.MSGraph.Model.ConditionalAccessGrantControls
+            $Controls._Operator = "OR"
+            $Controls.BuiltInControls = @('compliantDevice','domainJoinedDevice')
             New-AzureADMSConditionalAccessPolicy -DisplayName $Name -State "Disabled" -Conditions $conditions -GrantControls $controls
             Write-LogInfo "Conditional Access '$Name' created"
             }
