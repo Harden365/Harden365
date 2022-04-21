@@ -87,6 +87,7 @@ $Users = Get-MsolUser -All | Select ObJectId,LastPasswordChangeTimestamp,Passwor
                                                                         @{Name = 'LicensePlans'; Expression = {(($_.licenses).Accountsku).SkupartNumber}}
           foreach ($user in $Users) {
           $objuser = New-Object PSObject -Property @{
+          #LastLogon = Get-AzureAdAuditSigninLogs -top 1 -Filter "userDisplayName eq '$user'" | select CreatedDateTime
           ObjectId = $user.ObjectId
           IsLicensed = if ($user.LicensePlans) {$True} else {$False}
           ADSync = if ($user.ImmutableId) {$True} else {$False}
