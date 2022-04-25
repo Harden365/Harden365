@@ -63,14 +63,19 @@ start-sleep -Seconds 2
 
 ## CREDENTIALS
 write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline
-Write-Host("PLEASE CONNECT ACCOUNT WITH GLOBAL ADMINISTRATOR ROLE WITHOUT MFA CONTROL") -ForegroundColor Red
+Write-Host("PLEASE CONNECT ACCOUNT WITH GLOBAL ADMINISTRATOR ROLE WITHOUT MFA CONTROL") -ForegroundColor Yellow
 start-sleep -Seconds 1
 $ErrorActionPreference = "SilentlyContinue"
 $Credential = Get-Credential -Message "Global Administrator without MFA Control"
 if ($Credential -eq $null){
 Write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; write-Host("ACTION STOPPED BY USER") -ForegroundColor Red
-Pause;Break
-}
+Pause;Break}
+try {
+Connect-AzureAD -Credential $Credential | Out-Null
+Get-AzureADTenantDetail | Out-Null 
+} catch {
+Write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; write-Host("USER/PASSWORD NOT VALID OR MFA ACTIVED") -ForegroundColor Red
+Pause;Break} 
 
 ## RUN MAIN MENU
 MainMenu -Credential $Credential

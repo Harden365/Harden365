@@ -68,26 +68,27 @@ $Roles = Get-AzureADDirectoryRole
 ForEach ($Role In $Roles){
   $Members = Get-AzureADDirectoryRoleMember -ObjectId $Role.ObjectId 
   ForEach ($Member In $Members) {
+    $UPN = $Member.UserPrincipalName
     $objrole = New-Object PSObject -Property @{
       ObjectId = $Member.ObjectId
-      RoleName = $Role.DisplayName
+      'Role Name' = $Role.DisplayName
+      'Last Logon (30d)' = (Get-AzureADAuditSignInLogs -top 1 -Filter "UserPrincipalName eq '$UPN'").CreatedDateTime
       Name = $Member.DisplayName
       UserPrincipalName = $Member.UserPrincipalName
       MemberType = $Member.UserType
       Enabled = $Member.AccountEnabled
-      WhenCreated = ($Member.ExtensionProperty).createdDateTime
+      'When Created' = ($Member.ExtensionProperty).createdDateTime
       }
       $RolesCollection += $objrole
   }
 }
 
 $UsersCollection = @()
-$Users = Get-MsolUser -All | Select ObJectId,LastPasswordChangeTimestamp,PasswordNeverExpires,ImmutableId,StrongAuthenticationMethods, `
+$Users = Get-MsolUser -All | Select ObJectId,UserPrincipalName,LastPasswordChangeTimestamp,PasswordNeverExpires,ImmutableId,StrongAuthenticationMethods, `
                                                                         @{Name = 'PhoneNumbers'; Expression = {($_.StrongAuthenticationUserDetails).PhoneNumber}},
                                                                         @{Name = 'LicensePlans'; Expression = {(($_.licenses).Accountsku).SkupartNumber}}
           foreach ($user in $Users) {
           $objuser = New-Object PSObject -Property @{
-          #LastLogon = Get-AzureAdAuditSigninLogs -top 1 -Filter "userDisplayName eq '$user'" | select CreatedDateTime
           ObjectId = $user.ObjectId
           IsLicensed = if ($user.LicensePlans) {$True} else {$False}
           ADSync = if ($user.ImmutableId) {$True} else {$False}
@@ -103,31 +104,42 @@ $Users = Get-MsolUser -All | Select ObJectId,LastPasswordChangeTimestamp,Passwor
   
 foreach ($item in $RolesCollection) {
     foreach ($obj in $item) {
-        $obj | Add-Member -MemberType NoteProperty -Name 'PasswordLastChange' -Value ($UsersCollection | Where-Object { $_.ObjectId -eq $obj.ObjectId }).PasswordLastChange
+        $obj | Add-Member -MemberType NoteProperty -Name 'Password Last Change' -Value ($UsersCollection | Where-Object { $_.ObjectId -eq $obj.ObjectId }).PasswordLastChange
         $obj | Add-Member -MemberType NoteProperty -Name 'StrongAuthenticationMethod' -Value ($UsersCollection | Where-Object { $_.ObjectId -eq $obj.ObjectId }).StrongAuthenticationMethod
-        $obj | Add-Member -MemberType NoteProperty -Name 'PasswordNeverExpires' -Value ($UsersCollection | Where-Object { $_.ObjectId -eq $obj.ObjectId }).PasswordNeverExpires
-        $obj | Add-Member -MemberType NoteProperty -Name 'ADSync' -Value ($UsersCollection | Where-Object { $_.ObjectId -eq $obj.ObjectId }).ADSync
-        $obj | Add-Member -MemberType NoteProperty -Name 'MFAEnabled' -Value ($UsersCollection | Where-Object { $_.ObjectId -eq $obj.ObjectId }).MFAEnabled
-        $obj | Add-Member -MemberType NoteProperty -Name 'MFAMethod' -Value ($UsersCollection | Where-Object { $_.ObjectId -eq $obj.ObjectId }).MFAMethod
-        $obj | Add-Member -MemberType NoteProperty -Name 'MFAEnforced' -Value ($UsersCollection | Where-Object { $_.ObjectId -eq $obj.ObjectId }).MFAEnforced
-        $obj | Add-Member -MemberType NoteProperty -Name 'PhoneNumbers' -Value ($UsersCollection | Where-Object { $_.ObjectId -eq $obj.ObjectId }).PhoneNumbers
-        $obj | Add-Member -MemberType NoteProperty -Name 'IsLicensed' -Value ($UsersCollection | Where-Object { $_.ObjectId -eq $obj.ObjectId }).IsLicensed
+        $obj | Add-Member -MemberType NoteProperty -Name 'Password Expiration' -Value ($UsersCollection | Where-Object { $_.ObjectId -eq $obj.ObjectId }).PasswordNeverExpires
+        $obj | Add-Member -MemberType NoteProperty -Name 'AD Sync' -Value ($UsersCollection | Where-Object { $_.ObjectId -eq $obj.ObjectId }).ADSync
+        $obj | Add-Member -MemberType NoteProperty -Name 'MFA Configured' -Value ($UsersCollection | Where-Object { $_.ObjectId -eq $obj.ObjectId }).MFAEnabled
+        $obj | Add-Member -MemberType NoteProperty -Name 'MFA Primary Method' -Value ($UsersCollection | Where-Object { $_.ObjectId -eq $obj.ObjectId }).MFAMethod
+        $obj | Add-Member -MemberType NoteProperty -Name 'MFA per User' -Value ($UsersCollection | Where-Object { $_.ObjectId -eq $obj.ObjectId }).MFAEnforced
+        $obj | Add-Member -MemberType NoteProperty -Name 'Phone Number' -Value ($UsersCollection | Where-Object { $_.ObjectId -eq $obj.ObjectId }).PhoneNumbers
+        $obj | Add-Member -MemberType NoteProperty -Name 'Is Licensed' -Value ($UsersCollection | Where-Object { $_.ObjectId -eq $obj.ObjectId }).IsLicensed
+        if (
+            ($Obj.'Is Licensed' -eq $true) -or
+            ($Obj.'AD Sync' -eq $true) -or
+            ($Obj.'Password Expiration' -eq $false)
+            ) {
+        $obj | Add-Member -MemberType NoteProperty -Name 'Check' -Value 'Warning'}
+        else { $obj | Add-Member -MemberType NoteProperty -Name 'Check' -Value 'Healthy'}
     }
 }
 
-$Export = $RolesCollection | Where-Object {$_.MemberType -ne $null} | Sort-Object UserPrincipalName,RoleName
+
+$Export = $RolesCollection | Where-Object {$_.MemberType -ne $null} | Sort-Object UserPrincipalName,'Role Name'
 
 
 #GENERATE HTML
 mkdir -Force ".\Audit" | Out-Null
 $dateFileString = Get-Date -Format "FileDateTimeUniversal"
-$export | ConvertTo-Html -Property RoleName,Enabled,UserPrincipalName,Name,IsLicensed,ADSync,PasswordNeverExpires,PasswordLastChange,MFAEnforced,MFAEnabled,MFAMethod,PhoneNumbers,WhenCreated `
+$export | ConvertTo-Html -Property 'Check','Role Name',Enabled,UserPrincipalName,Name,'Is Licensed','AD Sync','Last Logon (30d)','Password Expiration','Password Last Change','MFA per User','MFA Configured','MFA Primary Method','Phone Number','When Created' `
     -PreContent "<h1>Audit Roles and Administrators</h1>" "<h2>$DomainOnM365</h2>" -Head $Header -Title "Harden 365 - Audit" -PostContent "<h2>$(Get-Date -UFormat "%d-%m-%Y %T ")</h2>"`
-    | foreach {$PSItem -replace "<td>Global Administrator</td>", "<td style='color: #cc0000;font-weight: bold'>Global Administrator</td>"}`
-    | Out-File .\Audit\Harden365-AuditRoles$dateFileString.html
+    | foreach {$PSItem -replace "<td>Warning</td>", "<td style='color: #cc0000;font-weight: bold'>Warning</td>"}`
+    | foreach {$PSItem -replace "<td>Healthy</td>", "<td style='color: #32cd32;font-weight: bold'>Healthy</td>"}`
+    | Out-File .\Audit\AuditRoles$dateFileString.html
 
-Invoke-Expression .\Audit\Harden365-AuditRoles$dateFileString.html
+$Export | Sort-Object UserPrincipalName,'Role Name' | Select-object 'Check','Role Name',Enabled,UserPrincipalName,Name,'Is Licensed','AD Sync','Last Logon (30d)','Password Expiration','Password Last Change','MFA per User','MFA Configured','MFA Primary Method','Phone Number','When Created' | Export-Csv -Path `
+".\Audit\AuditRolesDetails$dateFileString.csv" -Delimiter ';' -Encoding UTF8 -NoTypeInformation
+
+Invoke-Expression .\Audit\AuditRoles$dateFileString.html
 Write-LogInfo "Audit Roles Administration generated"
 Write-LogSection '' -NoHostOutput
 }
-
