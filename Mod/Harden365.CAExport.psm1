@@ -33,9 +33,8 @@ Function Get-MSOUsersList {
 
 #SCRIPT
 Write-LogSection 'EXPORT USERS LIST' -NoHostOutput
-$DomainOnM365=(Get-MsolDomain | Where-Object { $_.IsInitial -match $true }).Name
 
-$Users = Get-MsolUser -All | Where-Object {$_.IsLicensed -eq $true} | Select UserPrincipalName,WhenCreated,LastPasswordChangeTimestamp,PasswordNeverExpires,StrongAuthenticationMethods, `
+$Users = Get-MsolUser -All | Where-Object {$_.IsLicensed -eq $true} | Select-Object UserPrincipalName,WhenCreated,LastPasswordChangeTimestamp,PasswordNeverExpires,StrongAuthenticationMethods, `
                                                                         @{Name = 'PhoneNumbers'; Expression = {($_.StrongAuthenticationUserDetails).PhoneNumber}},
                                                                         @{Name = 'LicensePlans'; Expression = {(($_.licenses).Accountsku).SkupartNumber}}
 
@@ -62,7 +61,7 @@ $ExportUsers = @()
                    default { $licenseNames = $licenseNames }
                     }
 
-            $MFAMethod = (($user.StrongAuthenticationMethods) | ? {$_.IsDefault -eq $true}).MethodType
+            $MFAMethod = (($user.StrongAuthenticationMethods) | Where-Object {$_.IsDefault -eq $true}).MethodType
             Switch ($MFAMethod) {
                    "OneWaySMS" { $MFAMethod = "SMS token" }
                    "TwoWayVoiceMobile" { $MFAMethod = "Phone call verification" }
@@ -84,7 +83,6 @@ $ExportUsers = @()
                 $ExportUsers += New-Object PSObject -Property $Props
                 }
      
-$dateFileString = Get-Date -Format "FileDateTimeUniversal"
 mkdir -Force ".\Input" | Out-Null
 $ExportUsers | Sort-Object  UserPrincipalName,Licenses | Select-object UserPrincipalName,Licenses,"When Created","Password LastChange","Password NeverExpires","MFA Enabled","MFA Enforced","MFA Method",PhoneNumbers,ImportPhoneNumber | Export-Csv -Path `
 ".\Input\ImportPhoneNumbers.csv" -Delimiter ';' -Encoding UTF8 -NoTypeInformation

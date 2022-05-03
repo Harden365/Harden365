@@ -54,7 +54,6 @@ Write-LogSection 'MICROSOFT DEFENDER FOR OFFICE365' -NoHostOutput
 
 
 #SCRIPT
-$DomainOnM365=(Get-AcceptedDomain | Where-Object { $_.InitialDomain -match $true}).Name
     if ((Get-AntiPhishRule).name -ne $RuleName)
     {
         Try { 
@@ -148,7 +147,6 @@ Function Start-DefenderO365P1SafeLinks {
 
 
 #SCRIPT
-$DomainOnM365=(Get-AcceptedDomain | Where-Object { $_.InitialDomain -match $true}).Name
 
     if ((Get-SafeLinksRule).name -ne $RuleName)
     {

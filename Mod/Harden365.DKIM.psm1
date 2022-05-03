@@ -44,21 +44,21 @@ $Domains=(Get-AcceptedDomain | Where-Object { $_.DomainName -notmatch "onmicroso
 
 foreach ($Domain in $Domains) {
     $SPFResultes = Resolve-DnsName -Type TXT -Name $Domain -erroraction 'silentlycontinue'
-        If ($SPFResultes -eq $Null){
+        If ($Null -eq $SPFResultes){
             Write-LogWarning "No SPF Setting Found in $domain"
         } Else {
             $SPFResultesStrings =  ($SPFResultes   | Where-Object { $_.Strings -match "v=spf1"}).Strings
             Write-LogInfo "$Domain : Check SPF - $SPFResultesStrings"
         }
     $DKIMResultes = Resolve-DnsName -Type CNAME -Name selector1._domainkey.$Domain -erroraction 'silentlycontinue'
-        If ($DKIMResultes -eq $Null){
+        If ($Null -eq $DKIMResultes){
             Write-LogWarning "No DKIM Setting Found in $Domain"
         } Else {
             $DKIMResultesString =  $DKIMResultes.NameHost
             Write-LogInfo "$Domain : Check DKIM - $DKIMResultesString"
         }
     $DMARCResultes = Resolve-DnsName -Type Txt -Name _dmarc.$Domain -erroraction 'silentlycontinue'
-        If ($DMARCResultes -eq $Null){
+        If ($Null -eq $DMARCResultes){
             Write-LogWarning "No DMARC Setting Found in $Domain"
         } Else {
             $DMARCResultesStrings =  ($DMARCResultes   | Where-Object { $_.Name -match "_dmarc"}).Strings
@@ -108,7 +108,7 @@ foreach ($Domain in $Domains){
                                 }
                                 }
                                 
-                             if ($DKIMResults -ne $null){
+                             if ($null -ne $DKIMResults){
                                 $exportconfig = $true
                                 Write-LogWarning "Please get file csv in folder .\Output and insert records in Domain Registrar for $DKIMResults"
                                 }
@@ -133,7 +133,7 @@ foreach ($Domain in $Domains){
 $DMARCRecords = @{}
 foreach ($Domain in $Domains) {
     $DMARCResultes = Resolve-DnsName -Type Txt -Name _dmarc.$Domain -erroraction 'silentlycontinue'
-        If ($DMARCResultes -eq $Null){
+        If ($Null -eq $DMARCResultes){
             $exportcsvdmarc = $true
             Write-LogInfo "$Domain : No DMARC - Export csv"
             Write-LogWarning "$Domain : Please get file csv in folder .\Output and insert records in Domain Registrar"
@@ -142,7 +142,7 @@ foreach ($Domain in $Domains) {
         }
 if ($exportcsvdmarc -eq $true) {
 mkdir -Force ".\Output" | Out-Null
-$DMARCRecords.keys | Select @{l='Record';e={$_}},@{l='Value';e={$DMARCRecords.$_}} | Export-Csv -Path `.\Output\DNSRecord_DMARC.csv -Delimiter ';' -Encoding UTF8 -NoTypeInformation}
+$DMARCRecords.keys | Select-Object @{l='Record';e={$_}},@{l='Value';e={$DMARCRecords.$_}} | Export-Csv -Path `.\Output\DNSRecord_DMARC.csv -Delimiter ';' -Encoding UTF8 -NoTypeInformation}
 else {
 Write-LogInfo "$Domain : DMARC - Already created"}
         
@@ -180,7 +180,7 @@ foreach ($Domain in $Domains){
                     Write-LogInfo "$Domain : DKIM Enabled"
                     } 
                   }
-            if ($DKIMResults -ne $null){
+            if ($null -ne $DKIMResults){
             Write-LogWarning "Please get file csv in folder .\Output and insert records in Domain Registrar for $DKIMResults"
             }
 
