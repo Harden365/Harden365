@@ -43,7 +43,7 @@ Function Start-ImportPhoneNumbers
 Write-LogSection 'IMPORT PHONE NUMBERS' -NoHostOutput
 
 # Module Graph Identity
-if($(Get-Command "Get-MgUserAuthenticationPhoneMethod" -ErrorAction:SilentlyContinue).Version -eq $null){
+if($null -eq $(Get-Command "Get-MgUserAuthenticationPhoneMethod" -ErrorAction:SilentlyContinue).Version){
 
 Write-LogInfo "Installing Powershell Module Graph Identity"
 Install-module Microsoft.Graph.Identity.Signins -ErrorAction:SilentlyContinue -Scope CurrentUser -Confirm

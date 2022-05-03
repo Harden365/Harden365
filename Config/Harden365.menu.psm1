@@ -139,6 +139,8 @@ $AuditMenu = CreateMenu -MenuTitle "HARDEN 365 - AUDIT" -MenuOptions @("Audit Mi
                 write-host $FrontStyle -ForegroundColor Red
                 write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; write-host("AUDIT USERS WITH LICENCES") -ForegroundColor Red
                 write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; Write-host ('Connecting to  MSOL Service') -ForegroundColor Green
+                try { Get-AzureADTenantDetail | Out-Null 
+                } catch {Connect-AzureAD -Credential $Credential | Out-Null} 
                 Connect-MsolService -Credential $Credential | Out-Null
 
                 $scriptFunctions=(Get-ChildItem function: | Where-Object { $_.source -match 'Get-MSOAuditUsers'})
@@ -295,7 +297,7 @@ $MessagingMenu = CreateMenu -MenuTitle "HARDEN 365 - MESSAGING" -MenuOptions @("
              write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; Write-host ('Connecting to ExchangeOnline Powershell') -ForegroundColor Green
              try {Get-OrganizationConfig | Out-Null 
              } catch {Connect-ExchangeOnline  -Credential $Credential -WarningAction:SilentlyContinue -ShowBanner:$false}
-             $scriptFunctions=(Get-ChildItem function: | Where-Object { ($_.source -match 'Harden365.ExchangeOnline') -and ($_.Name -notmatch 'Start-EOPCheckAutoForward') })
+             $scriptFunctions=(Get-ChildItem function: | Where-Object { ($_.source -match 'Harden365.ExchangeOnline') -and ($_.Name -notmatch 'Start-EOPCheckAutoForward') -and ($_.Name -notmatch 'Start-EOPCheckDelegation') }) 
              $scriptFunctions | ForEach-Object {
              Try { 
              & $_.Name  -ErrorAction:SilentlyContinue | Out-Null
@@ -311,7 +313,7 @@ $MessagingMenu = CreateMenu -MenuTitle "HARDEN 365 - MESSAGING" -MenuOptions @("
              write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; Write-host ('Connecting to ExchangeOnline Powershell') -ForegroundColor Green
              try {Get-OrganizationConfig | Out-Null 
              } catch {Connect-ExchangeOnline  -Credential $Credential -WarningAction:SilentlyContinue -ShowBanner:$false}
-             $scriptFunctions=(Get-ChildItem function: | Where-Object { ($_.source -match 'Harden365.ExchangeOnline') -and ($_.Name -notmatch 'Start-EOPCheckAutoForward') })
+             $scriptFunctions=(Get-ChildItem function: | Where-Object { ($_.source -match 'Harden365.ExchangeOnline') -and ($_.Name -notmatch 'Start-EOPCheckAutoForward') -and ($_.Name -notmatch 'Start-EOPCheckDelegation') }) 
              $scriptFunctions | ForEach-Object {
              Try { 
              & $_.Name  -ErrorAction:SilentlyContinue | Out-Null

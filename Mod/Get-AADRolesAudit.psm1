@@ -69,8 +69,9 @@ Try {
     ForEach ($Role In $Roles){
     $Members = Get-AzureADDirectoryRoleMember -ObjectId $Role.ObjectId 
     ForEach ($Member In $Members) {
-    start-sleep -Seconds 1
     $UPN = $Member.UserPrincipalName
+    Write-LogInfo "Check $UPN"
+    start-sleep -Seconds 1
     $objrole = New-Object PSObject -Property @{
       ObjectId = $Member.ObjectId
       'Role Name' = $Role.DisplayName
@@ -111,7 +112,7 @@ foreach ($item in $RolesCollection) {
     foreach ($obj in $item) {
         $obj | Add-Member -MemberType NoteProperty -Name 'Password Last Change' -Value ($UsersCollection | Where-Object { $_.ObjectId -eq $obj.ObjectId }).PasswordLastChange
         $obj | Add-Member -MemberType NoteProperty -Name 'StrongAuthenticationMethod' -Value ($UsersCollection | Where-Object { $_.ObjectId -eq $obj.ObjectId }).StrongAuthenticationMethod
-        $obj | Add-Member -MemberType NoteProperty -Name 'Password Expiration' -Value ($UsersCollection | Where-Object { $_.ObjectId -eq $obj.ObjectId }).PasswordNeverExpires
+        $obj | Add-Member -MemberType NoteProperty -Name 'Never Expire' -Value ($UsersCollection | Where-Object { $_.ObjectId -eq $obj.ObjectId }).PasswordNeverExpires
         $obj | Add-Member -MemberType NoteProperty -Name 'AD Sync' -Value ($UsersCollection | Where-Object { $_.ObjectId -eq $obj.ObjectId }).ADSync
         $obj | Add-Member -MemberType NoteProperty -Name 'MFA Configured' -Value ($UsersCollection | Where-Object { $_.ObjectId -eq $obj.ObjectId }).MFAEnabled
         $obj | Add-Member -MemberType NoteProperty -Name 'MFA Primary Method' -Value ($UsersCollection | Where-Object { $_.ObjectId -eq $obj.ObjectId }).MFAMethod
@@ -121,7 +122,7 @@ foreach ($item in $RolesCollection) {
         if (
             ($Obj.'Is Licensed' -eq $true) -or
             ($Obj.'AD Sync' -eq $true) -or
-            (($Obj.'Password Expiration' -eq $false) -and ($Obj.'MFA Configured' -eq $false))
+            (($Obj.'Never Expire' -eq $true) -and ($Obj.'MFA Configured' -eq $false))
             ) {
         $obj | Add-Member -MemberType NoteProperty -Name 'Check' -Value 'Warning'}
         else { $obj | Add-Member -MemberType NoteProperty -Name 'Check' -Value 'Healthy'}
@@ -135,13 +136,13 @@ $Export = $RolesCollection | Where-Object {$null -ne $_.MemberType} | Sort-Objec
 #GENERATE HTML
 mkdir -Force ".\Audit" | Out-Null
 $dateFileString = Get-Date -Format "FileDateTimeUniversal"
-$export | ConvertTo-Html -Property 'Check','Role Name',Enabled,UserPrincipalName,Name,'Is Licensed','AD Sync','Last Logon (30d)','Password Expiration','Password Last Change','MFA per User','MFA Configured','MFA Primary Method','Phone Number','When Created' `
+$export | ConvertTo-Html -Property 'Check','Role Name',Enabled,UserPrincipalName,Name,'Is Licensed','AD Sync','Last Logon (30d)','Never Expire','Password Last Change','MFA per User','MFA Configured','MFA Primary Method','Phone Number','When Created' `
     -PreContent "<h1>Audit Roles and Administrators</h1>" "<h2>$DomainOnM365</h2>" -Head $Header -Title "Harden 365 - Audit" -PostContent "<h2>$(Get-Date -UFormat "%d-%m-%Y %T ")</h2>"`
     | foreach-Object {$PSItem -replace "<td>Warning</td>", "<td style='color: #cc0000;font-weight: bold'>Warning</td>"}`
     | foreach-Object {$PSItem -replace "<td>Healthy</td>", "<td style='color: #32cd32;font-weight: bold'>Healthy</td>"}`
     | Out-File .\Audit\AuditRoles$dateFileString.html
 
-$Export | Sort-Object UserPrincipalName,'Role Name' | Select-object 'Check','Role Name',Enabled,UserPrincipalName,Name,'Is Licensed','AD Sync','Last Logon (30d)','Password Expiration','Password Last Change','MFA per User','MFA Configured','MFA Primary Method','Phone Number','When Created' | Export-Csv -Path `
+$Export | Sort-Object UserPrincipalName,'Role Name' | Select-object 'Check','Role Name',Enabled,UserPrincipalName,Name,'Is Licensed','AD Sync','Last Logon (30d)','Never Expire','Password Last Change','MFA per User','MFA Configured','MFA Primary Method','Phone Number','When Created' | Export-Csv -Path `
 ".\Audit\AuditRolesDetails$dateFileString.csv" -Delimiter ';' -Encoding UTF8 -NoTypeInformation
 
 Invoke-Expression .\Audit\AuditRoles$dateFileString.html

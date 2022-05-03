@@ -21,7 +21,7 @@ Function Get-MSOAuditUsers {
          
     #>
 
-
+Write-LogSection 'AUDIT USERS' -NoHostOutput
 
 #SCRIPT
 
@@ -82,8 +82,12 @@ $Users = Get-MsolUser -All | Where-Object {$_.IsLicensed -eq $true} | Select-Obj
                                                                         @{Name = 'LicensePlans'; Expression = {(($_.licenses).Accountsku).SkupartNumber}}
 
 $ExportUsers = @()
+     Try {
           foreach ($user in $Users) {
-
+            $UPN = $user.UserPrincipalName
+            Write-LogInfo "Check $UPN"
+            start-sleep -Seconds 1
+            $LastLogon = (Get-AzureADAuditSignInLogs -top 1 -Filter "UserPrincipalName eq '$UPN'").CreatedDateTime
             $LicenseNames = $user.LicensePlans
             Switch -Wildcard ($LicenseNames) {
                    "*FLOW_FREE" { $LicenseNames = "" }
@@ -113,31 +117,38 @@ $ExportUsers = @()
                     }
 
                $Props = @{
-                "UserPrincipalName" =  $user.UserPrincipalName
+                "Check" = if (($user.PasswordNeverExpires -eq $true) -and (!$user.StrongAuthenticationMethods)) {'Warning'} else {'Healthy'}
+                "UserPrincipalName" =  $user.UserPrincipalName 
                 "When Created" =  $user.WhenCreated
                 "Password LastChange" =  $user.LastPasswordChangeTimestamp
-                "Password NeverExpires" = $user.PasswordNeverExpires
+                "Never Expire" = $user.PasswordNeverExpires
+                "Last Logon (30d)" = $LastLogon
                 "Licenses" = $LicenseNames
-                "ADSync" = if ($user.ImmutableId) {$True} else {$False}
-                "MFA Enabled" = if ($user.StrongAuthenticationMethods) {$True} else {$False}
-                "MFA Method" = $MFAMethod
-                "MFA Enforced" = if ($user.StrongAuthenticationRequirements) {$True} else {$False}
-                "PhoneNumbers" =  $user.PhoneNumbers
+                "AD Sync" = if ($user.ImmutableId) {$True} else {$False}
+                "MFA CONFIGURED" = if ($user.StrongAuthenticationMethods) {$True} else {$False}
+                "MFA PRIMARY METHOD" = $MFAMethod
+                "MFA PER USER" = if ($user.StrongAuthenticationRequirements) {$True} else {$False}
+                "Phone Number" =  $user.PhoneNumbers
                 }
                 $ExportUsers += New-Object PSObject -Property $Props
                 }
+    } catch { Write-LogError " Users Collection building error"}
      
 $dateFileString = Get-Date -Format "FileDateTimeUniversal"
 mkdir -Force ".\Audit" | Out-Null
-$ExportUsers | Sort-Object  UserPrincipalName,Licenses | Select-object UserPrincipalName,Licenses,AdSync,"When Created","Password LastChange","Password NeverExpires","MFA Enabled","MFA Enforced","MFA Method",PhoneNumbers | Export-Csv -Path `
-".\Audit\AuditUsersDetails$dateFileString.csv" -Delimiter ';' -Encoding UTF8 -NoTypeInformation
+$ExportUsers | Sort-Object  UserPrincipalName,Licenses | Select-object "Check",UserPrincipalName,Licenses,"Ad Sync","Never Expire","Password LastChange","MFA PER USER","MFA CONFIGURED","MFA PRIMARY METHOD","Phone Number","When Created"`
+ | Export-Csv -Path ".\Audit\AuditUsersDetails$dateFileString.csv" -Delimiter ';' -Encoding UTF8 -NoTypeInformation
 
 
 #GENERATE HTML
-$ExportUsers | Sort-Object  UserPrincipalName,Licenses,ADSync,"When Created","Password LastChange","Password NeverExpires","MFA Enabled","MFA Enforced","MFA Method",PhoneNumbers | ConvertTo-Html -Property  UserPrincipalName,Licenses,ADSync,"When Created","Password LastChange","Password NeverExpires","MFA Enabled","MFA Enforced","MFA Method",PhoneNumbers `
-    -PreContent "<h1>Audit Users Detail</h1>" "<h2>$DomainOnM365</h2>" -Head $Header -Title "OGIC - Audit" -PostContent "<h2>$(Get-Date)</h2>"`
+$ExportUsers | Sort-Object  UserPrincipalName,Licenses,"AD Sync","Last Logon (30d)","Never Expire","Password LastChange","MFA PER USER","MFA CONFIGURED","MFA PRIMARY METHOD","Phone Number","When Created" | ConvertTo-Html -Property  "Check",UserPrincipalName,Licenses,"AD Sync","Last Logon (30d)","Never Expire","Password LastChange","MFA PER USER","MFA CONFIGURED","MFA PRIMARY METHOD","Phone Number","When Created" `
+    -PreContent "<h1>Audit Users Detail</h1>" "<h2>$DomainOnM365</h2>" -Head $Header -PostContent "<h2>$(Get-Date)</h2>"`
+    | foreach-Object {$PSItem -replace "<td>Warning</td>", "<td style='color: #cc0000;font-weight: bold'>Warning</td>"}`
+    | foreach-Object {$PSItem -replace "<td>Healthy</td>", "<td style='color: #32cd32;font-weight: bold'>Healthy</td>"}`
     | Out-File .\Audit\Harden365-AuditUsersDetails$dateFileString.html
 
-Invoke-Expression .\Audit\Harden365-AuditUsersDetails$dateFileString.html  
+Invoke-Expression .\Audit\Harden365-AuditUsersDetails$dateFileString.html 
+Write-LogInfo "Audit Users Detail generated"
+Write-LogSection '' -NoHostOutput 
 }
 

@@ -17,9 +17,9 @@
         Create group for Antispam strict policy
         Create Antispam Strict Policy and Rule
         Create Antispam Standard Policy and Rule
+        Create Antiforward Standard Policy and Rule
         Create Antimalware Policy and Rule
         Create transport rules to warm user for Office files with macro
-        Create transport rules to block AutoForwarding mail out Organization
         Enable Unified Audit Log
 #>
 Function Start-EOEnableAuditLog {
@@ -95,7 +95,7 @@ $DomainOnM365=(Get-AcceptedDomain | Where-Object { $_.InitialDomain -match $true
     }
     else { 
             Try {
-            New-Mailbox -Name $Name -Alias "AlertsMailbox" –Shared -PrimarySmtpAddress "$alias@$DomainOnM365"
+            New-Mailbox -Name $Name -Alias "AlertsMailbox" ï¿½Shared -PrimarySmtpAddress "$alias@$DomainOnM365"
             Set-Mailbox -Identity "$alias@$DomainOnM365" -HiddenFromAddressListsEnabled $true
             
             #DMARC Config
@@ -112,7 +112,7 @@ $DomainOnM365=(Get-AcceptedDomain | Where-Object { $_.InitialDomain -match $true
 }
 
 
-Function Start-EOPAutoForwardGroup {
+Function Start-EOAutoForwardGroup {
      <#
         .Synopsis
          Create group for autoforward excluded
@@ -127,14 +127,13 @@ Function Start-EOPAutoForwardGroup {
 
 	param(
 	[Parameter(Mandatory = $false)]
-	[String]$Name = "Harden365 - GP AutoForward Exclude",
-    [String]$Alias = "gp_autoforward_exclude",
+	[String]$Name = "Harden365 - GP AutoForward Allow",
+    [String]$Alias = "gp_autoforward_Allow",
     [String]$Members = ""
 )
 
 
 #SCRIPT
-$DomainOnM365=(Get-AcceptedDomain | Where-Object { $_.InitialDomain -match $true}).Name
 $GroupEOL=(Get-UnifiedGroup | Where-Object { $_.DisplayName -eq $Name}).Name
     if (-not $GroupEOL)
         {
@@ -175,7 +174,6 @@ Function Start-EOPAntispamGroupStrict {
 
 
 #SCRIPT
-$DomainOnM365=(Get-AcceptedDomain | Where-Object { $_.InitialDomain -match $true}).Name
 $GroupEOL=(Get-UnifiedGroup | Where-Object { $_.DisplayName -eq $Name}).Name
     if (-not $GroupEOL)
         {
@@ -224,12 +222,10 @@ Function Start-EOPAntispamPolicyStrict {
 	[String]$RecipientLimitInternalPerHour = "800",
 	[String]$RecipientLimitPerDay = "800",
 	[String]$ActionWhenThresholdReached = "BlockUser",
+    [String]$AutoForwardingMode = "Off",
 	[String]$GroupStrict = "Harden365 - GP Antispam strict",
 	[String]$Priority = "0"
 )
-
-
-$DomainOnM365=(Get-AcceptedDomain | Where-Object { $_.InitialDomain -match $true}).Name
 
 
 #SCRIPT INBOUND
@@ -258,7 +254,7 @@ $DomainOnM365=(Get-AcceptedDomain | Where-Object { $_.InitialDomain -match $true
     } else
     {
         Try { 
-            New-HostedOutboundSpamFilterPolicy -Name $PolicyOutboundName -RecipientLimitExternalPerHour $RecipientLimitExternalPerHour -RecipientLimitInternalPerHour $RecipientLimitInternalPerHour -RecipientLimitPerDay $RecipientLimitPerDay -ActionWhenThresholdReached $ActionWhenThresholdReached
+            New-HostedOutboundSpamFilterPolicy -Name $PolicyOutboundName -RecipientLimitExternalPerHour $RecipientLimitExternalPerHour -RecipientLimitInternalPerHour $RecipientLimitInternalPerHour -RecipientLimitPerDay $RecipientLimitPerDay -ActionWhenThresholdReached $ActionWhenThresholdReached -AutoForwardingMode $AutoForwardingMode
             Write-LogInfo "$PolicyOutboundName created"
             New-HostedOutboundSpamFilterRule -Name $RuleOutboundName -HostedOutboundSpamFilterPolicy $PolicyOutboundName -Priority $Priority -FromMemberOf $GroupStrict
             Write-LogInfo "$RuleOutboundName created"
@@ -299,12 +295,11 @@ Function Start-EOPAntispamPolicyStandard {
 	[String]$RecipientLimitInternalPerHour = "1000",
 	[String]$RecipientLimitPerDay = "1000",
 	[String]$ActionWhenThresholdReached = "BlockUser",
+    [String]$AutoForwardingMode = "Off",
 	[String]$ExceptIfFromMemberOf = "",
 	[String]$Priority = "0"
 )
 
-
-$DomainOnM365=(Get-AcceptedDomain | Where-Object { $_.InitialDomain -match $true}).Name
 
 #SCRIPT INBOUND
     if ((Get-HostedContentFilterRule).name -eq $RuleInboundName)
@@ -333,14 +328,58 @@ $DomainOnM365=(Get-AcceptedDomain | Where-Object { $_.InitialDomain -match $true
     } else
     {
          Try { 
-            Set-HostedOutboundSpamFilterPolicy -Identity "Default" -RecipientLimitExternalPerHour $RecipientLimitExternalPerHour -RecipientLimitInternalPerHour $RecipientLimitInternalPerHour -RecipientLimitPerDay $RecipientLimitPerDay -ActionWhenThresholdReached $ActionWhenThresholdReached
-            New-HostedOutboundSpamFilterPolicy -Name $PolicyOutboundName -RecipientLimitExternalPerHour $RecipientLimitExternalPerHour -RecipientLimitInternalPerHour $RecipientLimitInternalPerHour -RecipientLimitPerDay $RecipientLimitPerDay -ActionWhenThresholdReached $ActionWhenThresholdReached
+            Set-HostedOutboundSpamFilterPolicy -Identity "Default" -RecipientLimitExternalPerHour $RecipientLimitExternalPerHour -RecipientLimitInternalPerHour $RecipientLimitInternalPerHour -RecipientLimitPerDay $RecipientLimitPerDay -ActionWhenThresholdReached $ActionWhenThresholdReached -AutoForwardingMode $AutoForwardingMode
+            New-HostedOutboundSpamFilterPolicy -Name $PolicyOutboundName -RecipientLimitExternalPerHour $RecipientLimitExternalPerHour -RecipientLimitInternalPerHour $RecipientLimitInternalPerHour -RecipientLimitPerDay $RecipientLimitPerDay -ActionWhenThresholdReached $ActionWhenThresholdReached -AutoForwardingMode $AutoForwardingMode
             Write-LogInfo "$PolicyOutboundName created"
             New-HostedOutboundSpamFilterRule -Name $RuleOutboundName -HostedOutboundSpamFilterPolicy $PolicyOutboundName -Priority $Priority -SenderDomainIs ((Get-AcceptedDomain).Name)
             Write-LogInfo "$RuleOutboundName created"
-            if ($ExceptIfFromMemberOf -ne ""){
-            Set-HostedOutboundSpamFilterPolicy -Identity $PolicyOutboundName -ExceptIfFromMemberOf $ExceptIfFromMemberOf}
-            Write-LogInfo "$PolicyInboundName created"
+        } Catch {
+                Write-LogError "$PolicyInboundName not created!"
+                }
+         }
+}
+
+
+Function Start-EOPAntiForwardPolicy {
+     <#
+        .Synopsis
+         Create Antiforward Policy and Rule
+        
+        .Description
+         This function will create new Antiforward Standard Policy
+
+        .Notes
+         Version: 01.00 -- 
+         
+    #>
+
+	param(
+	[Parameter(Mandatory = $false)]
+    [String]$PolicyOutboundName = "Harden365 - AntiForward Outbound Policy",
+    [String]$RuleOutboundName = "Harden365 - AntiForward Outbound Rule",
+    [String]$RecipientLimitExternalPerHour = "500",
+	[String]$RecipientLimitInternalPerHour = "1000",
+	[String]$RecipientLimitPerDay = "1000",
+    [String]$AutoForwardingMode = "On",
+	[String]$ActionWhenThresholdReached = "BlockUser",
+    [String]$FromMemberOf = "gp_autoforward_Allow",
+	[String]$ExceptIfFromMemberOf = "",
+	[String]$Priority = "0"
+)
+
+
+#SCRIPT OUTBOUND
+    if ((Get-HostedOutboundSpamFilterRule).name -eq $RuleOutboundName)
+    {
+        Write-LogWarning "$PolicyInboundName already created!"
+        
+    } else
+    {
+         Try { 
+            New-HostedOutboundSpamFilterPolicy -Name $PolicyOutboundName -RecipientLimitExternalPerHour $RecipientLimitExternalPerHour -RecipientLimitInternalPerHour $RecipientLimitInternalPerHour -RecipientLimitPerDay $RecipientLimitPerDay -ActionWhenThresholdReached $ActionWhenThresholdReached -AutoForwardingMode $AutoForwardingMode
+            Write-LogInfo "$PolicyOutboundName created"
+            New-HostedOutboundSpamFilterRule -Name $RuleOutboundName -HostedOutboundSpamFilterPolicy $PolicyOutboundName -Priority $Priority -FromMemberOf $FromMemberOf
+            Write-LogInfo "$RuleOutboundName created"
         } Catch {
                 Write-LogError "$PolicyInboundName not created!"
                 }
@@ -434,7 +473,7 @@ $WarmDisclaimerEN="<table border=0 cellspacing=0 cellpadding=0 align=left width=
  15px`" color=`"#212121`">
 <div><p><span style='font-size:11pt;font-family:Arial,sans-serif;color:
 #212121'>
-<b>CAUTION:</b> Do not open these types of files—unless you were expecting them—because the files may contain malicious code and knowing the sender isn't a guarantee of safety.
+<b>CAUTION:</b> Do not open these types of filesï¿½unless you were expecting themï¿½because the files may contain malicious code and knowing the sender isn't a guarantee of safety.
 </span></p></div>
 </td></tr></table>"
 
@@ -447,12 +486,12 @@ $WarmDisclaimerFR="<table border=0 cellspacing=0 cellpadding=0 align=left width=
  15px`" color=`"#212121`">
 <div><p><span style='font-size:11pt;font-family:Arial,sans-serif;color:
 #212121'>
-<b>CAUTION:</b> N’ouvrez pas ces types de fichiers, sauf si vous vous y attendiez, car les fichiers peuvent contenir du code malveillant et connaître l’expéditeur n’est pas une garantie de sécurité.
+<b>CAUTION:</b> Nï¿½ouvrez pas ces types de fichiers, sauf si vous vous y attendiez, car les fichiers peuvent contenir du code malveillant et connaï¿½tre lï¿½expï¿½diteur nï¿½est pas une garantie de sï¿½curitï¿½.
 </span></p></div>
 </td></tr></table>"
 
 
-$DomainOnM365=(Get-AcceptedDomain | Where-Object { $_.InitialDomain -match $true}).Name
+
 
 #SCRIPT
     if ((Get-TransportRule).name -eq $RuleName)
@@ -467,54 +506,8 @@ $DomainOnM365=(Get-AcceptedDomain | Where-Object { $_.InitialDomain -match $true
            } Catch {
                 Write-LogError "$RuleName not created!"
                 }
-}         
 }
-
-
-Function Start-EOPAutoForwardRule {
-     <#
-        .Synopsis
-         Create transport rules to block AutoForwarding mail out Organization
-        
-        .Description
-         This function will create new AutoForward Policy
-
-        .Notes
-         Version: 01.00 -- 
-         
-    #>
-
-	param(
-	[Parameter(Mandatory = $false)]
-    [String]$RuleName = "Harden365 - Prevent autoforwarding of email to external domains",
-    [String]$Mode = "Enforce",
-    [Boolean]$Enabled = $false,
-    [String]$RuleErrorAction = "Ignore",
-    [String]$FromScope = "InOrganization",
-    [String]$SentToScope = "NotInOrganization",
-    [String]$MessageTypeMatches = "AutoForward",
-    [String]$GroupExclude = "gp_autoforward_exclude",
-	[String]$Priority = "1"
-)
-
-
-#SCRIPT
-$ForwardDisclaimerEN="Auto-forwarding email outside this organization is prevented for security reasons."
-$DomainOnM365=(Get-AcceptedDomain | Where-Object { $_.InitialDomain -match $true}).Name
-    if ((Get-TransportRule).name -eq $RuleName)
-    {
-         Write-LogWarning "$RuleName already created"
-    } else
-    {
-            Try { 
-            New-TransportRule -Name $RuleName -Priority $Priority -Mode $Mode -Enabled $Enabled -RuleErrorAction $RuleErrorAction  -FromScope $FromScope -SentToScope $SentToScope -MessageTypeMatches $MessageTypeMatches -RejectMessageReasonText "$ForwardDisclaimerEN" -ExceptIfFromMemberOf "$GroupExclude@$DomainOnM365"
-            Start-Sleep -Seconds 2
-            Write-LogInfo "$RuleName created"
-            } Catch {
-                Write-LogError "$RuleName not created"
-                }
-    }
-Write-LogSection '' -NoHostOutput
+Write-LogSection '' -NoHostOutput         
 }
 
 
@@ -537,7 +530,7 @@ Function Start-EOPCheckAutoForward {
 #SCRIPT
             # Check autoforwarding in transport rule
             Write-Loginfo "Check autoforwarding in transport rule"
-            $Forwards=Get-TransportRule | Where-Object {$_.RedirectMessageTo -ne $null} | ForEach-Object {
+            Get-TransportRule | Where-Object {$null -ne $_.RedirectMessageTo} | ForEach-Object {
             if ($_ -ne $null) {
             Write-LogWarning "Autoforwarding found in rule $($_.Name)  to $($_.RedirectMessageTo)"
             }
@@ -545,7 +538,7 @@ Function Start-EOPCheckAutoForward {
 
             # Check autoforwarding in exchange admin mailbox setting
             Write-LogInfo "Check autoforwarding in mailbox settings"
-            $Forwards=((Get-Mailbox -ResultSize Unlimited) | ? { ($_.ForwardingAddress -ne $null) -or ($_.ForwardingsmtpAddress -ne $null)}) | ForEach-Object {
+            ((Get-Mailbox -ResultSize Unlimited) | Where-Object { ($null -ne $_.ForwardingAddress) -or ($null -ne $_.ForwardingsmtpAddress)}) | ForEach-Object {
             if ($_ -ne $null) {
             Write-LogWarning "Autoforwarding found in $($_.UserPrincipalName)  to $($_.ForwardingAddress -split "SMTP:") $($_.ForwardingSmtpAddress -split "SMTP:")"
             }
@@ -555,10 +548,36 @@ Function Start-EOPCheckAutoForward {
             Write-LogInfo "Check autoforwarding in inbox rules"
             $rules=Get-Mailbox -ResultSize Unlimited| ForEach-Object {
             Get-InboxRule -Mailbox $PSItem.primarysmtpaddress -WarningAction:SilentlyContinue }
-            $forwardingRules = $rules | Where-Object {($_.forwardto -ne $null) -or ($_.forwardsattachmentto -ne $null) -or ($_.Redirectto -ne $null)}
+            $forwardingRules = $rules | Where-Object {($null -ne $_.forwardto) -or ($null -ne $_.forwardsattachmentto) -or ($null -ne $_.Redirectto)}
             foreach ($rule in $forwardingRules) {
             Write-LogWarning "Mailbox '$($rule.MailboxOwnerId)' forward to '$($rule.ForwardTo)$($rule.RedirectTo)'"
             }
             
 }
 
+Function Start-EOPCheckDelegation {
+     <#
+        .Synopsis
+         check Mailbox permissions
+        
+        .Description
+         This function will check Mailbox permissions
+
+        .Notes
+         Version: 01.00 -- 
+         
+    #>
+
+	param(
+)
+
+#SCRIPT
+            # Check autoforwarding in transport rule
+            Write-Loginfo "Check permission in all mailbox"
+            $dateFileString = Get-Date -Format "FileDateTimeUniversal"
+            mkdir -Force ".\Audit" | Out-Null
+            Get-Mailbox | where-object {$null -ne $_.GrantSendOnBehalfTo} | select-object Name,Alias,UserPrincipalName,PrimarySmtpAddress,@{l='SendOnBehalfOf';e={$_.GrantSendOnBehalfTo -join ";"}}`
+             | Export-Csv -Path ".\Audit\AuditMailboxPermission$dateFileString.csv" -Delimiter ';' -Encoding UTF8 -NoTypeInformation
+
+            
+}
