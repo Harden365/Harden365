@@ -12,10 +12,11 @@
         Get tenant information
 
     .DESCRIPTION
-        TenantPrimaryDomain
-        TenantEdition.
+        TenantInfos
+        TenantEdition
         Defender ATP
-        Create SafeAttachments Policy
+        HashSyncPassword
+        SSPR
 #>
 Function Check-TenantInfos {
      <#
@@ -84,6 +85,56 @@ elseif (((Get-MsolAccountSku | Where-Object { $_.ActiveUnits -ne "0" } | Select 
 elseif (((Get-MsolAccountSku | Where-Object { $_.ActiveUnits -ne "0" } | Select -ExpandProperty ServiceStatus).ServicePlan).ServiceName -match "EOP_ENTERPRISE")
     { $O365ATP = ((Get-MsolAccountSku | Where-Object { $_.ActiveUnits -ne "0" } | Select -ExpandProperty ServiceStatus).ServicePlan | Where-Object { $_.ServiceName -match "EOP_ENTERPRISE" }).ServiceName
       $TenantEdition = "Exchange Online Protection" }  
+}
+
+Function Check-HashSyncPassword {
+     <#
+        .Synopsis
+         Check Hash Sync Password
+        
+        .Description
+         Check Hash Sync Password
+
+        .Notes
+         Version: 01.00 -- 
+         
+    #>
+
+#SCRIPT
+if ($(Get-MsolCompanyInformation).DirectorySynchronizationEnabled -eq $true) {
+if ($(Get-MsolCompanyInformation).PasswordSynchronizationEnabled -eq $false){ 
+    Write-LogWarning "Hash Sync Password not enabled!"
+    $HashSync = $false
+    }
+else {
+      Write-LogInfo "Hash Sync Password enabled"
+      $HashSync = $true
+      }
+}
+}
+
+Function Check-SSPR {
+     <#
+        .Synopsis
+         Check SSPR
+        
+        .Description
+         Check SSPR
+
+        .Notes
+         Version: 01.00 -- 
+         
+    #>
+
+#SCRIPT
+if ($(Get-MsolCompanyInformation).SelfServePasswordResetEnabled -eq $false) { 
+    Write-LogWarning "SSPR not enabled!"
+    $SSPR = $false
+    }
+else {
+      Write-LogInfo "SSPR enabled"
+      $SSPR = $true
+      }
 }
 
 <#

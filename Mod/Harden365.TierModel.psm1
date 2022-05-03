@@ -18,8 +18,7 @@
 #>
 
 
-Function Start-Tiers0EmergencyAccount
-{
+Function Start-Tiers0EmergencyAccount {
      <#
         .Synopsis
          create user with Global admin assignment.
@@ -81,7 +80,7 @@ $DomainOnM365=(Get-AzureADDomain | Where-Object { $_.IsInitial -match $true }).N
             $uadmin = Get-AzureADUser -Filter "userPrincipalName eq 'u-admin@$DomainOnM365'"
             $globalAdmin = Get-AzureADMSRoleDefinition -Filter "displayName eq 'Global Administrator'"
             Start-Sleep -Seconds 10
-            $roleAssignment = New-AzureADMSRoleAssignment -DirectoryScopeId '/' -RoleDefinitionId $globalAdmin.Id -PrincipalId $uadmin.objectId
+            New-AzureADMSRoleAssignment -DirectoryScopeId '/' -RoleDefinitionId $globalAdmin.Id -PrincipalId $uadmin.objectId
             Write-LogInfo "User 'u-admin@$DomainOnM365' created"
             }
                  Catch {
@@ -91,8 +90,7 @@ $DomainOnM365=(Get-AzureADDomain | Where-Object { $_.IsInitial -match $true }).N
 }
 
 
-Function Start-Tiers0GlobalAdminAccount
-{
+Function Start-Tiers0GlobalAdminAccount {
      <#
         .Synopsis
          create user with Global admin assignment.
@@ -152,7 +150,7 @@ $DomainOnM365=(Get-AzureADDomain | Where-Object { $_.IsInitial -match $true }).N
             $sadmin = Get-AzureADUser -Filter "userPrincipalName eq 's-admin@$DomainOnM365'"
             $globalAdmin = Get-AzureADMSRoleDefinition -Filter "displayName eq 'Global Administrator'"
             Start-Sleep -Seconds 10
-            $roleAssignment = New-AzureADMSRoleAssignment -DirectoryScopeId '/' -RoleDefinitionId $globalAdmin.Id -PrincipalId $sadmin.objectId
+            New-AzureADMSRoleAssignment -DirectoryScopeId '/' -RoleDefinitionId $globalAdmin.Id -PrincipalId $sadmin.objectId
             Write-LogInfo "User 's-admin@$DomainOnM365' created"
             }
                  Catch {
@@ -162,8 +160,7 @@ $DomainOnM365=(Get-AzureADDomain | Where-Object { $_.IsInitial -match $true }).N
 }
 
 
-Function Start-TiersAdminNoExpire
-{
+Function Start-TiersAdminNoExpire {
      <#
         .Synopsis
          Remove users with Global admin assignment.
@@ -192,7 +189,7 @@ $DomainOnM365=(Get-MsolDomain | Where-Object { $_.IsInitial -match $true}).Name
                         Write-LogError "SSPR for Admin not disabled"
                        }
 
-     if ((Get-MsolUser).UserPrincipalName -eq "u-admin@$DomainOnM365")
+     if ((Get-MsolUser -All).UserPrincipalName -eq "u-admin@$DomainOnM365")
         {
          Try {
               Set-MsolUser -UserPrincipalName "u-admin@$DomainOnM365" -PasswordNeverExpires $true
@@ -208,7 +205,7 @@ $DomainOnM365=(Get-MsolDomain | Where-Object { $_.IsInitial -match $true}).Name
           }
 
 
-     if ((Get-MsolUser).UserPrincipalName -eq "s-admin@$DomainOnM365")
+     if ((Get-MsolUser -All).UserPrincipalName -eq "s-admin@$DomainOnM365")
         {
          Try {
               Set-MsolUser -UserPrincipalName "s-admin@$DomainOnM365" -PasswordNeverExpires $true

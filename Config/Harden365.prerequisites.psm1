@@ -75,13 +75,13 @@ function Test-PowerShellModule {
 
     $installedPSModule = Get-InstalledModule $ModuleName -ErrorAction Ignore
     $installedPSModuleVersion = Get-InstalledModule $ModuleName -MinimumVersion $ModuleVersion -ErrorAction Ignore
-    if($installedPSModule -eq $null){
+    if($null -eq $installedPSModule){
         Write-LogInfo ("Installing $ModuleName Powershell Module")
         Check-UserIsAdministrator
         [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
         Install-Module $ModuleName -AllowClobber
         Write-LogWarning "$ModuleName Powershell Module necessary"
-    } elseif ($installedPSModuleVersion -eq $null) {
+    } elseif ($null -eq $installedPSModuleVersion) {
         Write-LogInfo ("Updating $ModuleName Powershell Module")
         Test-UserIsAdministrator
         Pause
@@ -122,7 +122,7 @@ function Test-AllPrerequisites {
     $currentCountOfPrerequisitesCheck++
     Test-PowerShellModule -ModuleName 'Microsoft.Online.SharePoint.PowerShell' -ModuleVersion '16.0' -OperationCount $currentCountOfPrerequisitesCheck -OperationTotal $numberOfPrerequisitesCheck
     $currentCountOfPrerequisitesCheck++
-    Test-PowerShellModule -ModuleName 'MicrosoftTeams' -ModuleVersion '2.6' -OperationCount $currentCountOfPrerequisitesCheck -OperationTotal $numberOfPrerequisitesCheck
+    Test-PowerShellModule -ModuleName 'MicrosoftTeams' -ModuleVersion '4.2.0' -OperationCount $currentCountOfPrerequisitesCheck -OperationTotal $numberOfPrerequisitesCheck
     $currentCountOfPrerequisitesCheck++
     Test-PowerShellModule -ModuleName 'ORCA' -ModuleVersion '2.0' -OperationCount $currentCountOfPrerequisitesCheck -OperationTotal $numberOfPrerequisitesCheck
     $currentCountOfPrerequisitesCheck++
@@ -157,7 +157,7 @@ function Import-AllScriptModules {
     Update-ProgressionBarOuterLoop -Activity 'Prerequisites check' -Status 'In progress' -OperationCount $OperationCount -OperationTotal $OperationTotal
 
     Update-ProgressionBarInnerLoop -Activity 'Script modules load' -Status 'In progress' -OperationCount $currentCountOfModules -OperationTotal $numberOfModules
-    $allModulesPathList | % {
+    $allModulesPathList | ForEach-Object {
         Import-ScriptModule ".\Mod\$_.psm1" -OperationCount $currentCountOfModules -OperationTotal $numberOfModules
         $currentCountOfModules++
     }
@@ -170,7 +170,7 @@ function Import-AllScriptModules {
 }
 
 function Remove-AllHarden365Modules {
-    $allModulesPathList | % {
+    $allModulesPathList | ForEach-Object {
         Remove-Module $_ -ErrorAction SilentlyContinue
     }
 }

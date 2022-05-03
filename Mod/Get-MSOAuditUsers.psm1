@@ -77,7 +77,7 @@ $header = @"
 
 
 
-$Users = Get-MsolUser -All | Where-Object {$_.IsLicensed -eq $true} | Select UserPrincipalName,WhenCreated,ImmutableId,LastPasswordChangeTimestamp,PasswordNeverExpires,StrongAuthenticationMethods, `
+$Users = Get-MsolUser -All | Where-Object {$_.IsLicensed -eq $true} | Select-Object UserPrincipalName,WhenCreated,ImmutableId,LastPasswordChangeTimestamp,PasswordNeverExpires,StrongAuthenticationMethods, `
                                                                         @{Name = 'PhoneNumbers'; Expression = {($_.StrongAuthenticationUserDetails).PhoneNumber}},
                                                                         @{Name = 'LicensePlans'; Expression = {(($_.licenses).Accountsku).SkupartNumber}}
 
@@ -104,7 +104,7 @@ $ExportUsers = @()
                    default { $licenseNames = $licenseNames }
                     }
 
-            $MFAMethod = (($user.StrongAuthenticationMethods) | ? {$_.IsDefault -eq $true}).MethodType
+            $MFAMethod = (($user.StrongAuthenticationMethods) | Where-Object {$_.IsDefault -eq $true}).MethodType
             Switch ($MFAMethod) {
                    "OneWaySMS" { $MFAMethod = "SMS token" }
                    "TwoWayVoiceMobile" { $MFAMethod = "Phone call verification" }

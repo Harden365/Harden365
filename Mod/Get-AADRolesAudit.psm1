@@ -65,9 +65,11 @@ $header = @"
 
 $RolesCollection = @()
 $Roles = Get-AzureADDirectoryRole
-ForEach ($Role In $Roles){
-  $Members = Get-AzureADDirectoryRoleMember -ObjectId $Role.ObjectId 
-  ForEach ($Member In $Members) {
+Try {
+    ForEach ($Role In $Roles){
+    $Members = Get-AzureADDirectoryRoleMember -ObjectId $Role.ObjectId 
+    ForEach ($Member In $Members) {
+    start-sleep -Seconds 1
     $UPN = $Member.UserPrincipalName
     $objrole = New-Object PSObject -Property @{
       ObjectId = $Member.ObjectId
@@ -80,11 +82,13 @@ ForEach ($Role In $Roles){
       'When Created' = ($Member.ExtensionProperty).createdDateTime
       }
       $RolesCollection += $objrole
-  }
-}
+    }
+    }
+} catch { Write-LogError " Roles Collection building error"}
 
-$UsersCollection = @()
-$Users = Get-MsolUser -All | Select ObJectId,UserPrincipalName,LastPasswordChangeTimestamp,PasswordNeverExpires,ImmutableId,StrongAuthenticationMethods, `
+try {
+    $UsersCollection = @()
+    $Users = Get-MsolUser -All | Select-Object ObJectId,UserPrincipalName,LastPasswordChangeTimestamp,PasswordNeverExpires,ImmutableId,StrongAuthenticationMethods, `
                                                                         @{Name = 'PhoneNumbers'; Expression = {($_.StrongAuthenticationUserDetails).PhoneNumber}},
                                                                         @{Name = 'LicensePlans'; Expression = {(($_.licenses).Accountsku).SkupartNumber}}
           foreach ($user in $Users) {
@@ -96,11 +100,12 @@ $Users = Get-MsolUser -All | Select ObJectId,UserPrincipalName,LastPasswordChang
           PasswordLastChange =  $user.LastPasswordChangeTimestamp
           MFAEnforced = $(if ($user.StrongAuthenticationRequirements) {$True} else {$False})
           MFAEnabled = if ($user.StrongAuthenticationMethods) {$True} else {$False}
-          MFAMethod = (($user.StrongAuthenticationMethods) | ? {$_.IsDefault -eq $true}).MethodType
+          MFAMethod = (($user.StrongAuthenticationMethods) | Where-Object {$_.IsDefault -eq $true}).MethodType
           PhoneNumbers =  $user.PhoneNumbers
           }
           $UsersCollection += $objuser
-  }
+     }
+} catch { Write-LogError " Users Collection building error"}
   
 foreach ($item in $RolesCollection) {
     foreach ($obj in $item) {
@@ -116,7 +121,7 @@ foreach ($item in $RolesCollection) {
         if (
             ($Obj.'Is Licensed' -eq $true) -or
             ($Obj.'AD Sync' -eq $true) -or
-            ($Obj.'Password Expiration' -eq $false)
+            (($Obj.'Password Expiration' -eq $false) -and ($Obj.'MFA Configured' -eq $false))
             ) {
         $obj | Add-Member -MemberType NoteProperty -Name 'Check' -Value 'Warning'}
         else { $obj | Add-Member -MemberType NoteProperty -Name 'Check' -Value 'Healthy'}
@@ -124,7 +129,7 @@ foreach ($item in $RolesCollection) {
 }
 
 
-$Export = $RolesCollection | Where-Object {$_.MemberType -ne $null} | Sort-Object UserPrincipalName,'Role Name'
+$Export = $RolesCollection | Where-Object {$null -ne $_.MemberType} | Sort-Object UserPrincipalName,'Role Name'
 
 
 #GENERATE HTML
@@ -132,8 +137,8 @@ mkdir -Force ".\Audit" | Out-Null
 $dateFileString = Get-Date -Format "FileDateTimeUniversal"
 $export | ConvertTo-Html -Property 'Check','Role Name',Enabled,UserPrincipalName,Name,'Is Licensed','AD Sync','Last Logon (30d)','Password Expiration','Password Last Change','MFA per User','MFA Configured','MFA Primary Method','Phone Number','When Created' `
     -PreContent "<h1>Audit Roles and Administrators</h1>" "<h2>$DomainOnM365</h2>" -Head $Header -Title "Harden 365 - Audit" -PostContent "<h2>$(Get-Date -UFormat "%d-%m-%Y %T ")</h2>"`
-    | foreach {$PSItem -replace "<td>Warning</td>", "<td style='color: #cc0000;font-weight: bold'>Warning</td>"}`
-    | foreach {$PSItem -replace "<td>Healthy</td>", "<td style='color: #32cd32;font-weight: bold'>Healthy</td>"}`
+    | foreach-Object {$PSItem -replace "<td>Warning</td>", "<td style='color: #cc0000;font-weight: bold'>Warning</td>"}`
+    | foreach-Object {$PSItem -replace "<td>Healthy</td>", "<td style='color: #32cd32;font-weight: bold'>Healthy</td>"}`
     | Out-File .\Audit\AuditRoles$dateFileString.html
 
 $Export | Sort-Object UserPrincipalName,'Role Name' | Select-object 'Check','Role Name',Enabled,UserPrincipalName,Name,'Is Licensed','AD Sync','Last Logon (30d)','Password Expiration','Password Last Change','MFA per User','MFA Configured','MFA Primary Method','Phone Number','When Created' | Export-Csv -Path `

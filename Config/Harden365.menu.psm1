@@ -109,7 +109,7 @@ $AuditMenu = CreateMenu -MenuTitle "HARDEN 365 - AUDIT" -MenuOptions @("Audit Mi
     switch($AuditMenu){
     0{
                 write-host $FrontStyle -ForegroundColor Red
-                write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; Write-Host "AUDIT TENANT With ORCA"-ForegroundColor Green	
+                write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; Write-Host "Audit Messaging with ORCA"-ForegroundColor Red	
                 mkdir -Force ".\Audit" | Out-Null
                 write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; Write-host ('Connecting to ExchangeOnline Powershell') -ForegroundColor Green
                 try {Get-OrganizationConfig | Out-Null 
