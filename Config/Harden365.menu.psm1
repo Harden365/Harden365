@@ -105,7 +105,7 @@ function AuditMenu(){
         [System.Management.Automation.PSCredential]$Credential
     )
 
-$AuditMenu = CreateMenu -MenuTitle "HARDEN 365 - AUDIT" -MenuOptions @("Audit Microsoft Defender for O365 with ORCA","Audit Administration Roles","Audit Users with licenses","<- Return")
+$AuditMenu = CreateMenu -MenuTitle "HARDEN 365 - AUDIT" -MenuOptions @("Audit Microsoft Defender for O365 with ORCA","Audit Administration Roles","Audit Users with licenses","Check Autoforwarding","Check Mailbox Permissions","<- Return")
     switch($AuditMenu){
     0{
                 write-host $FrontStyle -ForegroundColor Red
@@ -152,7 +152,39 @@ $AuditMenu = CreateMenu -MenuTitle "HARDEN 365 - AUDIT" -MenuOptions @("Audit Mi
                 Read-Host -Prompt "Press Enter to return_"
                 AuditMenu -Credential $Credential
       }
-     3{
+    3{
+                write-host $FrontStyle -ForegroundColor Red
+                write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; write-host("AUDIT AUTOFORWARDING") -ForegroundColor Red
+                write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; Write-host ('Connecting to  ExchangeOnline Powershell') -ForegroundColor Green
+                try {Get-OrganizationConfig | Out-Null 
+                } catch {Connect-ExchangeOnline  -Credential $Credential -WarningAction:SilentlyContinue -ShowBanner:$false}
+
+                $scriptFunctions=(Get-ChildItem function: | Where-Object { $_.Name -match 'Start-EOPCheckAutoForward'})
+                $scriptFunctions | ForEach-Object {
+                Try { 
+                & $_.Name -ErrorAction:SilentlyContinue | Out-Null
+                } Catch {}
+                }
+                Read-Host -Prompt "Press Enter to return_"
+                AuditMenu -Credential $Credential
+      }
+     4{
+                write-host $FrontStyle -ForegroundColor Red
+                write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; write-host("AUDIT MAILBOX PERMISSIONS") -ForegroundColor Red
+                write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; Write-host ('Connecting to  ExchangeOnline Powershell') -ForegroundColor Green
+                try {Get-OrganizationConfig | Out-Null 
+                } catch {Connect-ExchangeOnline  -Credential $Credential -WarningAction:SilentlyContinue -ShowBanner:$false}
+
+                $scriptFunctions=(Get-ChildItem function: | Where-Object { $_.Name -match 'Start-EOPCheckPermissionsMailbox'})
+                $scriptFunctions | ForEach-Object {
+                Try { 
+                & $_.Name -ErrorAction:SilentlyContinue | Out-Null
+                } Catch {}
+                }
+                Read-Host -Prompt "Press Enter to return_"
+                AuditMenu -Credential $Credential
+      }
+     5{
                 MainMenu -Credential $Credential
       }
     Default{

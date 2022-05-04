@@ -555,7 +555,8 @@ Function Start-EOPCheckAutoForward {
             
 }
 
-Function Start-EOPCheckDelegation {
+
+Function Start-EOPCheckPermissionsMailbox {
      <#
         .Synopsis
          check Mailbox permissions
@@ -572,12 +573,27 @@ Function Start-EOPCheckDelegation {
 )
 
 #SCRIPT
-            # Check autoforwarding in transport rule
-            Write-Loginfo "Check permission in all mailbox"
-            $dateFileString = Get-Date -Format "FileDateTimeUniversal"
-            mkdir -Force ".\Audit" | Out-Null
-            Get-Mailbox | where-object {$null -ne $_.GrantSendOnBehalfTo} | select-object Name,Alias,UserPrincipalName,PrimarySmtpAddress,@{l='SendOnBehalfOf';e={$_.GrantSendOnBehalfTo -join ";"}}`
-             | Export-Csv -Path ".\Audit\AuditMailboxPermission$dateFileString.csv" -Delimiter ';' -Encoding UTF8 -NoTypeInformation
+$MailboxCollection = @()
+$MailboxCollection = Get-Mailbox -ResultSize Unlimited
 
-            
+$Permissions = @()
+$Permissions = Get-Mailbox -ResultSize Unlimited | ForEach-Object { Get-MailboxPermission -Identity $_.UserPrincipalName | where-object {$_.User -ne 'NT AUTHORITY\SELF'} | select-object Identity,AccessRights,User}
+
+foreach ($item in $Permissions) {
+    foreach ($obj in $item) {
+        $obj | Add-Member -MemberType NoteProperty -Name 'Type' -Value ($MailboxCollection | Where-Object { $_.Name -eq $obj.Identity }).RecipientTypeDetails
+        $obj | Add-Member -MemberType NoteProperty -Name 'Name' -Value ($MailboxCollection | Where-Object { $_.Name -eq $obj.Identity }).Name
+        $obj | Add-Member -MemberType NoteProperty -Name 'UserPrincipalName' -Value ($MailboxCollection | Where-Object { $_.Name -eq $obj.Identity }).UserPrincipalName
+        }
+        }
+
+
+
+# Export CSV
+Write-Loginfo "Check permissions in all mailbox"
+$dateFileString = Get-Date -Format "FileDateTimeUniversal"
+mkdir -Force ".\Audit" | Out-Null
+$Permissions | Select-Object Name,UserprincipalName,Type,AccessRights,User | Export-Csv -Path ".\Audit\AuditMailboxPermission$dateFileString.csv" -Delimiter ';' -Encoding UTF8 -NoTypeInformation
+   
 }
+
