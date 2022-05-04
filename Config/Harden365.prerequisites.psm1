@@ -77,7 +77,7 @@ function Test-PowerShellModule {
     $installedPSModuleVersion = Get-InstalledModule $ModuleName -MinimumVersion $ModuleVersion -ErrorAction Ignore
     if($null -eq $installedPSModule){
         Write-LogInfo ("Installing $ModuleName Powershell Module")
-        Check-UserIsAdministrator
+        Test-UserIsAdministrator
         [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
         Install-Module $ModuleName -AllowClobber
         Write-LogWarning "$ModuleName Powershell Module necessary"
