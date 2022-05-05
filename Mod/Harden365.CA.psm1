@@ -118,6 +118,7 @@ Function Start-LegacyAuthPolicy {
 
 #SCRIPT
 $ExcludeCAGroup = (Get-AzureADGroup -All $true | Where-Object DisplayName -eq $GroupExclude).ObjectId
+$DomainOnM365=(Get-AzureADDomain | Where-Object { $_.IsInitial -match $true }).Name
 $CondAccPol=Get-AzureADMSConditionalAccessPolicy | Where-Object DisplayName -eq $Name
     if (-not $CondAccPol){
         Try {
@@ -126,20 +127,21 @@ $CondAccPol=Get-AzureADMSConditionalAccessPolicy | Where-Object DisplayName -eq 
             $Conditions.Applications.IncludeApplications = "All"
             $Conditions.Users = New-Object -TypeName Microsoft.Open.MSGraph.Model.ConditionalAccessUserCondition
             $Conditions.Users.IncludeUsers = "All"
+            $conditions.Users.ExcludeUsers = (Get-AzureADUser -Filter "userPrincipalName eq 'u-admin@$DomainOnM365'").ObjectId
             $Conditions.Users.ExcludeGroups = $ExcludeCAGroup
             $Conditions.ClientAppTypes = @('ExchangeActiveSync', 'Other')
             $Controls = New-Object -TypeName Microsoft.Open.MSGraph.Model.ConditionalAccessGrantControls
             $Controls._Operator = "OR"
             $Controls.BuiltInControls = "Block"
             New-AzureADMSConditionalAccessPolicy -DisplayName $Name -State "Disabled" -Conditions $conditions -GrantControls $controls
-            Write-LogInfo "Conditional Access '$Name' created"
+            Write-LogInfo "CA '$Name' created"
             }
                  Catch {
-                        Write-LogError "Conditional Access '$Name' not created"
+                        Write-LogError "CA '$Name' not created"
                         }
             }
             else { 
-                  Write-LogWarning "Conditional Access '$Name' already created"
+                  Write-LogWarning "CA '$Name' already created"
                   }
  }
 
@@ -204,14 +206,14 @@ $CondAccPol=Get-AzureADMSConditionalAccessPolicy | Where-Object DisplayName -eq 
             $sessions.PersistentBrowser.Mode = "Never"
             $sessions.PersistentBrowser.IsEnabled = "true"
             New-AzureADMSConditionalAccessPolicy -DisplayName $Name -State "Disabled" -Conditions $conditions -GrantControls $controls -SessionControls $sessions
-            Write-LogInfo "Conditional Access '$Name' created"
+            Write-LogInfo "CA '$Name' created"
             }
                  Catch {
-                        Write-LogError "Conditional Access '$Name' not created"
+                        Write-LogError "CA '$Name' not created"
                         }
             }
             else { 
-                  Write-LogWarning "Conditional Access '$Name' already created!"
+                  Write-LogWarning "CA '$Name' already created!"
                   }
 }
 
@@ -236,7 +238,7 @@ Function Start-MFAUsers {
 
 
 #SCRIPT
-#$ExcludeCAGroup = (Get-AzureADGroup -All $true | Where-Object DisplayName -eq $GroupExclude).ObjectId
+$ExcludeCAGroup = (Get-AzureADGroup -All $true | Where-Object DisplayName -eq $GroupExclude).ObjectId
 $DomainOnM365=(Get-AzureADDomain | Where-Object { $_.IsInitial -match $true }).Name
 $CondAccPol=Get-AzureADMSConditionalAccessPolicy | Where-Object DisplayName -eq $Name
 
@@ -249,7 +251,7 @@ $CondAccPol=Get-AzureADMSConditionalAccessPolicy | Where-Object DisplayName -eq 
             $conditions.Users = New-Object -TypeName Microsoft.Open.MSGraph.Model.ConditionalAccessUserCondition
             $conditions.Users.IncludeUsers = "All"
             $conditions.Users.ExcludeUsers = "GuestsOrExternalUsers",(Get-AzureADUser -Filter "userPrincipalName eq 'u-admin@$DomainOnM365'").ObjectId
-            #$conditions.Users.ExcludeGroups = $ExcludeCAGroup
+            $conditions.Users.ExcludeGroups = $ExcludeCAGroup
             $conditions.Users.ExcludeRoles = (Get-AzureADDirectoryRoleTemplate).ObjectId
             $conditions.ClientAppTypes = @('Browser', 'MobileAppsAndDesktopClients')
             $conditions.Locations = New-Object -TypeName Microsoft.Open.MSGraph.Model.ConditionalAccessLocationCondition
@@ -267,11 +269,11 @@ $CondAccPol=Get-AzureADMSConditionalAccessPolicy | Where-Object DisplayName -eq 
             Write-LogInfo "Conditional Access '$Name' created"
             }
                  Catch {
-                        Write-LogError "Conditional Access '$Name' not created"
+                        Write-LogError "CA '$Name' not created"
                         }
             }
             else { 
-                  Write-LogWarning "Conditional Access '$Name' already created!"
+                  Write-LogWarning "CA '$Name' already created!"
                   }
  Write-LogSection '' -NoHostOutput
 
@@ -316,14 +318,14 @@ $CondAccPol=Get-AzureADMSConditionalAccessPolicy | Where-Object DisplayName -eq 
             $sessions.ApplicationEnforcedRestrictions = New-Object -TypeName Microsoft.Open.MSGraph.Model.ConditionalAccessApplicationEnforcedRestrictions
             $sessions.ApplicationEnforcedRestrictions.IsEnabled = "true"
             New-AzureADMSConditionalAccessPolicy -DisplayName $Name -State "Disabled" -Conditions $conditions -SessionControls $sessions
-            Write-LogInfo "Conditional Access '$Name' created"
+            Write-LogInfo "CA '$Name' created"
             }
                  Catch {
-                        Write-LogError "Conditional Access '$Name' not created"
+                        Write-LogError "CA '$Name' not created"
                         }
             }
             else { 
-                  Write-LogWarning "Conditional Access '$Name' already created!"
+                  Write-LogWarning "CA '$Name' already created!"
                   }
  Write-LogSection '' -NoHostOutput
 
@@ -345,6 +347,7 @@ Function Start-UnsupportedDevicePlatforms {
 	param(
 	[Parameter(Mandatory = $false)]
 	[String]$Name = "Harden365 - Unsupported Device Platforms",
+    [String]$GroupLegacyExclude = "Harden365 - CA Exclusion - Legacy Authentification Exclude",
 	[String]$GroupExclude = "Harden365 - CA Exclusion - Unsupported Device Platforms Exclude"   
 )
 
@@ -361,7 +364,7 @@ $CondAccPol=Get-AzureADMSConditionalAccessPolicy | Where-Object DisplayName -eq 
             $conditions.Users = New-Object -TypeName Microsoft.Open.MSGraph.Model.ConditionalAccessUserCondition
             $conditions.Users.IncludeUsers = "All"
             $conditions.Users.ExcludeUsers = (Get-AzureADUser -Filter "userPrincipalName eq 'u-admin@$DomainOnM365'").ObjectId
-            $conditions.Users.ExcludeGroups = $ExcludeCAGroup
+            $conditions.Users.ExcludeGroups = $ExcludeCAGroup,$GroupLegacyExclude
             $conditions.ClientAppTypes = @('Browser', 'MobileAppsAndDesktopClients')
             $conditions.Platforms = New-Object -TypeName Microsoft.Open.MSGraph.Model.ConditionalAccessPlatformCondition
             $conditions.Platforms.IncludePlatforms = "All"
@@ -370,14 +373,14 @@ $CondAccPol=Get-AzureADMSConditionalAccessPolicy | Where-Object DisplayName -eq 
             $Controls._Operator = "OR"
             $Controls.BuiltInControls = "Block"
             New-AzureADMSConditionalAccessPolicy -DisplayName $Name -State "Disabled" -Conditions $conditions -GrantControls $controls
-            Write-LogInfo "Conditional Access '$Name' created"
+            Write-LogInfo "CA '$Name' created"
             }
                  Catch {
-                        Write-LogError "Conditional Access '$Name' not created"
+                        Write-LogError "CA '$Name' not created"
                         }
             }
             else { 
-                  Write-LogWarning "Conditional Access '$Name' already created!"
+                  Write-LogWarning "CA '$Name' already created!"
                   }
  Write-LogSection '' -NoHostOutput
 
@@ -422,14 +425,14 @@ $CondAccPol=Get-AzureADMSConditionalAccessPolicy | Where-Object DisplayName -eq 
             $Controls._Operator = "OR"
             $Controls.BuiltInControls = 'approvedApplication'
             New-AzureADMSConditionalAccessPolicy -DisplayName $Name -State "Disabled" -Conditions $conditions -GrantControls $controls
-            Write-LogInfo "Conditional Access '$Name' created"
+            Write-LogInfo "CA '$Name' created"
             }
                  Catch {
-                        Write-LogError "Conditional Access '$Name' not created"
+                        Write-LogError "CA '$Name' not created"
                         }
             }
             else { 
-                  Write-LogWarning "Conditional Access '$Name' already created!"
+                  Write-LogWarning "CA '$Name' already created!"
                   }
  Write-LogSection '' -NoHostOutput
 
@@ -477,11 +480,11 @@ $CondAccPol=Get-AzureADMSConditionalAccessPolicy | Where-Object DisplayName -eq 
             Write-LogInfo "Conditional Access '$Name' created"
             }
                  Catch {
-                        Write-LogError "Conditional Access '$Name' not created"
+                        Write-LogError "CA '$Name' not created"
                         }
             }
             else { 
-                  Write-LogWarning "Conditional Access '$Name' already created!"
+                  Write-LogWarning "CA '$Name' already created!"
                   }
  Write-LogSection '' -NoHostOutput
 
@@ -530,11 +533,11 @@ $CondAccPol=Get-AzureADMSConditionalAccessPolicy | Where-Object DisplayName -eq 
             Write-LogInfo "Conditional Access '$Name' created"
             }
                  Catch {
-                        Write-LogError "Conditional Access '$Name' not created"
+                        Write-LogError "CA '$Name' not created"
                         }
             }
             else { 
-                  Write-LogWarning "Conditional Access '$Name' already created!"
+                  Write-LogWarning "CA '$Name' already created!"
                   }
  Write-LogSection '' -NoHostOutput
 
@@ -561,7 +564,11 @@ Function Start-HighRiskUsers {
 
 
 #SCRIPT
-#$ExcludeCAGroup = (Get-AzureADGroup -All $true | Where-Object DisplayName -eq $GroupExclude).ObjectId
+
+if (((Get-MsolAccountSku | Where-Object { $_.ActiveUnits -ne "0" }| Select-Object -ExpandProperty ServiceStatus).ServicePlan).ServiceName -match "AAD_PREMIUM_P2")
+    { 
+
+$ExcludeCAGroup = (Get-AzureADGroup -All $true | Where-Object DisplayName -eq $GroupExclude).ObjectId
 $DomainOnM365=(Get-AzureADDomain | Where-Object { $_.IsInitial -match $true }).Name
 $CondAccPol=Get-AzureADMSConditionalAccessPolicy | Where-Object DisplayName -eq $Name
 
@@ -574,21 +581,23 @@ $CondAccPol=Get-AzureADMSConditionalAccessPolicy | Where-Object DisplayName -eq 
             $conditions.Users.IncludeUsers = "All"
             $conditions.Users.ExcludeUsers = (Get-AzureADUser -Filter "userPrincipalName eq 'admin@$DomainOnM365'").ObjectId
             $conditions.UserRiskLevels = "High"
-            #$conditions.Users.ExcludeGroups = $ExcludeCAGroup
+            $conditions.Users.ExcludeGroups = $ExcludeCAGroup
             $conditions.ClientAppTypes = 'All'
             $controls = New-Object -TypeName Microsoft.Open.MSGraph.Model.ConditionalAccessGrantControls
             $controls._Operator = "AND"
             $controls.BuiltInControls = @('MFA','passwordChange')
             New-AzureADMSConditionalAccessPolicy -DisplayName $Name -State "Disabled" -Conditions $conditions -GrantControls $controls
-            Write-LogInfo "Conditional Access '$Name' created"
+            Write-LogInfo "CA '$Name' created"
             }
                  Catch {
-                        Write-LogError "Conditional Access '$Name' not created"
+                        Write-LogError "CA '$Name' not created"
                         }
             }
             else { 
-                  Write-LogWarning "Conditional Access '$Name' already created!"
+                  Write-LogWarning "CA '$Name' already created!"
                   }
+}
+
  Write-LogSection '' -NoHostOutput
 
 }
@@ -612,9 +621,11 @@ Function Start-HighRiskSignIn {
 	[String]$GroupExclude = "Harden365 - CA Exclusion - High-Risk SignIn Exclude"   
 )
 
+if (((Get-MsolAccountSku | Where-Object { $_.ActiveUnits -ne "0" }| Select-Object -ExpandProperty ServiceStatus).ServicePlan).ServiceName -match "AAD_PREMIUM_P2")
+    { 
 
 #SCRIPT
-#$ExcludeCAGroup = (Get-AzureADGroup -All $true | Where-Object DisplayName -eq $GroupExclude).ObjectId
+$ExcludeCAGroup = (Get-AzureADGroup -All $true | Where-Object DisplayName -eq $GroupExclude).ObjectId
 $DomainOnM365=(Get-AzureADDomain | Where-Object { $_.IsInitial -match $true }).Name
 $CondAccPol=Get-AzureADMSConditionalAccessPolicy | Where-Object DisplayName -eq $Name
 
@@ -627,21 +638,20 @@ $CondAccPol=Get-AzureADMSConditionalAccessPolicy | Where-Object DisplayName -eq 
             $conditions.Users.IncludeUsers = "All"
             $conditions.Users.ExcludeUsers = (Get-AzureADUser -Filter "userPrincipalName eq 'admin@$DomainOnM365'").ObjectId
             $conditions.SignInRiskLevels = "High"
-            #$conditions.Users.ExcludeGroups = $ExcludeCAGroup
+            $conditions.Users.ExcludeGroups = $ExcludeCAGroup
             $conditions.ClientAppTypes = 'All'
             $controls = New-Object -TypeName Microsoft.Open.MSGraph.Model.ConditionalAccessGrantControls
             $controls._Operator = "OR"
             $controls.BuiltInControls = @('MFA')
             New-AzureADMSConditionalAccessPolicy -DisplayName $Name -State "Disabled" -Conditions $conditions -GrantControls $controls
-            Write-LogInfo "Conditional Access '$Name' created"
+            Write-LogInfo "CA '$Name' created"
             }
                  Catch {
-                        Write-LogError "Conditional Access '$Name' not created"
+                        Write-LogError "CA '$Name' not created"
                         }
             }
             else { 
-                  Write-LogWarning "Conditional Access '$Name' already created!"
+                  Write-LogWarning "CA '$Name' already created!"
                   }
- Write-LogSection '' -NoHostOutput
-
+ }
 }

@@ -37,7 +37,7 @@ $totalCountofOperations = 2
 $currentCountOfOperations = 0
 
 clear-Host
-(0..10)| % {write-host }
+(0..10)| ForEach-Object {write-host }
 
 if ($reloadModules) {
     Remove-Module 'Harden365.debug'
@@ -59,7 +59,6 @@ Test-AllPrerequisites -OperationCount $currentCountOfOperations -OperationTotal 
 $currentCountOfOperations++
 Import-AllScriptModules -OperationCount $currentCountOfOperations -OperationTotal $totalCountofOperations
 $currentCountOfOperations++
-start-sleep -Seconds 2
 
 ## CREDENTIALS
 write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline
@@ -67,7 +66,7 @@ Write-Host("PLEASE CONNECT ACCOUNT WITH GLOBAL ADMINISTRATOR ROLE WITHOUT MFA CO
 start-sleep -Seconds 1
 $ErrorActionPreference = "SilentlyContinue"
 $Credential = Get-Credential -Message "Global Administrator without MFA Control"
-if ($Credential -eq $null){
+if ($null -eq $Credential){
 Write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; write-Host("ACTION STOPPED BY USER") -ForegroundColor Red
 Pause;Break}
 try {
@@ -77,6 +76,24 @@ Get-AzureADTenantDetail | Out-Null
 Write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; write-Host("USER/PASSWORD NOT VALID OR MFA ACTIVED") -ForegroundColor Red
 Pause;Break} 
 
+#TENANT DETAIL
+Connect-MsolService -Credential $Credential | Out-Null
+#AZUREADEDITION
+if (((Get-MsolAccountSku | Where-Object { $_.ActiveUnits -ne "0" }| Select-Object -ExpandProperty ServiceStatus).ServicePlan).ServiceName -match "AAD_PREMIUM_P2")
+{ $TenantEdition = "Azure AD Premium P2"} 
+elseif (((Get-MsolAccountSku | Where-Object { $_.ActiveUnits -ne "0" } | Select-Object -ExpandProperty ServiceStatus).ServicePlan).ServiceName -match "AAD_PREMIUM")
+{ $TenantEdition = "Azure AD Premium P1"} 
+elseif (((Get-MsolAccountSku | Where-Object { $_.ActiveUnits -ne "0" } | Select-Object -ExpandProperty ServiceStatus).ServicePlan).ServiceName -match "AAD_BASIC")
+{ $TenantEdition = "Azure AD Basic"} 
+#OFFICE365ATP
+if (((Get-MsolAccountSku | Where-Object { $_.ActiveUnits -ne "0" } | Select-Object -ExpandProperty ServiceStatus).ServicePlan).ServiceName -match "THREAT_INTELLIGENCE")
+    { $O365ATP = "Defender for Office365 P2" }   
+elseif (((Get-MsolAccountSku | Where-Object { $_.ActiveUnits -ne "0" } | Select-Object -ExpandProperty ServiceStatus).ServicePlan).ServiceName -match "ATP_ENTERPRISE")
+    { $O365ATP = "Defender for Office365 P1" }  
+elseif (((Get-MsolAccountSku | Where-Object { $_.ActiveUnits -ne "0" } | Select-Object -ExpandProperty ServiceStatus).ServicePlan).ServiceName -match "EOP_ENTERPRISE")
+    { $O365ATP = "Exchange Online Protection" }  
+
+
 ## RUN MAIN MENU
-MainMenu -Credential $Credential
+MainMenu -Credential $Credential -TenantEdition $TenantEdition -O365ATP $O365ATP
 

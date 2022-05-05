@@ -5,13 +5,20 @@
 Function CreateMenu (){
     
     Param(
-        [Parameter(Mandatory=$True)][String]$MenuTitle,
+        [Parameter(Mandatory=$False)]
+        [String]$MenuTitle,
+        [String]$TenantEdition,
+        [String]$O365ATP,
+        [Boolean]$TenantDetail = $false,
         [Parameter(Mandatory=$True)][array]$MenuOptions
     )
 
     $MaxValue = $MenuOptions.count-1
     $Selection = 0
     $EnterPressed = $False
+
+$FrontStyle = "    _________________________________________________________________________________________            
+            "
     
     Clear-Host
 
@@ -19,17 +26,23 @@ Function CreateMenu (){
     $LogoData = Get-Content (".\Config\Harden365.logo")
         foreach ($line in $LogoData){Write-Host $line}
  
-        Write-Host "            $MenuTitle" -ForegroundColor Red
-        Write-Host "
-            _________________________________________________________________________________________
-            " -ForegroundColor Red
+        Write-Host "    $MenuTitle" -ForegroundColor Red
+        Write-Host $FrontStyle -ForegroundColor Red
 
+    if ($TenantDetail -eq $True) {
+        write-Host "    AzureAD Edition = " -NoNewline -ForegroundColor Red
+        write-Host "$TenantEdition"
+        write-Host "    DefenderO365 Edition = " -NoNewline -ForegroundColor Red
+        write-Host "$O365ATP"
+        Write-Host $FrontStyle -ForegroundColor Red
+    }
         For ($i=0; $i -le $MaxValue; $i++){
             
             If ($i -eq $Selection){
+                Write-Host -NoNewline "    "
                 Write-Host -BackgroundColor yellow -ForegroundColor Black "[ $($MenuOptions[$i]) ]"
             } Else {
-                Write-Host "  $($MenuOptions[$i])  "
+                Write-Host "      $($MenuOptions[$i])  "
             }
 
         }
@@ -73,29 +86,35 @@ Function CreateMenu (){
 function MainMenu(){
     Param(
         [System.Management.Automation.PSCredential]$Credential,
-        [String]$TenantDisplayName,
-        [String]$TenantPrimaryDomain,
-        [String]$TenantDirectorySync
+        [Parameter(Mandatory=$False)]
+        [String]$TenantEdition,
+        [String]$O365ATP
     )
 
 
 
-$MainMenu = CreateMenu -MenuTitle "HARDEN 365 - MENU" -MenuOptions @("Audit","Hardening","Quit")
-write-host "Tenant Name           : $TenantDisplayName"
-write-host "Tenant PrimaryDomain  : $TenantPrimaryDomain"
-write-host "Tenant Directory Sync : $TenantDirectorySync"
+$MainMenu = CreateMenu -TenantEdition $TenantEdition -TenantDetail $true -O365ATP $O365ATP -MenuOptions @("Audit","Identity","Messaging","Application","Device","Quit")
     switch($MainMenu){
     0{
       AuditMenu -Credential $Credential
       }
     1{
-      HardenMenu -Credential $Credential
+      IdentityMenu -Credential $Credential
       }
     2{
+      MessagingMenu -Credential $Credential
+      }
+    3{
+      ApplicationMenu -Credential $Credential
+      }
+    4{
+      DeviceMenu -Credential $Credential
+      }
+    5{
       Break
       }
     Default{
-      MainMenu -Credential $Credential
+      MainMenu -Credential $Credential -TenantEdition $TenantEdition -TenantDetail $true -O365ATP $O365ATP
       }
     }
 }
@@ -105,7 +124,7 @@ function AuditMenu(){
         [System.Management.Automation.PSCredential]$Credential
     )
 
-$AuditMenu = CreateMenu -MenuTitle "HARDEN 365 - AUDIT" -MenuOptions @("Audit Microsoft Defender for O365 with ORCA","Audit Administration Roles","Audit Users with licenses","Check Autoforwarding","Check Mailbox Permissions","<- Return")
+$AuditMenu = CreateMenu -MenuTitle "HARDEN 365 - AUDIT" -MenuOptions @("Audit Microsoft Defender for O365 with ORCA","Audit Administration Roles","Audit Users with licenses","Audit Autoforwarding","Audit Mailbox Permissions","<- Return")
     switch($AuditMenu){
     0{
                 write-host $FrontStyle -ForegroundColor Red
@@ -185,38 +204,10 @@ $AuditMenu = CreateMenu -MenuTitle "HARDEN 365 - AUDIT" -MenuOptions @("Audit Mi
                 AuditMenu -Credential $Credential
       }
      5{
-                MainMenu -Credential $Credential
+       MainMenu -Credential $Credential -TenantEdition $TenantEdition -O365ATP $O365ATP
       }
     Default{
       AuditMenu -Credential $Credential
-      }
-    }
-}
-
-function HardenMenu(){
-    Param(
-        [System.Management.Automation.PSCredential]$Credential
-    )
-
-$HardenMenu = CreateMenu -MenuTitle "HARDEN 365 - HARDENING" -MenuOptions @("Identity","Messaging","Data","Device","<- Return")
-        switch($HardenMenu){
-    0{
-      IdentityMenu -Credential $Credential
-      }
-    1{
-      MessagingMenu -Credential $Credential
-      }
-    2{
-      DataMenu -Credential $Credential
-      }
-    3{
-      DeviceMenu -Credential $Credential
-      }
-    4{
-      MainMenu -Credential $Credential
-      }
-    Default{
-      HardenMenu -Credential $Credential
       }
     }
 }
@@ -225,13 +216,15 @@ function IdentityMenu(){
     Param(
         [System.Management.Automation.PSCredential]$Credential
     )
-$IdentityMenu = CreateMenu -MenuTitle "HARDEN 365 - IDENTITY" -MenuOptions @("Emergency Account","MFA per User","Conditionnal Access Models AAD P1","Conditionnal Access Models AAD P2","Export user configuration MFA","Import user configuration MFA","<- Return")
+$IdentityMenu = CreateMenu -MenuTitle "HARDEN 365 - IDENTITY" -MenuOptions @("Emergency Account","MFA per User","Conditionnal Access Models AAD","Export user configuration MFA","Import user configuration MFA","<- Return")
         switch($IdentityMenu){
     0{
                 write-host $FrontStyle -ForegroundColor Red
                 write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; write-host("HARDENING TIER MODEL") -ForegroundColor Red
                 write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; Write-host ('Connecting to Azure AD Powershell') -ForegroundColor Green
-                Connect-AzureAD  -Credential $Credential -WarningAction:SilentlyContinue
+                try {
+                Get-AzureADTenantDetail | Out-Null 
+                } catch {Connect-AzureAD -Credential $Credential | Out-Null} 
                 write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; Write-host ('Connecting to  MSOL Service') -ForegroundColor Green
                 Connect-MsolService  -Credential $Credential | Out-Null
                 $scriptFunctions=(Get-ChildItem function: | Where-Object { $_.source -match 'Harden365.TierModel'})
@@ -261,7 +254,7 @@ $IdentityMenu = CreateMenu -MenuTitle "HARDEN 365 - IDENTITY" -MenuOptions @("Em
       }
     2{
                 write-host $FrontStyle -ForegroundColor Red
-                write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; write-host("HARDENING CONDITIONNAL ACCESS FOR AAD P1") -ForegroundColor Red
+                write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; write-host("HARDENING CONDITIONNAL ACCESS FOR AAD") -ForegroundColor Red
                 write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; Write-host ('Connecting to  AzureAD') -ForegroundColor Green
                 try {
                 Get-AzureADTenantDetail | Out-Null 
@@ -280,14 +273,9 @@ $IdentityMenu = CreateMenu -MenuTitle "HARDEN 365 - IDENTITY" -MenuOptions @("Em
       }
     3{
                 write-host $FrontStyle -ForegroundColor Red
-                Read-Host -Prompt "HARDENING CONDITIONNAL ACCESS FOR AAD P2 COMING SOON"
-                IdentityMenu -Credential $Credential
-      }
-    4{
-                write-host $FrontStyle -ForegroundColor Red
                 write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; write-host("HARDENING EXPORT CONFIG MFA") -ForegroundColor Red
                 Connect-MsolService  -Credential $Credential | Out-Null
-                $scriptFunctions=(Get-ChildItem function: | Where-Object { $_.source -match 'Harden365.CAExport'})
+                $scriptFunctions=(Get-ChildItem function: | Where-Object { $_.source -match 'Harden365.ExportForCA'})
                 $scriptFunctions | ForEach-Object {
                 Try { 
                 & $_.Name -ErrorAction:SilentlyContinue | Out-Null
@@ -296,7 +284,7 @@ $IdentityMenu = CreateMenu -MenuTitle "HARDEN 365 - IDENTITY" -MenuOptions @("Em
                 Read-Host -Prompt "Press Enter to return_"
                 IdentityMenu -Credential $Credential
       }
-    5{
+    4{
                 write-host $FrontStyle -ForegroundColor Red
                 write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; write-host("HARDENING IMPORT CONFIG MFA") -ForegroundColor Red
                 $scriptFunctions=(Get-ChildItem function: | Where-Object { $_.source -match 'Harden365.ImportPhoneNumbers'})
@@ -308,8 +296,8 @@ $IdentityMenu = CreateMenu -MenuTitle "HARDEN 365 - IDENTITY" -MenuOptions @("Em
                 Read-Host -Prompt "Press Enter to return_"
                 IdentityMenu -Credential $Credential
       }
-    6{
-      HardenMenu -Credential $Credential
+    5{
+      MainMenu -Credential $Credential -TenantEdition $TenantEdition -O365ATP $O365ATP
       }
     Default{
       IdentityMenu -Credential $Credential
@@ -409,7 +397,7 @@ $MessagingMenu = CreateMenu -MenuTitle "HARDEN 365 - MESSAGING" -MenuOptions @("
              MessagingMenu -Credential $Credential
       }
     5{
-      HardenMenu -Credential $Credential
+      MainMenu -Credential $Credential -TenantEdition $TenantEdition -O365ATP $O365ATP
       }
     Default{
       MessagingMenu -Credential $Credential
@@ -417,29 +405,29 @@ $MessagingMenu = CreateMenu -MenuTitle "HARDEN 365 - MESSAGING" -MenuOptions @("
     }
 }
 
-function DataMenu(){
+function ApplicationMenu(){
     Param(
         [System.Management.Automation.PSCredential]$Credential
     )
-$DataMenu = CreateMenu -MenuTitle "HARDEN 365 - HARDENING" -MenuOptions @("N/A","N/A","N/A","N/A","<- Return")
-        switch($DataMenu){
+$ApplicationMenu = CreateMenu -MenuTitle "HARDEN 365 - APPLICATION" -MenuOptions @("N/A","N/A","N/A","N/A","<- Return")
+        switch($ApplicationMenu){
     0{
-      DataMenu -Credential $Credential
+      ApplicationMenu -Credential $Credential
       }
     1{
-      DataMenu -Credential $Credential
+      ApplicationMenu -Credential $Credential
       }
     2{
-      DataMenu -Credential $Credential
+      ApplicationMenu -Credential $Credential
       }
     3{
-      DataMenu -Credential $Credential
+      ApplicationMenu -Credential $Credential
       }
     4{
-      HardenMenu -Credential $Credential
+      MainMenu -Credential $Credential -TenantEdition $TenantEdition -O365ATP $O365ATP
       }
     Default{
-      DataMenu -Credential $Credential
+      ApplicationMenu -Credential $Credential
       }
     }
 }
@@ -448,7 +436,7 @@ function DeviceMenu(){
     Param(
         [System.Management.Automation.PSCredential]$Credential
     )
-$DeviceMenu = CreateMenu -MenuTitle "HARDEN 365 - HARDENING" -MenuOptions @("N/A","N/A","N/A","N/A","<- Return")
+$DeviceMenu = CreateMenu -MenuTitle "HARDEN 365 - DEVICE" -MenuOptions @("N/A","N/A","N/A","N/A","<- Return")
         switch($DeviceMenu){
     0{
       DeviceMenu -Credential $Credential
@@ -463,7 +451,7 @@ $DeviceMenu = CreateMenu -MenuTitle "HARDEN 365 - HARDENING" -MenuOptions @("N/A
       DeviceMenu -Credential $Credential
       }
     4{
-      HardenMenu -Credential $Credential
+      MainMenu -Credential $Credential -TenantEdition $TenantEdition -O365ATP $O365ATP
       }
     Default{
       DeviceMenu -Credential $Credential

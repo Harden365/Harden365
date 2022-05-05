@@ -133,6 +133,7 @@ Function Start-DefenderO365P1SafeLinks {
     [String]$RuleName = "Harden365 - SafeLinks Rule",
     [Boolean]$IsEnabled = $true,
     [Boolean]$EnableSafeLinksForTeams = $true,
+    [Boolean]$EnableSafeLinksForEmail = $true,
     [Boolean]$ScanUrls = $true,
     [Boolean]$DeliverMessageAfterScan = $true,
     [Boolean]$EnableForInternalSenders = $true,
@@ -145,13 +146,16 @@ Function Start-DefenderO365P1SafeLinks {
 )
 
 
-
 #SCRIPT
 
     if ((Get-SafeLinksRule).name -ne $RuleName)
     {
         Try { 
-            New-SafeLinksPolicy -Name $PolicyName -IsEnabled $IsEnabled -EnableSafeLinksForTeams $EnableSafeLinksForTeams -ScanUrls $ScanUrls -DeliverMessageAfterScan $DeliverMessageAfterScan -EnableForInternalSenders $EnableForInternalSenders -DoNotRewriteUrls $DoNotRewriteUrls -AllowClickThrough $AllowClickThrough -DoNotAllowClickThrough $DoNotAllowClickThrough
+            New-SafeLinksPolicy -Name $PolicyName -EnableSafeLinksForTeams $EnableSafeLinksForTeams -ScanUrls $ScanUrls -DeliverMessageAfterScan $DeliverMessageAfterScan -EnableForInternalSenders $EnableForInternalSenders -DoNotRewriteUrls $DoNotRewriteUrls -AllowClickThrough $AllowClickThrough
+         if (-not (Get-SafeLinksPolicy -Identity $PolicyName).DoNotAllowClickThrough)
+            {} else {  Set-SafeLinksPolicy -Identity $PolicyName  -DoNotAllowClickThrough $DoNotAllowClickThrough }
+         if ($(Get-SafeLinksPolicy -Identity $PolicyName).EnableSafeLinksForEmail -eq $false)
+            {Set-SafeLinksPolicy -Identity $PolicyName  -EnableSafeLinksForEmail $EnableSafeLinksForEmail } else {   }          
             New-SafeLinksRule -Name $RuleName -SafeLinksPolicy $PolicyName -Priority $Priority -RecipientDomainIs ((Get-AcceptedDomain).Name)
             $WarningActionPreference = "SilentlyContinue"
             Set-AtpPolicyForO365 -TrackClicks $TrackClicks -EnableSafeLinksForO365Clients $EnableSafeLinksForO365Clients

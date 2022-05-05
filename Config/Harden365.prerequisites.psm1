@@ -27,7 +27,7 @@ $allModulesPathList = @(
     'Harden365.DKIM'
     'Harden365.TierModel'
     'Harden365.CA'
-    'Harden365.CAExport'
+    'Harden365.ExportForCA'
     'Harden365.MFAperUser'
     'Harden365.ImportPhoneNumbers'
     'Get-AADRolesAudit'

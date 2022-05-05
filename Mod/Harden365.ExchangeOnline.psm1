@@ -224,7 +224,7 @@ Function Start-EOPAntispamPolicyStrict {
 	[String]$ActionWhenThresholdReached = "BlockUser",
     [String]$AutoForwardingMode = "Off",
 	[String]$GroupStrict = "Harden365 - GP Antispam strict",
-	[String]$Priority = "0"
+	[String]$Priority = "1"
 )
 
 
@@ -297,7 +297,7 @@ Function Start-EOPAntispamPolicyStandard {
 	[String]$ActionWhenThresholdReached = "BlockUser",
     [String]$AutoForwardingMode = "Off",
 	[String]$ExceptIfFromMemberOf = "",
-	[String]$Priority = "0"
+	[String]$Priority = "1"
 )
 
 
@@ -530,6 +530,7 @@ Function Start-EOPCheckAutoForward {
 #SCRIPT
             # Check autoforwarding in transport rule
             Write-Loginfo "Check autoforwarding in transport rule"
+            #$AutoforwardTP = @()
             Get-TransportRule | Where-Object {$null -ne $_.RedirectMessageTo} | ForEach-Object {
             if ($_ -ne $null) {
             Write-LogWarning "Autoforwarding found in rule $($_.Name)  to $($_.RedirectMessageTo)"
