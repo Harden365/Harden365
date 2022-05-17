@@ -20,9 +20,15 @@
         Create Antiforward Standard Policy and Rule
         Create Antimalware Policy and Rule
         Create transport rules to warm user for Office files with macro
+        Create transport rules to skip filtering Antispam by domains.
+        Prevent share details calendar
         Enable Unified Audit Log
 #>
-Function Start-EOEnableAuditLog {
+
+
+
+
+Function Start-EOAuditLog {
      <#
         .Synopsis
          Enable Unified Audit Log
@@ -66,6 +72,46 @@ Write-LogSection 'EXCHANGE ONLINE PROTECTION' -NoHostOutput
 }
 
 
+Function Start-EOAutoForwardGroup {
+     <#
+        .Synopsis
+         Create group for autoforward excluded
+        
+        .Description
+         This function will create new group for Autoforward excluded
+        
+        .Notes
+         Version: 01.00 -- 
+         
+    #>
+
+	param(
+	[Parameter(Mandatory = $false)]
+	[String]$Name = "Harden365 - GP AutoForward Allow",
+    [String]$Alias = "gp_autoforward_Allow",
+    [String]$Members = ""
+)
+
+
+#SCRIPT
+$GroupEOL=(Get-UnifiedGroup | Where-Object { $_.DisplayName -eq $Name}).Name
+    if (-not $GroupEOL)
+        {
+        Try {
+            New-UnifiedGroup -Name $name -DisplayName $Name  -Alias $Alias -AccessType Private -Confirm:$false | Out-Null
+            Set-UnifiedGroup -Identity $Name -HiddenFromAddressListsEnabled $true -HiddenFromExchangeClientsEnabled -UnifiedGroupWelcomeMessageEnabled:$false
+            Write-LogInfo "Group '$Name' created"
+            }
+                 Catch {
+                        Write-LogError "Group '$Name' not created"
+                        }
+    }
+    else { 
+         Write-LogWarning "Group '$Name' already created!"
+         }
+}
+
+
 Function Start-EOPAlertsMailbox {
      <#
         .Synopsis
@@ -85,7 +131,6 @@ Function Start-EOPAlertsMailbox {
     [String]$Alias = "AlertsMailbox"
 )
 
-Write-LogSection 'EXCHANGE ONLINE PROTECTION' -NoHostOutput
 
 #SCRIPT
 $DomainOnM365=(Get-AcceptedDomain | Where-Object { $_.InitialDomain -match $true}).Name
@@ -95,7 +140,7 @@ $DomainOnM365=(Get-AcceptedDomain | Where-Object { $_.InitialDomain -match $true
     }
     else { 
             Try {
-            New-Mailbox -Name $Name -Alias "AlertsMailbox" �Shared -PrimarySmtpAddress "$alias@$DomainOnM365"
+            New-Mailbox -Name $Name -Alias "AlertsMailbox" -Shared -PrimarySmtpAddress "$alias@$DomainOnM365"
             Set-Mailbox -Identity "$alias@$DomainOnM365" -HiddenFromAddressListsEnabled $true
             
             #DMARC Config
@@ -224,7 +269,7 @@ Function Start-EOPAntispamPolicyStrict {
 	[String]$ActionWhenThresholdReached = "BlockUser",
     [String]$AutoForwardingMode = "Off",
 	[String]$GroupStrict = "Harden365 - GP Antispam strict",
-	[String]$Priority = "1"
+	[String]$Priority = "0"
 )
 
 
@@ -297,7 +342,8 @@ Function Start-EOPAntispamPolicyStandard {
 	[String]$ActionWhenThresholdReached = "BlockUser",
     [String]$AutoForwardingMode = "Off",
 	[String]$ExceptIfFromMemberOf = "",
-	[String]$Priority = "1"
+	[String]$PriorityIn = "0",
+    [String]$PriorityOut = "1"
 )
 
 
@@ -313,7 +359,7 @@ Function Start-EOPAntispamPolicyStandard {
             Set-HostedContentFilterPolicy -Identity "Default" -HighConfidenceSpamAction $HighConfidenceSpamAction -SpamAction $SpamAction -BulkThreshold $BulkThreshold -QuarantineRetentionPeriod $QuarantineRetentionPeriod -EnableEndUserSpamNotifications $EnableEndUserSpamNotifications -BulkSpamAction $BulkSpamAction -PhishSpamAction $PhishSpamAction
             New-HostedContentFilterPolicy -Name $PolicyInboundName -HighConfidenceSpamAction $HighConfidenceSpamAction -SpamAction $SpamAction -BulkThreshold $BulkThreshold -QuarantineRetentionPeriod $QuarantineRetentionPeriod -EnableEndUserSpamNotifications $EnableEndUserSpamNotifications -BulkSpamAction $BulkSpamAction -PhishSpamAction $PhishSpamAction
             Write-LogInfo "$PolicyInboundName created"
-            New-HostedContentFilterRule -Name $RuleInboundName -HostedContentFilterPolicy $PolicyInboundName -Priority $Priority -RecipientDomainIs ((Get-AcceptedDomain).Name)
+            New-HostedContentFilterRule -Name $RuleInboundName -HostedContentFilterPolicy $PolicyInboundName -Priority $PriorityIn -RecipientDomainIs ((Get-AcceptedDomain).Name)
             Write-LogInfo "$RuleInboundName created"
         } Catch {
                 Write-LogError "$PolicyInboundName not created!"
@@ -331,7 +377,7 @@ Function Start-EOPAntispamPolicyStandard {
             Set-HostedOutboundSpamFilterPolicy -Identity "Default" -RecipientLimitExternalPerHour $RecipientLimitExternalPerHour -RecipientLimitInternalPerHour $RecipientLimitInternalPerHour -RecipientLimitPerDay $RecipientLimitPerDay -ActionWhenThresholdReached $ActionWhenThresholdReached -AutoForwardingMode $AutoForwardingMode
             New-HostedOutboundSpamFilterPolicy -Name $PolicyOutboundName -RecipientLimitExternalPerHour $RecipientLimitExternalPerHour -RecipientLimitInternalPerHour $RecipientLimitInternalPerHour -RecipientLimitPerDay $RecipientLimitPerDay -ActionWhenThresholdReached $ActionWhenThresholdReached -AutoForwardingMode $AutoForwardingMode
             Write-LogInfo "$PolicyOutboundName created"
-            New-HostedOutboundSpamFilterRule -Name $RuleOutboundName -HostedOutboundSpamFilterPolicy $PolicyOutboundName -Priority $Priority -SenderDomainIs ((Get-AcceptedDomain).Name)
+            New-HostedOutboundSpamFilterRule -Name $RuleOutboundName -HostedOutboundSpamFilterPolicy $PolicyOutboundName -Priority $PriorityOut -SenderDomainIs ((Get-AcceptedDomain).Name)
             Write-LogInfo "$RuleOutboundName created"
         } Catch {
                 Write-LogError "$PolicyInboundName not created!"
@@ -473,7 +519,7 @@ $WarmDisclaimerEN="<table border=0 cellspacing=0 cellpadding=0 align=left width=
  15px`" color=`"#212121`">
 <div><p><span style='font-size:11pt;font-family:Arial,sans-serif;color:
 #212121'>
-<b>CAUTION:</b> Do not open these types of files�unless you were expecting them�because the files may contain malicious code and knowing the sender isn't a guarantee of safety.
+<b>CAUTION:</b> Do not open these types of files unless you were expecting them because the files may contain malicious code and knowing the sender isn't a guarantee of safety.
 </span></p></div>
 </td></tr></table>"
 
@@ -486,7 +532,7 @@ $WarmDisclaimerFR="<table border=0 cellspacing=0 cellpadding=0 align=left width=
  15px`" color=`"#212121`">
 <div><p><span style='font-size:11pt;font-family:Arial,sans-serif;color:
 #212121'>
-<b>CAUTION:</b> N�ouvrez pas ces types de fichiers, sauf si vous vous y attendiez, car les fichiers peuvent contenir du code malveillant et conna�tre l�exp�diteur n�est pas une garantie de s�curit�.
+<b>CAUTION:</b> N ouvrez pas ces types de fichiers, sauf si vous vous y attendiez, car les fichiers peuvent contenir du code malveillant et connaitre l expediteur n est pas une garantie de securite.
 </span></p></div>
 </td></tr></table>"
 
@@ -506,18 +552,17 @@ $WarmDisclaimerFR="<table border=0 cellspacing=0 cellpadding=0 align=left width=
            } Catch {
                 Write-LogError "$RuleName not created!"
                 }
-}
-Write-LogSection '' -NoHostOutput         
+}         
 }
 
 
-Function Start-EOPCheckAutoForward {
+Function Start-EOPBypassSpamByDomains {
      <#
         .Synopsis
-         check autoforwarding
+         Create transport rules to skip filtering Antispam by domains.
         
         .Description
-         This function will check autoforwarding
+         This function will create transport rules to skip filtering Antispam by domains
 
         .Notes
          Version: 01.00 -- 
@@ -525,76 +570,39 @@ Function Start-EOPCheckAutoForward {
     #>
 
 	param(
+	[Parameter(Mandatory = $false)]
+    [String]$RuleName = "Harden365 - Bypass Spam by Domains",
+    [String]$Mode = "Enforce",
+    [String]$RuleErrorAction = "Ignore",
+    [String]$SetSCL = '-1',
+    [String]$SenderDomainIs = 'example.com',
+    [String]$SetHeaderName = 'X-ETR',
+    [String]$SetHeaderValue = 'Bypass spam filtering for authenticated sender',
+    [String]$HeaderContainsMessageHeader = 'Authentification-Results',
+    [String]$FromScope = 'NotInOrganization',
+	[String]$Priority = "1"
 )
 
 #SCRIPT
-            # Check autoforwarding in transport rule
-            Write-Loginfo "Check autoforwarding in transport rule"
-            #$AutoforwardTP = @()
-            Get-TransportRule | Where-Object {$null -ne $_.RedirectMessageTo} | ForEach-Object {
-            if ($_ -ne $null) {
-            Write-LogWarning "Autoforwarding found in rule $($_.Name)  to $($_.RedirectMessageTo)"
-            }
-            }
+$HeaderContainsWords = @('dmarc=bestguesspass','dmarc=pass')
 
-            # Check autoforwarding in exchange admin mailbox setting
-            Write-LogInfo "Check autoforwarding in mailbox settings"
-            ((Get-Mailbox -ResultSize Unlimited) | Where-Object { ($null -ne $_.ForwardingAddress) -or ($null -ne $_.ForwardingsmtpAddress)}) | ForEach-Object {
-            if ($_ -ne $null) {
-            Write-LogWarning "Autoforwarding found in $($_.UserPrincipalName)  to $($_.ForwardingAddress -split "SMTP:") $($_.ForwardingSmtpAddress -split "SMTP:")"
-            }
-            }
-                                    
-            # Check autoforwarding in all inbox rule
-            Write-LogInfo "Check autoforwarding in inbox rules"
-            $rules=Get-Mailbox -ResultSize Unlimited| ForEach-Object {
-            Get-InboxRule -Mailbox $PSItem.primarysmtpaddress -WarningAction:SilentlyContinue }
-            $forwardingRules = $rules | Where-Object {($null -ne $_.forwardto) -or ($null -ne $_.forwardsattachmentto) -or ($null -ne $_.Redirectto)}
-            foreach ($rule in $forwardingRules) {
-            Write-LogWarning "Mailbox '$($rule.MailboxOwnerId)' forward to '$($rule.ForwardTo)$($rule.RedirectTo)'"
-            }
-            
+    if ((Get-TransportRule).name -eq $RuleName)
+    {
+     Write-LogWarning "$RuleName already created"
+     }
+     else{
+      Try { 
+           New-TransportRule -Name $RuleName -Priority $Priority -Mode $Mode -RuleErrorAction $RuleErrorAction -SetSCL $SetSCL -SenderDomainIs $SenderDomainIs -SetHeaderName $SetHeaderName -SetHeaderValue $SetHeaderValue -HeaderContainsMessageHeader $HeaderContainsMessageHeader -HeaderContainsWords $HeaderContainsWords -FromScope $FromScope
+           Disable-TransportRule -Identity $RuleName -Confirm:$false
+           Start-Sleep -Seconds 2
+           Write-LogInfo "$RuleName created"
+           } Catch {
+                Write-LogError "$RuleName not created!"
+                }
+} 
+Write-LogSection '' -NoHostOutput      
 }
 
 
-Function Start-EOPCheckPermissionsMailbox {
-     <#
-        .Synopsis
-         check Mailbox permissions
-        
-        .Description
-         This function will check Mailbox permissions
 
-        .Notes
-         Version: 01.00 -- 
-         
-    #>
-
-	param(
-)
-
-#SCRIPT
-$MailboxCollection = @()
-$MailboxCollection = Get-Mailbox -ResultSize Unlimited
-
-$Permissions = @()
-$Permissions = Get-Mailbox -ResultSize Unlimited | ForEach-Object { Get-MailboxPermission -Identity $_.UserPrincipalName | where-object {$_.User -ne 'NT AUTHORITY\SELF'} | select-object Identity,AccessRights,User}
-
-foreach ($item in $Permissions) {
-    foreach ($obj in $item) {
-        $obj | Add-Member -MemberType NoteProperty -Name 'Type' -Value ($MailboxCollection | Where-Object { $_.Name -eq $obj.Identity }).RecipientTypeDetails
-        $obj | Add-Member -MemberType NoteProperty -Name 'Name' -Value ($MailboxCollection | Where-Object { $_.Name -eq $obj.Identity }).Name
-        $obj | Add-Member -MemberType NoteProperty -Name 'UserPrincipalName' -Value ($MailboxCollection | Where-Object { $_.Name -eq $obj.Identity }).UserPrincipalName
-        }
-        }
-
-
-
-# Export CSV
-Write-Loginfo "Check permissions in all mailbox"
-$dateFileString = Get-Date -Format "FileDateTimeUniversal"
-mkdir -Force ".\Audit" | Out-Null
-$Permissions | Select-Object Name,UserprincipalName,Type,AccessRights,User | Export-Csv -Path ".\Audit\AuditMailboxPermission$dateFileString.csv" -Delimiter ';' -Encoding UTF8 -NoTypeInformation
-   
-}
 

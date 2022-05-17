@@ -124,7 +124,7 @@ function AuditMenu(){
         [System.Management.Automation.PSCredential]$Credential
     )
 
-$AuditMenu = CreateMenu -MenuTitle "HARDEN 365 - AUDIT" -MenuOptions @("Audit Microsoft Defender for O365 with ORCA","Audit Administration Roles","Audit Users with licenses","Audit Autoforwarding","Audit Mailbox Permissions","<- Return")
+$AuditMenu = CreateMenu -MenuTitle "HARDEN 365 - AUDIT" -MenuOptions @("Audit Microsoft Defender for O365 with ORCA","Audit Administration Roles","Audit Users with licenses","Audit Autoforwarding","Audit Mailbox Permissions","Check DNS Records","<- Return")
     switch($AuditMenu){
     0{
                 write-host $FrontStyle -ForegroundColor Red
@@ -204,6 +204,20 @@ $AuditMenu = CreateMenu -MenuTitle "HARDEN 365 - AUDIT" -MenuOptions @("Audit Mi
                 AuditMenu -Credential $Credential
       }
      5{
+             write-host $FrontStyle -ForegroundColor Red
+             write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; write-host("CHECK DNS RECORDS (SPF/DKIM/DMARC)") -ForegroundColor Red
+             Connect-ExchangeOnline  -Credential $Credential -WarningAction:SilentlyContinue -ShowBanner:$false
+             $scriptFunctions=(Get-ChildItem function: | Where-Object { $_.name -match 'Start-AuditSPFDKIMDMARC' })
+             $scriptFunctions | ForEach-Object {
+             Try { 
+             & $_.Name  -ErrorAction:SilentlyContinue | Out-Null
+             } Catch {
+             write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; write-host("ERROR --> Harden365.DKIM module not working") -ForegroundColor Red}
+             }
+             Read-Host -Prompt "Press Enter to return_"
+             AuditMenu -Credential $Credential
+      }
+     6{
        MainMenu -Credential $Credential -TenantEdition $TenantEdition -O365ATP $O365ATP
       }
     Default{
@@ -317,7 +331,7 @@ $MessagingMenu = CreateMenu -MenuTitle "HARDEN 365 - MESSAGING" -MenuOptions @("
              write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; Write-host ('Connecting to ExchangeOnline Powershell') -ForegroundColor Green
              try {Get-OrganizationConfig | Out-Null 
              } catch {Connect-ExchangeOnline  -Credential $Credential -WarningAction:SilentlyContinue -ShowBanner:$false}
-             $scriptFunctions=(Get-ChildItem function: | Where-Object { ($_.source -match 'Harden365.ExchangeOnline') -and ($_.Name -notmatch 'Start-EOPCheckAutoForward') -and ($_.Name -notmatch 'Start-EOPCheckDelegation') }) 
+             $scriptFunctions=(Get-ChildItem function: | Where-Object { $_.source -match 'Harden365.ExchangeOnline' }) 
              $scriptFunctions | ForEach-Object {
              Try { 
              & $_.Name  -ErrorAction:SilentlyContinue | Out-Null
@@ -333,7 +347,7 @@ $MessagingMenu = CreateMenu -MenuTitle "HARDEN 365 - MESSAGING" -MenuOptions @("
              write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; Write-host ('Connecting to ExchangeOnline Powershell') -ForegroundColor Green
              try {Get-OrganizationConfig | Out-Null 
              } catch {Connect-ExchangeOnline  -Credential $Credential -WarningAction:SilentlyContinue -ShowBanner:$false}
-             $scriptFunctions=(Get-ChildItem function: | Where-Object { ($_.source -match 'Harden365.ExchangeOnline') -and ($_.Name -notmatch 'Start-EOPCheckAutoForward') -and ($_.Name -notmatch 'Start-EOPCheckDelegation') }) 
+             $scriptFunctions=(Get-ChildItem function: | Where-Object { $_.source -match 'Harden365.ExchangeOnline' }) 
              $scriptFunctions | ForEach-Object {
              Try { 
              & $_.Name  -ErrorAction:SilentlyContinue | Out-Null
@@ -355,7 +369,7 @@ $MessagingMenu = CreateMenu -MenuTitle "HARDEN 365 - MESSAGING" -MenuOptions @("
              write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; write-host(" CHECK AUTOFORWARDING") -ForegroundColor Red
              write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; Write-host ('Connecting to ExchangeOnline Powershell') -ForegroundColor Green
              try {Get-OrganizationConfig | Out-Null 
-             } catch {Connect-ExchangeOnline -Credential $Credential -WarningAction:SilentlyContinue -ShowBanner:$false}
+             } catch {Connect-ExchangeOnline  -Credential $Credential -WarningAction:SilentlyContinue -ShowBanner:$false}
              $scriptFunctions=(Get-ChildItem function: | Where-Object { $_.Name -match 'Start-EOPCheckAutoForward' })
              $scriptFunctions | ForEach-Object {
              Try { 
@@ -368,10 +382,9 @@ $MessagingMenu = CreateMenu -MenuTitle "HARDEN 365 - MESSAGING" -MenuOptions @("
       }
     3{
              write-host $FrontStyle -ForegroundColor Red
-             write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; write-host("CHECK DNS RECORDS (SPF/DMARC/DKIM)") -ForegroundColor Red
-             write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; Write-host ('Connecting to ExchangeOnline Powershell') -ForegroundColor Green
-             Connect-ExchangeOnline -Credential $Credential -WarningAction:SilentlyContinue -ShowBanner:$false
-             $scriptFunctions=(Get-ChildItem function: | Where-Object { $_.name -match 'Start-AuditSPFDKIMDMARC' })
+             write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; write-host("CHECK DNS RECORDS (SPF/DKIM/DMARC)") -ForegroundColor Red
+             Connect-ExchangeOnline  -Credential $Credential -WarningAction:SilentlyContinue -ShowBanner:$false
+             $scriptFunctions=(Get-ChildItem function: | Where-Object { $_.Name -match 'Start-AuditSPFDKIMDMARC' })
              $scriptFunctions | ForEach-Object {
              Try { 
              & $_.Name  -ErrorAction:SilentlyContinue | Out-Null
@@ -386,7 +399,7 @@ $MessagingMenu = CreateMenu -MenuTitle "HARDEN 365 - MESSAGING" -MenuOptions @("
              write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; write-host("DKIM CONFIGURATION)") -ForegroundColor Red
              write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; Write-host ('Connecting to ExchangeOnline Powershell') -ForegroundColor Green
              Connect-ExchangeOnline  -Credential $Credential -WarningAction:SilentlyContinue -ShowBanner:$false
-             $scriptFunctions=(Get-ChildItem function: | Where-Object { ($_.source -match 'Harden365.DKIM') -and ($_.source -notmatch 'Start-AuditSPFDKIMDMARC')})
+             $scriptFunctions=(Get-ChildItem function: | Where-Object { ($_.source -match 'Harden365.DKIM') -and ($_.Name -notmatch 'Start-AuditSPFDKIMDMARC')})
              $scriptFunctions | ForEach-Object {
              Try { 
              & $_.Name  -ErrorAction:SilentlyContinue | Out-Null
@@ -409,21 +422,80 @@ function ApplicationMenu(){
     Param(
         [System.Management.Automation.PSCredential]$Credential
     )
-$ApplicationMenu = CreateMenu -MenuTitle "HARDEN 365 - APPLICATION" -MenuOptions @("N/A","N/A","N/A","N/A","<- Return")
+$ApplicationMenu = CreateMenu -MenuTitle "HARDEN 365 - APPLICATIONS" -MenuOptions @("Audit Applications","Hardening Outlook","Hardening MS Teams","Hardening PowerPlatform","<- Return")
         switch($ApplicationMenu){
     0{
-      ApplicationMenu -Credential $Credential
+             write-host $FrontStyle -ForegroundColor Red
+             write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; write-host("AUDIT APPLICATIONS") -ForegroundColor Red
+             write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; Write-host ('Connecting to MSOlService Powershell') -ForegroundColor Green
+             Connect-MSOlService -Credential $Credential -WarningAction:SilentlyContinue
+             try {Get-OrganizationConfig | Out-Null 
+             } catch {
+             write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; Write-host ('Connecting to ExchangeOnline Powershell') -ForegroundColor Green
+             Connect-ExchangeOnline  -Credential $Credential -WarningAction:SilentlyContinue -ShowBanner:$false}
+             write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; Write-host ('Connecting to MSTeams Powershell') -ForegroundColor Green
+             Connect-MicrosoftTeams -Credential $credential
+             write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; Write-host ('Connecting to MSPowerApps Powershell') -ForegroundColor Green
+             #Add-PowerAppsAccount -Username s-admin@fernandezfrance.onmicrosoft.com -Password $Credential.Password
+             $scriptFunctions=(Get-ChildItem function: | Where-Object { ($_.source -match 'Harden365.AuditApplications') -and ($_.Name -notmatch 'Start-OUTCheckAddIns')})
+             $scriptFunctions | ForEach-Object {
+             Try { 
+             & $_.Name  -ErrorAction:SilentlyContinue | Out-Null
+             } Catch {
+             write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; write-host("ERROR --> Harden365.AuditApplications module not working") -ForegroundColor Red}
+             }
+             Read-Host -Prompt "Press Enter to return_"
+             ApplicationMenu -Credential $Credential
       }
     1{
-      ApplicationMenu -Credential $Credential
+             write-host $FrontStyle -ForegroundColor Red
+             write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; write-host("HARDENING OUTLOOK") -ForegroundColor Red
+             try {Get-OrganizationConfig | Out-Null 
+             } catch {
+             write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; Write-host ('Connecting to ExchangeOnline Powershell') -ForegroundColor Green
+             Connect-ExchangeOnline  -Credential $Credential -WarningAction:SilentlyContinue -ShowBanner:$false}
+             $scriptFunctions=(Get-ChildItem function: | Where-Object { $_.source -match 'Harden365.Outlook'})
+             $scriptFunctions | ForEach-Object {
+             Try { 
+             & $_.Name  -ErrorAction:SilentlyContinue | Out-Null
+             } Catch {
+             write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; write-host("ERROR --> Harden365.Teams module not working") -ForegroundColor Red}
+             }
+             Read-Host -Prompt "Press Enter to return_"
+             ApplicationMenu -Credential $Credential
       }
     2{
-      ApplicationMenu -Credential $Credential
+             write-host $FrontStyle -ForegroundColor Red
+             write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; write-host("HARDENING MICROSOFT TEAMS") -ForegroundColor Red
+             Connect-MicrosoftTeams -Credential $credential
+             write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; Write-host ('Connecting to MSTeams Powershell') -ForegroundColor Green
+             $scriptFunctions=(Get-ChildItem function: | Where-Object { $_.source -match 'Harden365.Teams'})
+             $scriptFunctions | ForEach-Object {
+             Try { 
+             & $_.Name  -ErrorAction:SilentlyContinue | Out-Null
+             } Catch {
+             write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; write-host("ERROR --> Harden365.Teams module not working") -ForegroundColor Red}
+             }
+             Read-Host -Prompt "Press Enter to return_"
+             ApplicationMenu -Credential $Credential
       }
     3{
-      ApplicationMenu -Credential $Credential
+             write-host $FrontStyle -ForegroundColor Red
+             write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; write-host("HARDENING POWERPLATFORM") -ForegroundColor Red
+             write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; Write-host ('Connecting to MSOlService Powershell') -ForegroundColor Green
+             Connect-MSOlService -Credential $Credential -WarningAction:SilentlyContinue
+             #Add-PowerAppsAccount -Username $Credential.UserName -Password $Credential.Password
+             $scriptFunctions=(Get-ChildItem function: | Where-Object { $_.source -match 'Harden365.PowerPlatform'})
+             $scriptFunctions | ForEach-Object {
+             Try { 
+             & $_.Name  -ErrorAction:SilentlyContinue | Out-Null
+             } Catch {
+             write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; write-host("ERROR --> Harden365.PowerPlatform module not working") -ForegroundColor Red}
+             }
+             Read-Host -Prompt "Press Enter to return_"
+             ApplicationMenu -Credential $Credential
       }
-    4{
+      4{
       MainMenu -Credential $Credential -TenantEdition $TenantEdition -O365ATP $O365ATP
       }
     Default{

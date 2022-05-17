@@ -17,6 +17,8 @@
 #>
 
 $allModulesPathList = @(
+    'Harden365.Audit-ExchangeOnline'
+    'Harden365.AuditApplications'
     'Harden365.ConnectAllM365Services'
     'Harden365.AzureADAudit'
     'Harden365.EXOAudit'
@@ -30,6 +32,9 @@ $allModulesPathList = @(
     'Harden365.ExportForCA'
     'Harden365.MFAperUser'
     'Harden365.ImportPhoneNumbers'
+    'Harden365.PowerPlatform'
+    'Harden365.Teams'
+    'Harden365.Outlook'
     'Get-AADRolesAudit'
     'Get-MSOAuditUsers'
 
@@ -98,7 +103,7 @@ function Test-AllPrerequisites {
         [int]$OperationTotal
     )
     Write-LogSection 'PREREQUISITES' -NoHostOutput
-    $numberOfPrerequisitesCheck = 7
+    $numberOfPrerequisitesCheck = 10
     $currentCountOfPrerequisitesCheck = 0
 
     Update-ProgressionBarOuterLoop -Activity 'Prerequisites check' -Status 'In progress' -OperationCount $OperationCount -OperationTotal $OperationTotal
@@ -121,6 +126,12 @@ function Test-AllPrerequisites {
     Test-PowerShellModule -ModuleName 'MSOnline' -ModuleVersion '1.1' -OperationCount $currentCountOfPrerequisitesCheck -OperationTotal $numberOfPrerequisitesCheck
     $currentCountOfPrerequisitesCheck++
     Test-PowerShellModule -ModuleName 'Microsoft.Online.SharePoint.PowerShell' -ModuleVersion '16.0' -OperationCount $currentCountOfPrerequisitesCheck -OperationTotal $numberOfPrerequisitesCheck
+    $currentCountOfPrerequisitesCheck++
+    Test-PowerShellModule -ModuleName 'Microsoft.PowerApps.Administration.PowerShell' -ModuleVersion '2.0.147' -OperationCount $currentCountOfPrerequisitesCheck -OperationTotal $numberOfPrerequisitesCheck
+    $currentCountOfPrerequisitesCheck++
+    Test-PowerShellModule -ModuleName 'Microsoft.PowerApps.PowerShell' -ModuleVersion '1.0.20' -OperationCount $currentCountOfPrerequisitesCheck -OperationTotal $numberOfPrerequisitesCheck
+    $currentCountOfPrerequisitesCheck++ 
+    Test-PowerShellModule -ModuleName 'MSCommerce' -ModuleVersion '1.7' -OperationCount $currentCountOfPrerequisitesCheck -OperationTotal $numberOfPrerequisitesCheck
     $currentCountOfPrerequisitesCheck++
     Test-PowerShellModule -ModuleName 'MicrosoftTeams' -ModuleVersion '4.2.0' -OperationCount $currentCountOfPrerequisitesCheck -OperationTotal $numberOfPrerequisitesCheck
     $currentCountOfPrerequisitesCheck++

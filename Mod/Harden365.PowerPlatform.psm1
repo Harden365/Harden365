@@ -12,89 +12,114 @@
         Hardening PowerPlatform
 
     .DESCRIPTION
-        Create CA for admins connection
-        Create group for exclude users
-        Create CA for users connection
-        Create group for legacy authentification
-        Create CA for legacy authentification
+        Disable User to share Apps to everyone.
+        Disable subscription free licence by users.
+        Disable subscription payable licence by users.
+        Disable subscription trial/developer licence by users.
+
 #>
 
-
-
-Function Start-BlockSubscriptionFree {
+Function Start-BlockShareAppsEveryone {
      <#
         .Synopsis
-         Disable suscription free licence by users.
+         Disable User to share Apps to everyone.
         
         .Description
-         Disable suscription free licence by userA.
+         Disable User to share Apps to everyone.
 
         .Notes
          Version: 01.00 -- 
          
     #>
-
-	param(
-	[Parameter(Mandatory = $false)]
-    [String]$mailNickName = "H365-MFAExclude"
-)
 
 Write-LogSection 'POWERPLATFORM' -NoHostOutput
 
 #SCRIPT
-
-Set-MsolCompanySettings -AllowAdHocSubscriptions $false
-
-$GroupAAD=Get-AzureADGroup -Filter "DisplayName eq '$Name'"
-    if (-not $GroupAAD)
-        {
-        Try {
-            New-AzureADGroup -Description "$Name" -DisplayName "$Name" -MailEnabled $false -SecurityEnabled $true -MailNickName $MailNickName
-            Write-LogInfo "Group '$Name' created"
-            }
-                 Catch {
-                        Write-LogError "Group '$Name' not created"
-                        }
+if ((Get-TenantSettings).powerPlatform.powerApps.disableShareWithEveryone -eq $false) {
+    Write-LogWarning "User allow to share apps with everyone"
+    $settings = Get-TenantSettings
+    $requestBody = @{
+    disableShareWithEveryone = $true
+    enableGuestsToMake = $false
+    disableMembersIndicator = $false
     }
-    else { 
-        Write-LogWarning "Group '$Name' already created!"
-          }
+    Set-TenantSettings -RequestBody $requestBody.powerPlatform.powerApps
+    Write-LogInfo "Disable standard users to share apps with everyone"}
+else {Write-LogInfo "Standard users already disabled to share apps with everyone"}
 }
 
-Function Start-LegacyAuthGroupExclude {
+Function Start-BlockSubscriptionFree {
      <#
         .Synopsis
-         Create group to legacy authentification.
+         Disable subscription free licence by users.
         
         .Description
-         This function will create new group to exclude LegacyAuth .
+         Disable subscription free licence by userA.
 
         .Notes
          Version: 01.00 -- 
          
     #>
 
-	param(
-	[Parameter(Mandatory = $false)]
-	[String]$Name = "Harden365 - CA Exclusion - Legacy Authentification Exclude",
-    [String]$mailNickName = "H365-LegacyExclude"
-)
+
+#SCRIPT
+if ((Get-MsolCompanyInformation).AllowAdHocSubscriptions -eq $true) {
+    Write-LogWarning "Prevent standard users from creating free subscriptions"
+    Set-MsolCompanySettings -AllowAdHocSubscriptions $false
+    Write-LogInfo "Disable standard users from creating free subscriptions"}
+else {Write-LogInfo "Standard users already disabled to create free subscriptions"}
+}
+
+Function Start-BlockSubscriptionPayable {
+     <#
+        .Synopsis
+         Disable subscription payable licence by users.
+        
+        .Description
+         Disable subscription payable licence by userA.
+
+        .Notes
+         Version: 01.00 -- 
+         
+    #>
 
 
 #SCRIPT
-$GroupAAD=Get-AzureADGroup -Filter "DisplayName eq '$Name'"
-    if (-not $GroupAAD)
-        {
-        Try {
-            New-AzureADGroup -Description "$Name" -DisplayName "$Name" -MailEnabled $false -SecurityEnabled $true -MailNickName $MailNickName
-            Write-LogInfo "Group '$Name' created"
-            }
-                 Catch {
-                        Write-LogError "Group '$Name' not created"
-                        }
+Connect-MSCommerce
+$Products = Get-MSCommerceProductPolicies -PolicyId AllowSelfServicePurchase
+ForEach ($Product in $Products) {
+        $productName = $Product.ProductName
+    if ($Product.PolicyValue -eq "Enabled") {
+        Write-LogWarning "Prevent standard users from creating $ProductName payable subscriptions"
+        Update-MSCommerceProductPolicy -PolicyId AllowSelfServicePurchase -ProductId $Product.ProductId -Enabled $false | Out-Null
+        Write-LogInfo "Disable standard users from creating $ProductName payable subscriptions"}
+    else {Write-LogInfo "Standard users already disabled to subscribe $ProductName payable subscriptions"}
     }
-    else { 
-        Write-LogWarning "Group '$Name' already created!"
-          }
+}
+
+Function Start-BlockSubscriptionTrials {
+     <#
+        .Synopsis
+         Disable subscription trial/developer licence by users.
+        
+        .Description
+         Disable subscription trial/developer licence by userA.
+
+        .Notes
+         Version: 01.00 -- 
+         
+    #>
+
+
+#SCRIPT
+
+if (((Get-AllowedConsentPlans).Types -eq "Internal") -or ((Get-AllowedConsentPlans).Types -eq "Viral")) {
+    Write-LogWarning "Prevent standard users from creating trial/developer subscriptions"
+    Remove-AllowedConsentPlans -Types @("Internal", "Viral") -Prompt $false
+    Write-LogInfo "Disable standard users from creating trial/developer subscriptions"}
+else {Write-LogInfo "Standard users already disabled to create trial/developer subscriptions"}
+
+Write-LogSection '' -NoHostOutput
+
 }
 

@@ -36,32 +36,45 @@ Function Start-AuditSPFDKIMDMARC {
 
 )
 
-Write-LogSection 'SPF - DMARC - DKIM' -NoHostOutput
+Write-LogSection 'SPF - DKIM - DMARC' -NoHostOutput
 
 #SCRIPT
 
-$Domains=(Get-AcceptedDomain | Where-Object { $_.DomainName -notmatch "onmicrosoft.com"}).Name
+$dateFileString = Get-Date -Format 'FileDateTimeUniversal'
+$debugFolderPath = Join-Path $pwd 'Audit'
+if (!(Test-Path -Path $debugFolderPath)) {
+    New-Item -Path $pwd -Name 'Audit' -ItemType Directory > $null
+}
+$debugFileFullPath = Join-Path $debugFolderPath "CheckDNS$dateFileString.log"
+"$(Get-Date -UFormat "%m-%d-%Y %T ") **** SPF - DKIM - DMARC" | Out-File "$debugFileFullPath" -Append
 
+$Domains=(Get-AcceptedDomain | Where-Object { $_.DomainName -notmatch "onmicrosoft.com"}).Name
 foreach ($Domain in $Domains) {
     $SPFResultes = Resolve-DnsName -Type TXT -Name $Domain -erroraction 'silentlycontinue'
         If ($Null -eq $SPFResultes){
+            "$(Get-Date -UFormat "%m-%d-%Y %T ") - No SPF Setting Found in $domain" | Out-File "$debugFileFullPath" -Append
             Write-LogWarning "No SPF Setting Found in $domain"
         } Else {
             $SPFResultesStrings =  ($SPFResultes   | Where-Object { $_.Strings -match "v=spf1"}).Strings
+            "$(Get-Date -UFormat "%m-%d-%Y %T ") - $Domain : Check SPF - $SPFResultesStrings" | Out-File "$debugFileFullPath" -Append
             Write-LogInfo "$Domain : Check SPF - $SPFResultesStrings"
         }
     $DKIMResultes = Resolve-DnsName -Type CNAME -Name selector1._domainkey.$Domain -erroraction 'silentlycontinue'
         If ($Null -eq $DKIMResultes){
+            "$(Get-Date -UFormat "%m-%d-%Y %T ") - No DKIM Setting Found in $Domain" | Out-File "$debugFileFullPath" -Append
             Write-LogWarning "No DKIM Setting Found in $Domain"
         } Else {
             $DKIMResultesString =  $DKIMResultes.NameHost
+            "$(Get-Date -UFormat "%m-%d-%Y %T ") - $Domain : Check DKIM - $DKIMResultesString" | Out-File "$debugFileFullPath" -Append
             Write-LogInfo "$Domain : Check DKIM - $DKIMResultesString"
         }
     $DMARCResultes = Resolve-DnsName -Type Txt -Name _dmarc.$Domain -erroraction 'silentlycontinue'
         If ($Null -eq $DMARCResultes){
+            "$(Get-Date -UFormat "%m-%d-%Y %T ") - No DMARC Setting Found in $Domain" | Out-File "$debugFileFullPath" -Append
             Write-LogWarning "No DMARC Setting Found in $Domain"
         } Else {
             $DMARCResultesStrings =  ($DMARCResultes   | Where-Object { $_.Name -match "_dmarc"}).Strings
+            "$(Get-Date -UFormat "%m-%d-%Y %T ") - $Domain : Check DMARC - $DMARCResultesStrings" | Out-File "$debugFileFullPath" -Append
             Write-LogInfo "$Domain : Check DMARC - $DMARCResultesStrings"
         }
           }

@@ -69,6 +69,9 @@ $DomainOnM365=(Get-AzureADDomain | Where-Object { $_.IsInitial -match $true }).N
             Try {
             Remove-KeePassDatabaseConfiguration -DatabaseProfileName "Harden365_uadmin" -Confirm:$false
             New-KeePassDatabaseConfiguration -DatabaseProfileName "Harden365_uadmin" -DatabasePath ".\Keepass\Harden365.kdbx" -UseMasterKey
+            $SecureString128=ConvertTo-SecureString "Harden365" -AsPlainText -Force
+            if ((Get-KeePassEntry -DatabaseProfileName "Harden365_uadmin" -KeePassEntryGroupPath "Harden365" -Title $Title -MasterKey $SecureString128) -eq $null)
+            {
             $Pass_uadmin = New-KeePassPassword -UpperCase:$UpperCase -LowerCase:$LowerCase -Digits:$Digits -SpecialCharacters:$SpecialCharacters  -ExcludeCharacters:$ExcludeCharacters -Length $Lengt
             $SecureString128=ConvertTo-SecureString "Harden365" -AsPlainText -Force
             New-KeePassEntry -DatabaseProfileName "Harden365_uadmin" -KeePassEntryGroupPath "Harden365" -Title $Title -UserName "u-admin@$DomainOnM365" -KeePassPassword $Pass_uadmin -MasterKey $SecureString128
@@ -82,6 +85,8 @@ $DomainOnM365=(Get-AzureADDomain | Where-Object { $_.IsInitial -match $true }).N
             Start-Sleep -Seconds 10
             New-AzureADMSRoleAssignment -DirectoryScopeId '/' -RoleDefinitionId $globalAdmin.Id -PrincipalId $uadmin.objectId
             Write-LogInfo "User 'u-admin@$DomainOnM365' created"
+            } else {
+            Write-LogWarning "User 'u-admin@$DomainOnM365' already created"}
             }
                  Catch {
                         Write-LogError "User 'u-admin@$DomainOnM365' not created"
@@ -106,7 +111,6 @@ Function Start-Tiers0GlobalAdminAccount {
 	param(
 	[Parameter(Mandatory = $false)]
 	[String]$Name = "Harden365 - Global Admin Account",
-    [String]$Domain = "onmicrosoft.com",
     [Boolean]$UpperCase = $true,
     [Boolean]$LowerCase = $true,
     [Boolean]$Digits = $true,
@@ -124,7 +128,7 @@ try {
     $poshkeepassinstalled = $true
 } catch {} 
 if (-not $poshkeepassinstalled) {
-    Write-LogWarning "User 'u-admin@$DomainOnM365' already created!" 
+    Write-LogInfo "Installing PoshKeepass Module!" 
     Install-Module -Name PoShKeePass -Force
 }
 
@@ -139,6 +143,9 @@ $DomainOnM365=(Get-AzureADDomain | Where-Object { $_.IsInitial -match $true }).N
             Try {
             Remove-KeePassDatabaseConfiguration -DatabaseProfileName "Harden365_sadmin" -Confirm:$false
             New-KeePassDatabaseConfiguration -DatabaseProfileName "Harden365_sadmin" -DatabasePath ".\Keepass\Harden365.kdbx" -UseMasterKey
+            $SecureString16=ConvertTo-SecureString "Harden365" -AsPlainText -Force
+            if ((Get-KeePassEntry -DatabaseProfileName "Harden365_sadmin" -KeePassEntryGroupPath "Harden365" -Title $Title -MasterKey $SecureString16) -eq $null)
+            {
             $Pass_sadmin = New-KeePassPassword -UpperCase:$UpperCase -LowerCase:$LowerCase -Digits:$Digits -SpecialCharacters:$SpecialCharacters  -ExcludeCharacters:$ExcludeCharacters -Length $Lengt
             $SecureString16=ConvertTo-SecureString "Harden365" -AsPlainText -Force
             New-KeePassEntry -DatabaseProfileName "Harden365_sadmin" -KeePassEntryGroupPath "Harden365" -Title $Title -UserName "s-admin@$DomainOnM365" -KeePassPassword $Pass_sadmin -MasterKey $SecureString16
@@ -152,6 +159,8 @@ $DomainOnM365=(Get-AzureADDomain | Where-Object { $_.IsInitial -match $true }).N
             Start-Sleep -Seconds 10
             New-AzureADMSRoleAssignment -DirectoryScopeId '/' -RoleDefinitionId $globalAdmin.Id -PrincipalId $sadmin.objectId
             Write-LogInfo "User 's-admin@$DomainOnM365' created"
+            } else {
+            Write-LogWarning "User 's-admin@$DomainOnM365' already created"}
             }
                  Catch {
                         Write-LogError "User 's-admin@$DomainOnM365' not created"
@@ -192,8 +201,8 @@ $DomainOnM365=(Get-MsolDomain | Where-Object { $_.IsInitial -match $true}).Name
      if ((Get-MsolUser -All).UserPrincipalName -eq "u-admin@$DomainOnM365")
         {
          Try {
+              Start-Sleep -Seconds 5
               Set-MsolUser -UserPrincipalName "u-admin@$DomainOnM365" -PasswordNeverExpires $true
-              Start-Sleep -Seconds 3
               Write-LogInfo "User 'u-admin@$DomainOnM365' never expires"
               }
                  Catch {
@@ -208,8 +217,8 @@ $DomainOnM365=(Get-MsolDomain | Where-Object { $_.IsInitial -match $true}).Name
      if ((Get-MsolUser -All).UserPrincipalName -eq "s-admin@$DomainOnM365")
         {
          Try {
+              Start-Sleep -Seconds 5
               Set-MsolUser -UserPrincipalName "s-admin@$DomainOnM365" -PasswordNeverExpires $true
-              Start-Sleep -Seconds 3
               Write-LogInfo "User 's-admin@$DomainOnM365' never expires"
               }
                  Catch {
