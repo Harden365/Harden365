@@ -19,8 +19,6 @@
         Block file sharing for other cloud storage services
         Prevent share details calendar
 
-MSO
-EOP
 
 #>
 
@@ -63,14 +61,29 @@ Function Start-OUTBlockOutlookAddIns {
          
     #>
 
+	param(
+	[Parameter(Mandatory = $false)]
+	[String]$PolicyName = "Harden365 - Prevent Add-ins"
+    )
 
+#OUTLOOK ADD INS
+try{
+$OutAddins= (Get-EXOMailbox | Select-Object -Unique RoleAssignmentPolicy | ForEach-Object { 
+    Get-RoleAssignmentPolicy -Identity $_.RoleAssignmentPolicy | Where-Object {
+        ($_.AssignedRoles -like "*Apps*") -and ($_.IsDefault -eq $true)}} | Select-Object Identity, @{Name="AssignedRoles"; Expression={Get-Mailbox | Select-Object -Unique RoleAssignmentPolicy | ForEach-Object {
+            Get-RoleAssignmentPolicy -Identity $_.RoleAssignmentPolicy | Select-Object -ExpandProperty AssignedRoles | Where-Object {$_ -like "*Apps*"}}}})
 
-#SCRIPT
-$newPolicyName = "Role Assignment Policy - Prevent Add-ins"
-$revisedRoles = <#"MyTeamMailboxes", "MyTextMessaging",#> "MyDistributionGroups", "MyMailSubscriptions", "MyBaseOptions", "MyVoiceMail", "MyProfileInformation", "MyContactInformation", "MyRetentionPolicies", "MyDistributionGroupMembership"
-New-RoleAssignmentPolicy -Name $newPolicyName -Roles $revisedRoles
-Set-RoleAssignmentPolicy -id $newPolicyName -IsDefault Get-Mailbox -ResultSize Unlimited | Set-Mailbox -RoleAssignmentPolicy $newPolicyName
-Write-LogInfo "Policy $newPolicyName created"      
+if (!$OutAddins) { 
+    Write-LogInfo "Outlook AddIns disable for self activation"
+    }
+else { 
+    Write-LogWarning "Outlook AddIns is self activation enabled !"
+    New-RoleAssignmentPolicy -Name $PolicyName -Roles $Roles
+    Set-RoleAssignmentPolicy -Identity $PolicyName -IsDefault -Confirm:$false
+    Get-Mailbox -ResultSize Unlimited | Set-Mailbox -RoleAssignmentPolicy $PolicyName
+    Write-LogInfo "Policy $PolicyName created"      
+}
+} catch{ Write-LogError "Module error" }
 }
 
 
@@ -116,9 +129,15 @@ Function Start-OUTCalendarSharing {
 
 #SCRIPT
 try {
-Get-SharingPolicy | Where-Object { ($_.Domains -like '*CalendarSharing*') -and ($_.Enabled -eq $true) } | ForEach-Object { Set-SharingPolicy -Identity $_.Name -Enabled $false 
-Write-LogInfo 'Policy share details calendar disabled' }
-} catch { Write-LogInfo 'Policy already disabled' }
+if (Get-SharingPolicy | Where-Object { ($_.Domains -like '*CalendarSharing*') -and ($_.Enabled -eq $true) }) { 
+    Get-SharingPolicy | Where-Object { ($_.Domains -like '*CalendarSharing*') -and ($_.Enabled -eq $true) } |
+    ForEach-Object {
+    Write-LogWarning 'Policy with calendar sharing found'
+    Set-SharingPolicy -Identity $_.Name -Enabled $false
+    Write-LogInfo 'Policy with Calendar Sharing disabled' }
+    }
+    else { Write-LogInfo 'Policy with Calendar Sharing not found' }
+} catch{ Write-LogError "Module error" }
 Write-LogSection '' -NoHostOutput        
 }
 

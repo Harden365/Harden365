@@ -429,18 +429,15 @@ $ApplicationMenu = CreateMenu -MenuTitle "HARDEN 365 - APPLICATIONS" -MenuOption
              write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; write-host("AUDIT APPLICATIONS") -ForegroundColor Red
              write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; Write-host ('Connecting to MSOlService Powershell') -ForegroundColor Green
              Connect-MSOlService -Credential $Credential -WarningAction:SilentlyContinue
-             try {Get-OrganizationConfig | Out-Null 
-             } catch {
              write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; Write-host ('Connecting to ExchangeOnline Powershell') -ForegroundColor Green
-             Connect-ExchangeOnline  -Credential $Credential -WarningAction:SilentlyContinue -ShowBanner:$false}
+             Connect-ExchangeOnline  -Credential $Credential -WarningAction:SilentlyContinue -ShowBanner:$false
              write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; Write-host ('Connecting to MSTeams Powershell') -ForegroundColor Green
              Connect-MicrosoftTeams -Credential $credential
              write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; Write-host ('Connecting to MSPowerApps Powershell') -ForegroundColor Green
-             #Add-PowerAppsAccount -Username s-admin@fernandezfrance.onmicrosoft.com -Password $Credential.Password
              $scriptFunctions=(Get-ChildItem function: | Where-Object { ($_.source -match 'Harden365.AuditApplications') -and ($_.Name -notmatch 'Start-OUTCheckAddIns')})
              $scriptFunctions | ForEach-Object {
              Try { 
-             & $_.Name  -ErrorAction:SilentlyContinue | Out-Null
+             & $_.Name  -credential $credential -ErrorAction:SilentlyContinue | Out-Null
              } Catch {
              write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; write-host("ERROR --> Harden365.AuditApplications module not working") -ForegroundColor Red}
              }
@@ -450,10 +447,8 @@ $ApplicationMenu = CreateMenu -MenuTitle "HARDEN 365 - APPLICATIONS" -MenuOption
     1{
              write-host $FrontStyle -ForegroundColor Red
              write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; write-host("HARDENING OUTLOOK") -ForegroundColor Red
-             try {Get-OrganizationConfig | Out-Null 
-             } catch {
              write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; Write-host ('Connecting to ExchangeOnline Powershell') -ForegroundColor Green
-             Connect-ExchangeOnline  -Credential $Credential -WarningAction:SilentlyContinue -ShowBanner:$false}
+             Connect-ExchangeOnline  -Credential $Credential -WarningAction:SilentlyContinue -ShowBanner:$false
              $scriptFunctions=(Get-ChildItem function: | Where-Object { $_.source -match 'Harden365.Outlook'})
              $scriptFunctions | ForEach-Object {
              Try { 
@@ -484,11 +479,10 @@ $ApplicationMenu = CreateMenu -MenuTitle "HARDEN 365 - APPLICATIONS" -MenuOption
              write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; write-host("HARDENING POWERPLATFORM") -ForegroundColor Red
              write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; Write-host ('Connecting to MSOlService Powershell') -ForegroundColor Green
              Connect-MSOlService -Credential $Credential -WarningAction:SilentlyContinue
-             #Add-PowerAppsAccount -Username $Credential.UserName -Password $Credential.Password
              $scriptFunctions=(Get-ChildItem function: | Where-Object { $_.source -match 'Harden365.PowerPlatform'})
              $scriptFunctions | ForEach-Object {
              Try { 
-             & $_.Name  -ErrorAction:SilentlyContinue | Out-Null
+             & $_.Name -credential $credential -ErrorAction:SilentlyContinue | Out-Null
              } Catch {
              write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; write-host("ERROR --> Harden365.PowerPlatform module not working") -ForegroundColor Red}
              }

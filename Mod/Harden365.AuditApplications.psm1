@@ -34,33 +34,38 @@ Function Start-OUTAudit {
 Write-LogInfo "**** AUDIT APPLICATION OUTLOOK"
 
 #LEGACY AUTHENTIFICATION
+try {
 if ($(Get-OrganizationConfig).OAuth2ClientProfileEnabled -eq $false) { 
     Write-LogWarning "Modern Auth in ExchangeOnline is disable!"
     }
 else { Write-LogInfo "Modern Auth in ExchangeOnline enabled"}    
-
+} catch{ Write-LogError "Module error" }
  
 
 #EXTERNAL STORAGE PROVIDER
+try {
 if ($(Get-OwaMailboxPolicy).AdditionalStorageProvidersAvailable -eq $true) { 
     Write-LogWarning "External storage Provider is available in Outlook !"
     }
 else { Write-LogInfo "External storage Provider is disabled"
 }
+} catch{ Write-LogError "Module error" }
 
 
 #CALENDAR SHARING
 try {
-Get-SharingPolicy | Where-Object { ($_.Domains -like '*CalendarSharing*') -and ($_.Enabled -eq $true) } | ForEach-Object { 
-Write-LogInfo 'Policy share details calendar disabled' }
-} catch { Write-LogInfo 'Policy already disabled' } 
-Write-LogSection '' -NoHostOutput       
-
+$calendars = Get-SharingPolicy | Where-Object { ($_.Domains -like '*CalendarSharing*') -and ($_.Enabled -eq $true) }
+if (!$calendars) { Write-LogInfo 'No Policy with Calendar Sharing found' }
+    else { ForEach ($calendar in $calendars) { 
+    Write-LogWarning 'Policy with calendar sharing found' }
+    }
+} catch{ Write-LogError "Module error" }
 
 #OUTLOOK ADD INS
+try{
 $OutAddins= (Get-EXOMailbox | Select-Object -Unique RoleAssignmentPolicy | ForEach-Object { 
     Get-RoleAssignmentPolicy -Identity $_.RoleAssignmentPolicy | Where-Object {
-        $_.AssignedRoles -like "*Apps*"}} | Select-Object Identity, @{Name="AssignedRoles"; Expression={Get-Mailbox | Select-Object -Unique RoleAssignmentPolicy | ForEach-Object {
+        ($_.AssignedRoles -like "*Apps*") -and ($_.IsDefault -eq $true)}} | Select-Object Identity, @{Name="AssignedRoles"; Expression={Get-Mailbox | Select-Object -Unique RoleAssignmentPolicy | ForEach-Object {
             Get-RoleAssignmentPolicy -Identity $_.RoleAssignmentPolicy | Select-Object -ExpandProperty AssignedRoles | Where-Object {$_ -like "*Apps*"}}}})
 
 if (!$OutAddins) { 
@@ -68,6 +73,8 @@ if (!$OutAddins) {
     }
 else { Write-LogWarning "Outlook AddIns is self activation enabled !"
 }
+} catch{ Write-LogError "Module error" }
+Write-LogSection '' -NoHostOutput      
 }
 
 Function Start-OUTCheckAddIns {
@@ -180,22 +187,35 @@ Function Start-POWAudit {
 
 Write-LogInfo "**** AUDIT APPLICATION POWERPLATFORM"
 
+    Param(
+        [System.Management.Automation.PSCredential]$Credential
+    )
+
 #BLOCKFREESUBSCRIPTION
+try {
 if ((Get-MsolCompanyInformation).AllowAdHocSubscriptions -eq $true) {
     Write-LogWarning "Standard users enabled to creating free subscriptions"}
 else {Write-LogInfo "Standard users already disabled to create free subscriptions"}
+} catch{ Write-LogError "Module error" }
 
 #SHAREEVERYONE
+try {
+Add-PowerAppsAccount -Username $Credential.UserName -Password $Credential.Password
 if ((Get-TenantSettings).powerPlatform.powerApps.disableShareWithEveryone -eq $false) {
     Write-LogWarning "User allow to share apps with everyone"}
 else {Write-LogInfo "Standard users already disabled to share apps with everyone"}
+} catch{ Write-LogError "Module error" }
 
 #BLOCKTRIALSUBSCRIPTION
+try {
+Add-PowerAppsAccount -Username $Credential.UserName -Password $Credential.Password
 if (((Get-AllowedConsentPlans).Types -eq "Internal") -or ((Get-AllowedConsentPlans).Types -eq "Viral")) {
     Write-LogWarning "Prevent standard users from creating trial/developer subscriptions"}
 else {Write-LogInfo "Standard users already disabled to create trial/developer subscriptions"}
+} catch{ Write-LogError "Module error" }
 
 #BLOCKPAYABLESUBSCRIPTION
+try{
 Connect-MSCommerce
 $Products = Get-MSCommerceProductPolicies -PolicyId AllowSelfServicePurchase
 ForEach ($Product in $Products) {
@@ -204,6 +224,7 @@ ForEach ($Product in $Products) {
         Write-LogWarning "Prevent standard users from creating $ProductName payable subscriptions"}
     else {Write-LogInfo "Standard users already disabled to subscribe $ProductName payable subscriptions"}
     }
+} catch{ Write-LogError "Module error" }
 Write-LogSection '' -NoHostOutput
 }
 
