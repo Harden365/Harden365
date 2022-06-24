@@ -414,7 +414,6 @@ Function Start-EOPAntiMalwarePolicy {
 	[Parameter(Mandatory = $false)]
 	[String]$PolicyName = "Harden365 - Malware Filter Policy",
     [String]$RuleName = "Harden365 - Malware Rule Policy",
-    [String]$Action = "DeleteMessage",
     [String]$Alerts = "alertsmailbox",
     [Boolean]$EnableFileFilter = $true,
     [Boolean]$ZapEnabled = $true,
@@ -431,7 +430,7 @@ $DomainOnM365=(Get-AcceptedDomain | Where-Object { $_.InitialDomain -match $true
     {
         Try { 
             Set-MalwareFilterPolicy -Identity "Default" -EnableFileFilter $EnableFileFilter
-            New-MalwareFilterPolicy -Name $PolicyName -Action $Action -EnableFileFilter $EnableFileFilter -ZapEnabled $ZapEnabled -EnableExternalSenderAdminNotifications $EnableExternalSenderAdminNotifications -ExternalSenderAdminAddress "$Alerts@$DomainOnM365" -EnableInternalSenderAdminNotifications $EnableInternalSenderAdminNotifications -InternalSenderAdminAddress "$Alerts@$DomainOnM365" -FileTypes $FileTypes
+            New-MalwareFilterPolicy -Name $PolicyName -EnableFileFilter $EnableFileFilter -ZapEnabled $ZapEnabled -EnableExternalSenderAdminNotifications $EnableExternalSenderAdminNotifications -ExternalSenderAdminAddress "$Alerts@$DomainOnM365" -EnableInternalSenderAdminNotifications $EnableInternalSenderAdminNotifications -InternalSenderAdminAddress "$Alerts@$DomainOnM365" -FileTypes $FileTypes
             Write-LogInfo "$PolicyName created"
             New-MalwareFilterRule -Name $RuleName -MalwareFilterPolicy $PolicyName -Priority $Priority -RecipientDomainIs ((Get-AcceptedDomain).Name)
             Write-LogInfo "$RuleName created"
