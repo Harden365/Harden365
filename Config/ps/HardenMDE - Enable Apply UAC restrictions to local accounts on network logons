@@ -1,0 +1,4 @@
+﻿# Enable 'Apply UAC restrictions to local accounts on network logons'
+if ($(Get-ItemProperty -Path Registry::HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System).LocalAccountTokenFilterPolicy -eq $null) {
+    New-ItemProperty -Path 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System' -Name 'LocalAccountTokenFilterPolicy' -Value "0" -PropertyType DWORD -Force }
+else {}

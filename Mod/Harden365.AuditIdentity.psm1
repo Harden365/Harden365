@@ -105,4 +105,12 @@ Write-LogSection '' -NoHostOutput
 # version Azure AD Tenant
 Get-AzureADSubscribedSku
 
-x<dc
+
+(Get-OrganizationConfig).Name
+(Get-OrganizationConfig).SharePointUrl
+
+(Get-OrganizationConfig).HiddenMembershipGroupsCreationEnabled  
+(Get-OrganizationConfig).DefaultGroupAccessType 
+(Get-OrganizationConfig).CustomerLockboxEnabled 
+
+Set-OrganizationConfig -CustomerLockboxEnabled $true

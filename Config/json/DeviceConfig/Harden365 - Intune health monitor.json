@@ -1,0 +1,19 @@
+{
+    "@odata.type":  "#microsoft.graph.windowsHealthMonitoringConfiguration",
+    "id":  "352a0069-5ca5-40d7-b6a6-85ebecdfd1e3",
+    "lastModifiedDateTime":  "2021-07-29T07:59:24.5489502Z",
+    "roleScopeTagIds":  [
+                            "0"
+                        ],
+    "supportsScopeTags":  true,
+    "deviceManagementApplicabilityRuleOsEdition":  null,
+    "deviceManagementApplicabilityRuleOsVersion":  null,
+    "deviceManagementApplicabilityRuleDeviceMode":  null,
+    "createdDateTime":  "2021-07-27T11:34:59.9578978Z",
+    "description":  "Harden365 - Intune health monitor v1.0",
+    "displayName":  "Harden365 - Intune health monitor",
+    "version":  2,
+    "allowDeviceHealthMonitoring":  "enabled",
+    "configDeviceHealthMonitoringScope":  "bootPerformance,windowsUpdates",
+    "configDeviceHealthMonitoringCustomScope":  null
+}

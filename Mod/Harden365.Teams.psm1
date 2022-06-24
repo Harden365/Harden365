@@ -160,3 +160,27 @@ Write-LogInfo "DesignatedPresentaterRoleMode change at OrganizerOnlyUserOverride
 } else { Write-LogInfo "DesignatedPresentaterRoleMode already set at OrganizerOnlyUserOverride"}
 Write-LogSection '' -NoHostOutput         
 }
+
+Function Start-TeamsExternalControl {
+     <#
+        .Synopsis
+         Configure which users are allowed to present in Teams meetings
+        
+        .Description
+         Configure which users are allowed to present in Teams meetings
+
+        .Notes
+         Version: 01.00 -- 
+         
+    #>
+
+
+
+#SCRIPT
+if ((Get-CsTeamsMeetingPolicy -Identity Global).AllowExternalParticipantGiveRequestControl -ne $false) {
+Set-CsTeamsMeetingPolicy -Identity Global -AllowExternalParticipantGiveRequestControl $false
+Write-LogInfo "AllowExternalParticipantGiveRequestControl disabled" 
+} else { Write-LogInfo "AllowExternalParticipantGiveRequestControl already disabled"}
+Write-LogSection '' -NoHostOutput         
+}
+

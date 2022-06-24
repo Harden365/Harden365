@@ -1,0 +1,4 @@
+﻿# Enable 'Local Security Authority (LSA) protection'
+if ($(Get-ItemProperty -Path Registry::HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Lsa).RunAsPPL -eq $null) {
+    New-ItemProperty -Path 'HKLM:\SYSTEM\CurrentControlSet\Control\Lsa' -Name 'RunAsPPL' -Value "1" -PropertyType DWORD -Force }
+else {}

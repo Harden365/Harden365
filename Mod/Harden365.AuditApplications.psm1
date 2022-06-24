@@ -135,12 +135,19 @@ Write-LogWarning "AutoAdmitted setting is not correct"
 } 
 else { Write-LogInfo "AutoAdmitted setting is correct"} 
 
-#ANONYMOUSJOINMETTING
+#ANONYMOUSJOINMEETING
 if ((Get-CsTeamsMeetingPolicy -Identity Global).AllowAnonymousUsersToJoinMeeting  -eq $true) {
 Write-LogWarning 'Anonymous Users allowed to Join Meeting !' 
 }
 else { Write-LogInfo "Anonymous Users disallowed to Join Meeting"
 }
+
+#EXTERNAL CONTROL
+if ((Get-CsTeamsMeetingPolicy -Identity Global).AllowExternalParticipantGiveRequestControl -ne $false) {
+Write-LogWarning "AllowExternalParticipantGiveRequestControl enabled !" 
+} else { Write-LogInfo "AllowExternalParticipantGiveRequestControl disabled"}
+Write-LogSection '' -NoHostOutput   
+
 
 #EXTERNAL STORAGE PROVIDER
 try {

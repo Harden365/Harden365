@@ -1,0 +1,4 @@
+﻿# Disable Flash on Adobe Reader DC
+if (-not $(Get-ItemProperty -Path "Registry::HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Adobe\Acrobat Reader\DC\FeatureLockDown").RequireSecuritySignature) {
+    New-ItemProperty -Path 'HKLM:\SOFTWARE\Policies\Adobe\Acrobat Reader\DC\FeatureLockDown' -Name 'bEnableFlash' -Value "0" -PropertyType DWORD -Force }
+else {}

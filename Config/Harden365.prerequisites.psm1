@@ -34,6 +34,7 @@ $allModulesPathList = @(
     'Harden365.ImportPhoneNumbers'
     'Harden365.PowerPlatform'
     'Harden365.Teams'
+    'Harden365.Sharepoint'
     'Harden365.Outlook'
     'Get-AADRolesAudit'
     'Get-MSOAuditUsers'
@@ -135,7 +136,7 @@ function Test-AllPrerequisites {
     $currentCountOfPrerequisitesCheck++
     Test-PowerShellModule -ModuleName 'MicrosoftTeams' -ModuleVersion '4.2.0' -OperationCount $currentCountOfPrerequisitesCheck -OperationTotal $numberOfPrerequisitesCheck
     $currentCountOfPrerequisitesCheck++
-    Test-PowerShellModule -ModuleName 'ORCA' -ModuleVersion '2.0' -OperationCount $currentCountOfPrerequisitesCheck -OperationTotal $numberOfPrerequisitesCheck
+    Test-PowerShellModule -ModuleName 'ORCA' -ModuleVersion '1.10.6' -OperationCount $currentCountOfPrerequisitesCheck -OperationTotal $numberOfPrerequisitesCheck
     $currentCountOfPrerequisitesCheck++
     Update-ProgressionBarInnerLoop -Activity 'Prerequisite check' -Status 'Complete' -OperationCount $currentCountOfPrerequisitesCheck -OperationTotal $numberOfPrerequisitesCheck
 

@@ -1,0 +1,42 @@
+{
+    "@odata.type":  "#microsoft.graph.windowsDeliveryOptimizationConfiguration",
+    "id":  "f7260755-68f7-4afa-8a8d-fe9ab391f912",
+    "lastModifiedDateTime":  "2021-08-02T10:19:39.7543647Z",
+    "roleScopeTagIds":  [
+                            "0"
+                        ],
+    "supportsScopeTags":  true,
+    "deviceManagementApplicabilityRuleOsEdition":  null,
+    "deviceManagementApplicabilityRuleOsVersion":  null,
+    "deviceManagementApplicabilityRuleDeviceMode":  null,
+    "createdDateTime":  "2021-07-30T13:52:17.153888Z",
+    "description":  "Harden365 - Download Mode v1.0",
+    "displayName":  "Harden365 - Download Mode",
+    "version":  2,
+    "deliveryOptimizationMode":  "httpWithPeeringNat",
+    "restrictPeerSelectionBy":  "subnetMask",
+    "groupIdSource":  null,
+    "backgroundDownloadFromHttpDelayInSeconds":  60,
+    "foregroundDownloadFromHttpDelayInSeconds":  60,
+    "minimumRamAllowedToPeerInGigabytes":  4,
+    "minimumDiskSizeAllowedToPeerInGigabytes":  32,
+    "minimumFileSizeToCacheInMegabytes":  10,
+    "minimumBatteryPercentageAllowedToUpload":  60,
+    "modifyCacheLocation":  null,
+    "maximumCacheAgeInDays":  15,
+    "vpnPeerCaching":  "disabled",
+    "cacheServerHostNames":  [
+
+                             ],
+    "cacheServerForegroundDownloadFallbackToHttpDelayInSeconds":  0,
+    "cacheServerBackgroundDownloadFallbackToHttpDelayInSeconds":  0,
+    "bandwidthMode":  {
+                          "@odata.type":  "#microsoft.graph.deliveryOptimizationBandwidthPercentage",
+                          "maximumBackgroundBandwidthPercentage":  25,
+                          "maximumForegroundBandwidthPercentage":  60
+                      },
+    "maximumCacheSize":  {
+                             "@odata.type":  "#microsoft.graph.deliveryOptimizationMaxCacheSizePercentage",
+                             "maximumCacheSizePercentage":  10
+                         }
+}

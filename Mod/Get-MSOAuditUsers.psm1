@@ -87,7 +87,7 @@ $ExportUsers = @()
             $UPN = $user.UserPrincipalName
             Write-LogInfo "Check $UPN"
             start-sleep -Seconds 1
-            $LastLogon = (Get-AzureADAuditSignInLogs -top 1 -Filter "UserPrincipalName eq '$UPN'").CreatedDateTime
+            try {$LastLogon = (Get-AzureADAuditSignInLogs -top 1 -Filter "UserPrincipalName eq '$UPN'").CreatedDateTime} catch { Write-LogError "line90 - No LastLogon found or TenantEdition not premium" }
             $LicenseNames = $user.LicensePlans
             Switch -Wildcard ($LicenseNames) {
                    "*FLOW_FREE" { $LicenseNames = "" }
@@ -136,7 +136,7 @@ $ExportUsers = @()
      
 $dateFileString = Get-Date -Format "FileDateTimeUniversal"
 mkdir -Force ".\Audit" | Out-Null
-$ExportUsers | Sort-Object  UserPrincipalName,Licenses | Select-object "Check",UserPrincipalName,Licenses,"Ad Sync","Never Expire","Password LastChange","MFA PER USER","MFA CONFIGURED","MFA PRIMARY METHOD","Phone Number","When Created"`
+$ExportUsers | Sort-Object  UserPrincipalName,Licenses | Select-object "Check",UserPrincipalName,Licenses,"Ad Sync","Never Expire","Last Logon (30d)","Password LastChange","MFA PER USER","MFA CONFIGURED","MFA PRIMARY METHOD","Phone Number","When Created"`
  | Export-Csv -Path ".\Audit\AuditUsersDetails$dateFileString.csv" -Delimiter ';' -Encoding UTF8 -NoTypeInformation
 
 

@@ -157,46 +157,6 @@ $DomainOnM365=(Get-AcceptedDomain | Where-Object { $_.InitialDomain -match $true
 }
 
 
-Function Start-EOAutoForwardGroup {
-     <#
-        .Synopsis
-         Create group for autoforward excluded
-        
-        .Description
-         This function will create new group for Autoforward excluded
-        
-        .Notes
-         Version: 01.00 -- 
-         
-    #>
-
-	param(
-	[Parameter(Mandatory = $false)]
-	[String]$Name = "Harden365 - GP AutoForward Allow",
-    [String]$Alias = "gp_autoforward_Allow",
-    [String]$Members = ""
-)
-
-
-#SCRIPT
-$GroupEOL=(Get-UnifiedGroup | Where-Object { $_.DisplayName -eq $Name}).Name
-    if (-not $GroupEOL)
-        {
-        Try {
-            New-UnifiedGroup -Name $name -DisplayName $Name  -Alias $Alias -AccessType Private -Confirm:$false | Out-Null
-            Set-UnifiedGroup -Identity $Name -HiddenFromAddressListsEnabled $true -HiddenFromExchangeClientsEnabled -UnifiedGroupWelcomeMessageEnabled:$false
-            Write-LogInfo "Group '$Name' created"
-            }
-                 Catch {
-                        Write-LogError "Group '$Name' not created"
-                        }
-    }
-    else { 
-         Write-LogWarning "Group '$Name' already created!"
-         }
-}
-
-
 Function Start-EOPAntispamGroupStrict {
      <#
         .Synopsis

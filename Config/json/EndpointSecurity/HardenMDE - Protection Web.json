@@ -1,0 +1,40 @@
+{
+    "displayName":  "HardenMDE - Protection Web",
+    "description":  "HardenMDE - Protection Web v1.0",
+    "roleScopeTagIds":  [
+                            "0"
+                        ],
+    "TemplateDisplayName":  "Web protection (Microsoft Edge Legacy)",
+    "TemplateId":  "72a62602-80d7-4e0e-a680-9a6ee84d019d",
+    "versionInfo":  "2005",
+    "settingsDelta":  [
+                          {
+                              "@odata.type":  "#microsoft.graph.deviceManagementStringSettingInstance",
+                              "id":  "81bcedf4-2297-4754-8cd9-b3faacca8d56",
+                              "definitionId":  "deviceConfiguration--windows10EndpointProtectionConfiguration_defenderNetworkProtectionType",
+                              "valueJson":  "\"enable\"",
+                              "value":  "enable"
+                          },
+                          {
+                              "@odata.type":  "#microsoft.graph.deviceManagementBooleanSettingInstance",
+                              "id":  "9ab8e2b5-0f20-4410-badf-7640b5dcf8a2",
+                              "definitionId":  "deviceConfiguration--windows10GeneralConfiguration_edgeRequireSmartScreen",
+                              "valueJson":  "true",
+                              "value":  true
+                          },
+                          {
+                              "@odata.type":  "#microsoft.graph.deviceManagementBooleanSettingInstance",
+                              "id":  "9ea5ad0e-1621-48ea-a603-b4e048fe5303",
+                              "definitionId":  "deviceConfiguration--windows10GeneralConfiguration_smartScreenBlockPromptOverride",
+                              "valueJson":  "false",
+                              "value":  false
+                          },
+                          {
+                              "@odata.type":  "#microsoft.graph.deviceManagementBooleanSettingInstance",
+                              "id":  "92ae17a0-608c-47f8-8f4f-9dbeecd83ead",
+                              "definitionId":  "deviceConfiguration--windows10GeneralConfiguration_smartScreenBlockPromptOverrideForFiles",
+                              "valueJson":  "false",
+                              "value":  false
+                          }
+                      ]
+}

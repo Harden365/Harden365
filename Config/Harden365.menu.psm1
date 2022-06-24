@@ -422,7 +422,7 @@ function ApplicationMenu(){
     Param(
         [System.Management.Automation.PSCredential]$Credential
     )
-$ApplicationMenu = CreateMenu -MenuTitle "HARDEN 365 - APPLICATIONS" -MenuOptions @("Audit Applications","Hardening Outlook","Hardening MS Teams","Hardening PowerPlatform","<- Return")
+$ApplicationMenu = CreateMenu -MenuTitle "HARDEN 365 - APPLICATIONS" -MenuOptions @("Audit Applications","Hardening Outlook","Hardening MS Teams","Hardening Sharepoint","Hardening PowerPlatform","<- Return")
         switch($ApplicationMenu){
     0{
              write-host $FrontStyle -ForegroundColor Red
@@ -474,7 +474,25 @@ $ApplicationMenu = CreateMenu -MenuTitle "HARDEN 365 - APPLICATIONS" -MenuOption
              Read-Host -Prompt "Press Enter to return_"
              ApplicationMenu -Credential $Credential
       }
-    3{
+     3{
+             write-host $FrontStyle -ForegroundColor Red
+             write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; write-host("HARDENING SHAREPOINT") -ForegroundColor Red
+             Connect-ExchangeOnline  -Credential $Credential -WarningAction:SilentlyContinue -ShowBanner:$false
+             write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; Write-host ('Connecting to SPO Powershell') -ForegroundColor Green
+             $URLSPO = (Get-OrganizationConfig).SharePointUrl -split '.sharepoint.com/'
+             $AdminSPO= $URLSPO -join'-admin.sharepoint.com'
+             Connect-SPOService -Url $AdminSPO -Credential $Credential -WarningAction:SilentlyContinue
+             $scriptFunctions=(Get-ChildItem function: | Where-Object { $_.source -match 'Harden365.Sharepoint'})
+             $scriptFunctions | ForEach-Object {
+             Try { 
+             & $_.Name -credential $credential -ErrorAction:SilentlyContinue | Out-Null
+             } Catch {
+             write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; write-host("ERROR --> Harden365.Sharepoint module not working") -ForegroundColor Red}
+             }
+             Read-Host -Prompt "Press Enter to return_"
+             ApplicationMenu -Credential $Credential
+      }
+    4{
              write-host $FrontStyle -ForegroundColor Red
              write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; write-host("HARDENING POWERPLATFORM") -ForegroundColor Red
              write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; Write-host ('Connecting to MSOlService Powershell') -ForegroundColor Green
@@ -489,7 +507,8 @@ $ApplicationMenu = CreateMenu -MenuTitle "HARDEN 365 - APPLICATIONS" -MenuOption
              Read-Host -Prompt "Press Enter to return_"
              ApplicationMenu -Credential $Credential
       }
-      4{
+
+      5{
       MainMenu -Credential $Credential -TenantEdition $TenantEdition -O365ATP $O365ATP
       }
     Default{

@@ -1,0 +1,4 @@
+﻿# Enable 'Require domain users to elevate when setting a network's location'
+if ($(Get-ItemProperty -Path Registry::HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\'Network Connections').NC_StdDomainUserSetLocation -eq $null) {
+    New-ItemProperty -Path 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\Network Connections' -Name 'NC_StdDomainUserSetLocation' -Value "1" -PropertyType DWORD -Force }
+else {}

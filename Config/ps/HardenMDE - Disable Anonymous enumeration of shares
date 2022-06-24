@@ -1,0 +1,4 @@
+﻿# Disable Anonymous enumeration of shares
+if ($(Get-ItemProperty -Path Registry::HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Lsa).RestrictAnonymous -eq "0") {
+    New-ItemProperty -Path 'HKLM:\SYSTEM\CurrentControlSet\Control\Lsa' -Name 'RestrictAnonymous' -Value "1" -PropertyType DWORD -Force }
+else {}
