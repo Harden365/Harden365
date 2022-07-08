@@ -1,4 +1,39 @@
-﻿#region Authentification
+﻿<# 
+    .NOTES
+    ===========================================================================
+        FileName:     Harden365.DeviceADMXImport.psm1
+        Author:       Community Harden - contact@harden365.net
+        Created On:   06/15/2022
+        Last Updated: 06/15/2022
+        Version:      v0.7
+    ===========================================================================
+
+    .SYNOPSYS
+        Export to Device ADMX setting
+
+    .DESCRIPTION
+
+#>
+
+Function Start-DeviceADMXImport {
+     <#
+        .Synopsis
+         DeviceScriptImport
+        
+        .Description
+         This function will 
+
+        .Notes
+         Version: 01.00 -- 
+         
+    #>
+
+	param(
+)
+
+Write-LogSection 'DEVICE ADMX IMPORT' -NoHostOutput
+
+#region Authentification
 $ApplicationID = $(Get-AzureADApplication -Filter "DisplayName eq 'Harden365 App'").AppId
 $TenantDomainName = $(Get-AzureADTenantDetail).ObjectId
 #Jeff
@@ -243,3 +278,4 @@ NAME: Test-AuthHeader
 
 $ImportPath =".\Config\json\ADMXConfig"
 Get-ChildItem "$ImportPath" | Where-Object { $_.PSIsContainer -eq $True } | ForEach-Object { import-ADMX $_.FullName }
+}

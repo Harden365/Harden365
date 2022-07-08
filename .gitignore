@@ -1,5 +1,3 @@
-Config/GraphAPI.psm1
-Config/html.psm1
 Logs/
 Input/
 Audit/

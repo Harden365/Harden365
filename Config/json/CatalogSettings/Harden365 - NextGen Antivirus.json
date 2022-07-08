@@ -1,6 +1,6 @@
 {
-    "name":  "Harden365-NextGen Antivirus",
-    "description":  "Harden365-NextGen Antivirus",
+    "name":  "Harden365 - NextGen Antivirus",
+    "description":  "Harden365 - NextGen Antivirus v1.0",
     "platforms":  "windows10",
     "technologies":  "mdm,microsoftSense",
     "templateReference":  {

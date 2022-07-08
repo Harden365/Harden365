@@ -38,7 +38,9 @@ Write-LogSection 'DEVICE CONFIGURATION IMPORT' -NoHostOutput
 $ApplicationID = $(Get-AzureADApplication -Filter "DisplayName eq 'Harden365 App'").AppId
 $TenantDomainName = $(Get-AzureADTenantDetail).ObjectId
 #$AccessSecret = "YjhlNjA1NWQtOWVmMC00ZjEyLWJmMDQtMTEyOGI1YjdhZWZm"
-$AccessSecret = $($PasswordCredential).Value
+#Demo
+$AccessSecret = "ZDIyYjFlMjctOTliYy00MTUxLTljMDItYjYyMzllOGMyZjlm"
+#$AccessSecret = $($PasswordCredential).Value
 
 $Body = @{
 Grant_Type    = "client_credentials"

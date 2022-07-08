@@ -57,9 +57,7 @@ if (((Get-MsolAccountSku | Where-Object { $_.ActiveUnits -ne "0" }| Select -Expa
 elseif (((Get-MsolAccountSku | Where-Object { $_.ActiveUnits -ne "0" } | Select -ExpandProperty ServiceStatus).ServicePlan).ServiceName -match "AAD_PREMIUM")
     { $TenantEdition = ((Get-MsolAccountSku | Where-Object { $_.ActiveUnits -ne "0" } | Select -ExpandProperty ServiceStatus).ServicePlan | Where-Object { $_.ServiceName -match "AAD_PREMIUM" }).ServiceName
        $TenantEdition = "Azure AD Premium P1" }  
-elseif (((Get-MsolAccountSku | Where-Object { $_.ActiveUnits -ne "0" } | Select -ExpandProperty ServiceStatus).ServicePlan).ServiceName -match "AAD_BASIC")
-    { $TenantEdition = ((Get-MsolAccountSku | Where-Object { $_.ActiveUnits -ne "0" } | Select -ExpandProperty ServiceStatus).ServicePlan | Where-Object { $_.ServiceName -match "EOP_ENTERPRISE" }).ServiceName
-      $TenantEdition = "Azure AD Free" }  
+else { $TenantEdition = "Azure AD Free" }  
 }
 
 Function Check-DefenderATP {

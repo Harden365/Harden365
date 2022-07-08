@@ -14,6 +14,15 @@ Function Get-AADRolesAudit {
 Write-LogSection 'AUDIT ROLES' -NoHostOutput
 $DomainOnM365=(Get-AzureADDomain | Where-Object { $_.IsInitial -match $true }).Name
 
+#TENANT EDITION
+if (((Get-MsolAccountSku | Where-Object { $_.ActiveUnits -ne "0" }| Select -ExpandProperty ServiceStatus).ServicePlan).ServiceName -match "AAD_PREMIUM_P2")
+    { $TenantEdition = ((Get-MsolAccountSku | Where-Object { $_.ActiveUnits -ne "0" } | Select -ExpandProperty ServiceStatus).ServicePlan | Where-Object { $_.ServiceName -match "AAD_PREMIUM_P2" }).ServiceName
+      $TenantEdition = "Azure AD Premium P2" }    
+elseif (((Get-MsolAccountSku | Where-Object { $_.ActiveUnits -ne "0" } | Select -ExpandProperty ServiceStatus).ServicePlan).ServiceName -match "AAD_PREMIUM")
+    { $TenantEdition = ((Get-MsolAccountSku | Where-Object { $_.ActiveUnits -ne "0" } | Select -ExpandProperty ServiceStatus).ServicePlan | Where-Object { $_.ServiceName -match "AAD_PREMIUM" }).ServiceName
+       $TenantEdition = "Azure AD Premium P1" }  
+
+
 
 $header = @"
 <img src="$pwd\Config\Harden365.logohtml" alt="logoHarden365" class="centerImage" alt="CH Logo" height="167" width="500">
@@ -65,6 +74,29 @@ $header = @"
 
 $RolesCollection = @()
 $Roles = Get-AzureADDirectoryRole
+
+if ($TenantEdition -eq $null) {
+Try {
+    ForEach ($Role In $Roles){
+    $Members = Get-AzureADDirectoryRoleMember -ObjectId $Role.ObjectId 
+    ForEach ($Member In $Members) {
+    $UPN = $Member.UserPrincipalName
+    Write-LogInfo "Check $UPN"
+    start-sleep -Seconds 1
+    $objrole = New-Object PSObject -Property @{
+      ObjectId = $Member.ObjectId
+      'Role Name' = $Role.DisplayName
+      Name = $Member.DisplayName
+      UserPrincipalName = $Member.UserPrincipalName
+      MemberType = $Member.UserType
+      Enabled = $Member.AccountEnabled
+      'When Created' = ($Member.ExtensionProperty).createdDateTime
+      }
+      $RolesCollection += $objrole
+    }
+    }
+} catch { Write-LogError " Roles Collection building error"}
+} else {
 Try {
     ForEach ($Role In $Roles){
     $Members = Get-AzureADDirectoryRoleMember -ObjectId $Role.ObjectId 
@@ -86,6 +118,10 @@ Try {
     }
     }
 } catch { Write-LogError " Roles Collection building error"}
+}
+
+
+
 
 try {
     $UsersCollection = @()

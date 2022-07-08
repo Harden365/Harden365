@@ -27,6 +27,14 @@ Write-LogSection 'AUDIT USERS' -NoHostOutput
 
 $DomainOnM365=(Get-MsolDomain | Where-Object { $_.IsInitial -match $true }).Name
 
+#TENANT EDITION
+if (((Get-MsolAccountSku | Where-Object { $_.ActiveUnits -ne "0" }| Select -ExpandProperty ServiceStatus).ServicePlan).ServiceName -match "AAD_PREMIUM_P2")
+    { $TenantEdition = ((Get-MsolAccountSku | Where-Object { $_.ActiveUnits -ne "0" } | Select -ExpandProperty ServiceStatus).ServicePlan | Where-Object { $_.ServiceName -match "AAD_PREMIUM_P2" }).ServiceName
+      $TenantEdition = "Azure AD Premium P2" }    
+elseif (((Get-MsolAccountSku | Where-Object { $_.ActiveUnits -ne "0" } | Select -ExpandProperty ServiceStatus).ServicePlan).ServiceName -match "AAD_PREMIUM")
+    { $TenantEdition = ((Get-MsolAccountSku | Where-Object { $_.ActiveUnits -ne "0" } | Select -ExpandProperty ServiceStatus).ServicePlan | Where-Object { $_.ServiceName -match "AAD_PREMIUM" }).ServiceName
+       $TenantEdition = "Azure AD Premium P1" }  
+
 $header = @"
 <img src="..\Config\Harden365.logohtml" alt="logoHarden365" class="centerImage" alt="CH Logo" height="167" width="500">
 <style>
@@ -87,7 +95,9 @@ $ExportUsers = @()
             $UPN = $user.UserPrincipalName
             Write-LogInfo "Check $UPN"
             start-sleep -Seconds 1
-            try {$LastLogon = (Get-AzureADAuditSignInLogs -top 1 -Filter "UserPrincipalName eq '$UPN'").CreatedDateTime} catch { Write-LogError "line90 - No LastLogon found or TenantEdition not premium" }
+            if ($TenantEdition -ne $null) {
+            $LastLogon = (Get-AzureADAuditSignInLogs -top 1 -Filter "UserPrincipalName eq '$UPN'").CreatedDateTime }
+
             $LicenseNames = $user.LicensePlans
             Switch -Wildcard ($LicenseNames) {
                    "*FLOW_FREE" { $LicenseNames = "" }

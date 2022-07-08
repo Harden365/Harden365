@@ -54,7 +54,6 @@ $token = $ConnectGraph.access_token
 #endregion
 
     $graphApiVersion = "Beta"
-    #$ESP_resource = "deviceManagement/deviceConfigurations"
     $ESP_resource = "deviceManagement/configurationPolicies"
     $uri = "https://graph.microsoft.com/$graphApiVersion/$($ESP_resource)"
     
@@ -67,7 +66,7 @@ foreach($Configuration in $Configurations){
     write-host $FileName
     $JSON_Data = Get-Content -Path ".\Config\json\CatalogSettings\$FileName"
     $JSON_Convert = $JSON_Data | ConvertFrom-Json | Select-Object -Property * -ExcludeProperty id,createdDateTime,lastModifiedDateTime,version,supportsScopeTags
-    $JSON_Output = $JSON_Convert | ConvertTo-Json -Depth 5
+    $JSON_Output = $JSON_Convert | ConvertTo-Json -Depth 20
 
     #region CONNECT GRAPH
     Invoke-RestMethod -Uri $uri -Headers @{Authorization = "Bearer $($token)"} -Method Post -Body $JSON_Output -ContentType "application/json"

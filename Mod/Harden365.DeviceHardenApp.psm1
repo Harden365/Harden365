@@ -1,4 +1,40 @@
-﻿#### HARDEN365 APP #####
+﻿<# 
+    .NOTES
+    ===========================================================================
+        FileName:     Harden365.DeviceHardenApp.psm1
+        Author:       Community Harden - contact@harden365.net
+        Created On:   06/15/2022
+        Last Updated: 06/15/2022
+        Version:      v0.7
+    ===========================================================================
+
+    .SYNOPSYS
+        Create Azure AD Application Harden365
+
+    .DESCRIPTION
+
+#>
+
+Function Start-Harden365App {
+     <#
+        .Synopsis
+         DeviceConfigImport
+        
+        .Description
+         This function will 
+
+        .Notes
+         Version: 01.00 -- 
+         
+    #>
+
+	param(
+)
+
+Write-LogSection 'CREATE HARDEN365 APP' -NoHostOutput
+
+
+#### HARDEN365 APP #####
 
 #region Create Secret
 $Secret = New-Guid
@@ -9,6 +45,7 @@ $PasswordCredential.EndDate = $startDate.AddYears(1)
 $PasswordCredential.KeyId = $Secret
 $PasswordCredential.Value = ([System.Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes(($Secret))))
 $SecretPass = $PasswordCredential.Value
+Write-LogWarning "Please keep Harden365 App secret $SecretPass"
 #endregion
 
 #region Create Harden365 App
@@ -95,3 +132,5 @@ $requiredResourcesAccess.Add($requiredGraphAccess)
 #Set permissions in existing Azure AD App
 $appObjectId=$Harden365App.ObjectId
 Set-AzureADApplication -ObjectId $appObjectId -RequiredResourceAccess $requiredResourcesAccess
+
+}

@@ -1,4 +1,39 @@
-﻿#region Authentification
+﻿<# 
+    .NOTES
+    ===========================================================================
+        FileName:     Harden365.DeviceADMXImport.psm1
+        Author:       Community Harden - contact@harden365.net
+        Created On:   06/15/2022
+        Last Updated: 06/15/2022
+        Version:      v0.7
+    ===========================================================================
+
+    .SYNOPSYS
+        Export to Device ADMX setting
+
+    .DESCRIPTION
+
+#>
+
+Function Start-DeviceSecurityImport {
+     <#
+        .Synopsis
+         DeviceScriptImport
+        
+        .Description
+         This function will 
+
+        .Notes
+         Version: 01.00 -- 
+         
+    #>
+
+	param(
+)
+
+Write-LogSection 'DEVICE SECURITY IMPORT' -NoHostOutput
+
+#region Authentification
 $ApplicationID = $(Get-AzureADApplication -Filter "DisplayName eq 'Harden365 App'").AppId
 $TenantDomainName = $(Get-AzureADTenantDetail).ObjectId
 #Jeff
@@ -99,8 +134,6 @@ Write-Verbose "Resource: $ESP_resource"
 
         else {
 
-        Test-JSON -JSON $JSON
-
         $uri = "https://graph.microsoft.com/$graphApiVersion/$($ESP_resource)"
         #Invoke-RestMethod -Uri $uri -Headers $authToken -Method Post -Body $JSON -ContentType "application/json"
         Invoke-RestMethod -Uri $uri -Headers @{Authorization = "Bearer $($token)"} -Method Post -Body $JSON -ContentType "application/json"
@@ -126,71 +159,19 @@ Write-Verbose "Resource: $ESP_resource"
 
 }
 
-####################################################
-
-Function Test-JSON(){
-
-<#
-.SYNOPSIS
-This function is used to test if the JSON passed to a REST Post request is valid
-.DESCRIPTION
-The function tests if the JSON passed to the REST Post is valid
-.EXAMPLE
-Test-JSON -JSON $JSON
-Test if the JSON is valid before calling the Graph REST interface
-.NOTES
-NAME: Test-JSON
-#>
-
-param (
-
-$JSON
-
-)
-
-    try {
-
-    $TestJSON = ConvertFrom-Json $JSON -ErrorAction Stop
-    $validJson = $true
-
-    }
-
-    catch {
-
-    $validJson = $false
-    $_.Exception
-
-    }
-
-    if (!$validJson){
-    
-    Write-Host "Provided JSON isn't in valid JSON format" -f Red
-    break
-
-    }
-
-}
-
-
-
-$ImportPath = Read-Host -Prompt "Please specify a path to a JSON file to import data from e.g. C:\IntuneOutput\Policies\policy.json"
-
-# Replacing quotes for Test-Path
-$ImportPath = $ImportPath.replace('"','')
-
-if(!(Test-Path "$ImportPath")){
-
-Write-Host "Import Path for JSON file doesn't exist..." -ForegroundColor Red
-Write-Host "Script can't continue..." -ForegroundColor Red
-Write-Host
-break
-
-}
 
 ####################################################
+
+$Configurations = Get-ChildItem -Path .\Config\json\EndpointSecurity\
+
+foreach($Configuration in $Configurations){
+    $FileName = $Configuration.Name
+    write-host $FileName
+
+###################################################
 
 # Getting content of JSON Import file
-$JSON_Data = gc "$ImportPath"
+$JSON_Data = Get-Content -Path ".\Config\json\EndpointSecurity\$FileName"
 
 # Converting input to JSON format
 $JSON_Convert = $JSON_Data | ConvertFrom-Json
@@ -307,3 +288,5 @@ $JSON_Output
 write-host
 Write-Host "Adding Endpoint Security Policy '$DisplayName'" -ForegroundColor Yellow
 Add-EndpointSecurityPolicy -TemplateId $TemplateId -JSON $JSON_Output
+}
+}

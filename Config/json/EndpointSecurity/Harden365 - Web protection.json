@@ -1,6 +1,6 @@
 {
-    "displayName":  "HardenMDE - Protection Web",
-    "description":  "HardenMDE - Protection Web v1.0",
+    "displayName":  "HardenMDE - Web Protection",
+    "description":  "HardenMDE - Web Protection v1.0",
     "roleScopeTagIds":  [
                             "0"
                         ],
