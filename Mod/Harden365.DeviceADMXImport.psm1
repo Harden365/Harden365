@@ -38,7 +38,7 @@ Write-LogSection 'DEVICE ADMX IMPORT' -NoHostOutput
 #region Authentification
 $ApplicationID = $(Get-AzureADApplication -Filter "DisplayName eq 'Harden365 App'").AppId
 $TenantDomainName = $(Get-AzureADTenantDetail).ObjectId
-$AccessSecret = 'Y2UxMmI3ODQtNjk1OC00OTk4LTg1MDYtY2Q3ZTliOThiMTMw'
+
 
 $Body = @{
 Grant_Type    = "client_credentials"
