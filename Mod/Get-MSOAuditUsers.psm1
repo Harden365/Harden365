@@ -96,7 +96,9 @@ $ExportUsers = @()
             Write-LogInfo "Check $UPN"
             start-sleep -Seconds 1
             if ($TenantEdition -ne $null) {
-            $LastLogon = (Get-AzureADAuditSignInLogs -top 1 -Filter "UserPrincipalName eq '$UPN'").CreatedDateTime }
+            try {$LastLogon = (Get-AzureADAuditSignInLogs -top 1 -Filter "UserPrincipalName eq '$UPN'").CreatedDateTime} catch { $LastLogon = 'N/A' }
+            }
+
 
             $LicenseNames = $user.LicensePlans
             Switch -Wildcard ($LicenseNames) {
@@ -109,6 +111,7 @@ $ExportUsers = @()
                    "*POWER_BI_PRO" { $LicenseNames = "PowerBI Pro" }
                    "*EXCHANGESTANDARD" { $LicenseNames = "ExchangeOnline P1" }
                    "*O365_BUSINESS_PREMIUM" { $LicenseNames = "M365 Business Standard" }
+                   "*O365_BUSINESS_ESSENTIALS" { $LicenseNames = "M365 Business Basic" }
                    "*DYN365_ENTERPRISE_SALES" { $LicenseNames = "Dyn365 Sales Enterprise Edition" }
                    "*DYN365_TEAM_MEMBERS" { $LicenseNames = "Dyn365 Team Members" }
                    "*PROJECTPROFESSIONAL" { $LicenseNames = "Project Professional P3" }

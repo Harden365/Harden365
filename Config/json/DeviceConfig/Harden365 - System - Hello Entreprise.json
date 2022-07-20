@@ -1,7 +1,7 @@
 {
     "@odata.type":  "#microsoft.graph.windowsIdentityProtectionConfiguration",
     "id":  "c849d28e-bc0b-4b49-8ceb-bade52beef87",
-    "lastModifiedDateTime":  "2021-07-23T06:41:30.8006155Z",
+    "lastModifiedDateTime":  "2022-07-13T12:17:18.9386037Z",
     "roleScopeTagIds":  [
                             "0"
                         ],
@@ -10,9 +10,9 @@
     "deviceManagementApplicabilityRuleOsVersion":  null,
     "deviceManagementApplicabilityRuleDeviceMode":  null,
     "createdDateTime":  "2021-07-23T06:41:30.8006155Z",
-    "description":  "Harden365 - Hello Entreprise v1.0",
-    "displayName":  "Harden365 - Hello Entreprise",
-    "version":  1,
+    "description":  null,
+    "displayName":  "Harden365 - System - Hello Entreprise",
+    "version":  2,
     "useSecurityKeyForSignin":  true,
     "enhancedAntiSpoofingForFacialFeaturesEnabled":  false,
     "pinMinimumLength":  4,

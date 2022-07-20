@@ -1,0 +1,40 @@
+{
+    "@odata.type":  "#microsoft.graph.macOSExtensionsConfiguration",
+    "id":  "d93b7af5-1d10-480e-b807-3e1d9564eef3",
+    "lastModifiedDateTime":  "2022-07-07T13:16:18.3956794Z",
+    "roleScopeTagIds":  [
+                            "0"
+                        ],
+    "supportsScopeTags":  true,
+    "deviceManagementApplicabilityRuleOsEdition":  null,
+    "deviceManagementApplicabilityRuleOsVersion":  null,
+    "deviceManagementApplicabilityRuleDeviceMode":  null,
+    "createdDateTime":  "2022-07-07T12:22:36.169272Z",
+    "description":  null,
+    "displayName":  "HardenMAC - Defender System Extensions",
+    "version":  2,
+    "kernelExtensionOverridesAllowed":  false,
+    "kernelExtensionAllowedTeamIdentifiers":  [
+
+                                              ],
+    "systemExtensionsBlockOverride":  false,
+    "systemExtensionsAllowedTeamIdentifiers":  [
+
+                                               ],
+    "kernelExtensionsAllowed":  [
+
+                                ],
+    "systemExtensionsAllowed":  [
+                                    {
+                                        "teamIdentifier":  "UBF8T346G9",
+                                        "bundleId":  "com.microsoft.wdav.epsext"
+                                    },
+                                    {
+                                        "teamIdentifier":  "UBF8T346G9",
+                                        "bundleId":  "com.microsoft.wdav.netext"
+                                    }
+                                ],
+    "systemExtensionsAllowedTypes":  [
+
+                                     ]
+}

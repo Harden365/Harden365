@@ -29,6 +29,8 @@ Function Start-DeviceConfigImport {
     #>
 
 	param(
+	[Parameter(Mandatory = $false)]
+    [String]$AccessSecret
 )
 
 Write-LogSection 'DEVICE CONFIGURATION IMPORT' -NoHostOutput
@@ -37,10 +39,6 @@ Write-LogSection 'DEVICE CONFIGURATION IMPORT' -NoHostOutput
 #region Authentification
 $ApplicationID = $(Get-AzureADApplication -Filter "DisplayName eq 'Harden365 App'").AppId
 $TenantDomainName = $(Get-AzureADTenantDetail).ObjectId
-#$AccessSecret = "YjhlNjA1NWQtOWVmMC00ZjEyLWJmMDQtMTEyOGI1YjdhZWZm"
-#Demo
-$AccessSecret = "ZDIyYjFlMjctOTliYy00MTUxLTljMDItYjYyMzllOGMyZjlm"
-#$AccessSecret = $($PasswordCredential).Value
 
 $Body = @{
 Grant_Type    = "client_credentials"
@@ -60,7 +58,7 @@ $token = $ConnectGraph.access_token
 
 foreach($Configuration in $Configurations){
     $FileName = $Configuration.Name
-    write-host $FileName
+    write-LogInfo "Adding Device Configuration '$FileName'"
     $JSON_Data = Get-Content -Path ".\Config\json\DeviceConfig\$FileName"
     $JSON_Convert = $JSON_Data | ConvertFrom-Json | Select-Object -Property * -ExcludeProperty id,createdDateTime,lastModifiedDateTime,version,supportsScopeTags
     $JSON_Output = $JSON_Convert | ConvertTo-Json -Depth 5

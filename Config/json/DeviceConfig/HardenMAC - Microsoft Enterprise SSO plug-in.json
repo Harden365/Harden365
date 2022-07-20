@@ -1,0 +1,89 @@
+{
+    "@odata.type":  "#microsoft.graph.macOSDeviceFeaturesConfiguration",
+    "id":  "14c3ed2f-e279-4caf-92bb-76ce78ad4a55",
+    "lastModifiedDateTime":  "2022-07-07T12:10:54.7831409Z",
+    "roleScopeTagIds":  [
+                            "0"
+                        ],
+    "supportsScopeTags":  true,
+    "deviceManagementApplicabilityRuleOsEdition":  null,
+    "deviceManagementApplicabilityRuleOsVersion":  null,
+    "deviceManagementApplicabilityRuleDeviceMode":  null,
+    "createdDateTime":  "2022-07-06T13:01:28.6566581Z",
+    "description":  null,
+    "displayName":  "HardenMAC - Microsoft Enterprise SSO plug-in",
+    "version":  2,
+    "adminShowHostInfo":  false,
+    "loginWindowText":  null,
+    "authorizedUsersListHidden":  false,
+    "authorizedUsersListHideLocalUsers":  false,
+    "authorizedUsersListHideMobileAccounts":  false,
+    "authorizedUsersListIncludeNetworkUsers":  false,
+    "authorizedUsersListHideAdminUsers":  false,
+    "authorizedUsersListShowOtherManagedUsers":  false,
+    "shutDownDisabled":  false,
+    "restartDisabled":  false,
+    "sleepDisabled":  false,
+    "consoleAccessDisabled":  false,
+    "shutDownDisabledWhileLoggedIn":  false,
+    "restartDisabledWhileLoggedIn":  false,
+    "powerOffDisabledWhileLoggedIn":  false,
+    "logOutDisabledWhileLoggedIn":  false,
+    "screenLockDisableImmediate":  false,
+    "singleSignOnExtension":  null,
+    "contentCachingEnabled":  false,
+    "contentCachingType":  "notConfigured",
+    "contentCachingMaxSizeBytes":  null,
+    "contentCachingDataPath":  null,
+    "contentCachingDisableConnectionSharing":  false,
+    "contentCachingForceConnectionSharing":  false,
+    "contentCachingClientPolicy":  "notConfigured",
+    "contentCachingPeerPolicy":  "notConfigured",
+    "contentCachingParentSelectionPolicy":  "notConfigured",
+    "contentCachingParents":  [
+
+                              ],
+    "contentCachingLogClientIdentities":  false,
+    "contentCachingBlockDeletion":  false,
+    "contentCachingShowAlerts":  false,
+    "contentCachingKeepAwake":  false,
+    "contentCachingPort":  null,
+    "airPrintDestinations":  [
+
+                             ],
+    "autoLaunchItems":  [
+
+                        ],
+    "associatedDomains":  [
+
+                          ],
+    "appAssociatedDomains":  [
+
+                             ],
+    "macOSSingleSignOnExtension":  {
+                                       "@odata.type":  "#microsoft.graph.macOSAzureAdSingleSignOnExtension",
+                                       "enableSharedDeviceMode":  false,
+                                       "bundleIdAccessControlList":  [
+
+                                                                     ],
+                                       "configurations":  [
+                                                              {
+                                                                  "@odata.type":  "#microsoft.graph.keyStringValuePair",
+                                                                  "key":  "AppPrefixAllowList",
+                                                                  "value":  "com.microsoft."
+                                                              }
+                                                          ]
+                                   },
+    "contentCachingClientListenRanges":  [
+
+                                         ],
+    "contentCachingPeerListenRanges":  [
+
+                                       ],
+    "contentCachingPeerFilterRanges":  [
+
+                                       ],
+    "contentCachingPublicRanges":  [
+
+                                   ]
+}

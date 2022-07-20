@@ -1,0 +1,39 @@
+{
+    "displayName":  "HardenMAC - Firewall",
+    "description":  "",
+    "roleScopeTagIds":  [
+                            "0"
+                        ],
+    "TemplateDisplayName":  "macOS firewall",
+    "TemplateId":  "5340aa10-47a8-4e67-893f-690984e4d5da",
+    "versionInfo":  "2005",
+    "settingsDelta":  [
+                          {
+                              "@odata.type":  "#microsoft.graph.deviceManagementBooleanSettingInstance",
+                              "id":  "4bc6165c-b572-494f-a1e6-118e38e24d08",
+                              "definitionId":  "deviceConfiguration--macOSEndpointProtectionConfiguration_firewallEnabled",
+                              "valueJson":  "true",
+                              "value":  true
+                          },
+                          {
+                              "@odata.type":  "#microsoft.graph.deviceManagementBooleanSettingInstance",
+                              "id":  "a74f219a-019a-44c1-9c45-bad6df4d0119",
+                              "definitionId":  "deviceConfiguration--macOSEndpointProtectionConfiguration_firewallBlockAllIncoming",
+                              "valueJson":  "false",
+                              "value":  false
+                          },
+                          {
+                              "@odata.type":  "#microsoft.graph.deviceManagementBooleanSettingInstance",
+                              "id":  "ba30ae1c-eb13-4890-a3b7-7b034b5ae396",
+                              "definitionId":  "deviceConfiguration--macOSEndpointProtectionConfiguration_firewallEnableStealthMode",
+                              "valueJson":  "false",
+                              "value":  false
+                          },
+                          {
+                              "@odata.type":  "#microsoft.graph.deviceManagementCollectionSettingInstance",
+                              "id":  "1567a50f-cd69-48b9-b7a1-dbf3484ae8ea",
+                              "definitionId":  "deviceConfiguration--macOSEndpointProtectionConfiguration_firewallApplications",
+                              "valueJson":  "null"
+                          }
+                      ]
+}

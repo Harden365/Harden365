@@ -521,13 +521,41 @@ function DeviceMenu(){
     Param(
         [System.Management.Automation.PSCredential]$Credential
     )
-$DeviceMenu = CreateMenu -MenuTitle "HARDEN 365 - DEVICE" -MenuOptions @("N/A","N/A","N/A","N/A","<- Return")
+$DeviceMenu = CreateMenu -MenuTitle "HARDEN 365 - DEVICE" -MenuOptions @("Install Harden365 App","Hardening Intune","N/A","N/A","<- Return")
         switch($DeviceMenu){
     0{
-      DeviceMenu -Credential $Credential
+                write-host $FrontStyle -ForegroundColor Red
+                write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; write-host("INSTALL HARDEN365 APP") -ForegroundColor Red
+                write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; Write-host ('Connecting to Azure AD Powershell') -ForegroundColor Green
+                try {
+                Get-AzureADTenantDetail | Out-Null 
+                } catch {Connect-AzureAD -Credential $Credential | Out-Null} 
+                
+                $scriptFunctions=(Get-ChildItem function: | Where-Object { $_.Name -match 'Start-Harden365App'})
+                $scriptFunctions | ForEach-Object {
+                Try { 
+                & $_.Name -ErrorAction:SilentlyContinue | Out-Null } Catch {}
+                }
+                Read-Host -Prompt "Press Enter to return_"
+                DeviceMenu -Credential $Credential
       }
     1{
-      DeviceMenu -Credential $Credential
+                write-host $FrontStyle -ForegroundColor Red
+                write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; write-host("HARDENING INTUNE") -ForegroundColor Red
+                write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; Write-host ('Connecting to Azure AD Powershell') -ForegroundColor Green
+                try {
+                Get-AzureADTenantDetail | Out-Null 
+                } catch {Connect-AzureAD -Credential $Credential | Out-Null} 
+                Connect-MsolService -Credential $Credential | Out-Null
+                write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; write-host("Please insert Secret of Harden365App :") -NoNewline -ForegroundColor Yellow ; $AccessSecret = Read-Host
+
+                $scriptFunctions=(Get-ChildItem function: | Where-Object { $_.source -match 'Harden365.Device'})
+                $scriptFunctions | ForEach-Object {
+                Try { 
+                & $_.Name -Accesssecret $AccessSecret -ErrorAction:SilentlyContinue | Out-Null } Catch {}
+                }
+                Read-Host -Prompt "Press Enter to return_"
+                DeviceMenu -Credential $Credential
       }
     2{
       DeviceMenu -Credential $Credential

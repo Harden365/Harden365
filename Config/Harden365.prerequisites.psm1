@@ -36,6 +36,12 @@ $allModulesPathList = @(
     'Harden365.Teams'
     'Harden365.Sharepoint'
     'Harden365.Outlook'
+    'Harden365.HardenApp'
+    'Harden365.DeviceSecurityImport'
+    'Harden365.DeviceADMXImport'
+    'Harden365.DeviceScriptImport'
+    'Harden365.DeviceCatalogImport'
+    'Harden365.DeviceConfigImport'
     'Get-AADRolesAudit'
     'Get-MSOAuditUsers'
 

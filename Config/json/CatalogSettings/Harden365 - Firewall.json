@@ -1,6 +1,6 @@
 {
-    "name":  "Harden365 - Firewall Policy",
-    "description":  "Harden365 - Firewall Policy v1.0",
+    "name":  "Harden365 - Firewall",
+    "description":  "Harden365 - Firewall v1.0",
     "platforms":  "windows10",
     "technologies":  "mdm,microsoftSense",
     "templateReference":  {

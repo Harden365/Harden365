@@ -97,7 +97,7 @@ $requiredGraphAccess.ResourceAccess.Add($resourceAccess)
 }
 else
 {
-Write-Host "App permission $permission not found in the Graph Resource API" -ForegroundColor Red
+Write-LogWarning "App permission $permission not found in the Graph Resource API"
 }
 }
  
@@ -119,7 +119,7 @@ $requiredGraphAccess.ResourceAccess.Add($resourceAccess)
 }
 else
 {
-Write-Host "Delegated permission $permission not found in the Graph Resource API" -ForegroundColor Red
+Write-LogWarning "App permission $permission not found in the Graph Resource API"
 }
 }
 #>
@@ -132,5 +132,5 @@ $requiredResourcesAccess.Add($requiredGraphAccess)
 #Set permissions in existing Azure AD App
 $appObjectId=$Harden365App.ObjectId
 Set-AzureADApplication -ObjectId $appObjectId -RequiredResourceAccess $requiredResourcesAccess
-
+Write-LogWarning "Please grant permissions for Harden365 App in Registered Application / AAD "
 }

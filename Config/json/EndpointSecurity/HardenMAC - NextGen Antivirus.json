@@ -1,0 +1,64 @@
+{
+    "displayName":  "HardenMAC - NextGen Antivirus",
+    "description":  "",
+    "roleScopeTagIds":  [
+                            "0"
+                        ],
+    "TemplateDisplayName":  "Antivirus",
+    "TemplateId":  "2a68aa33-f853-4572-94bc-7dbdc87fd51e",
+    "versionInfo":  "2005",
+    "settingsDelta":  [
+                          {
+                              "@odata.type":  "#microsoft.graph.deviceManagementStringSettingInstance",
+                              "id":  "55bc7de4-3a67-45d1-80f0-111adb37793c",
+                              "definitionId":  "deviceConfiguration--macOSEndpointProtectionConfiguration_advancedThreatProtectionRealTime",
+                              "valueJson":  "\"enabled\"",
+                              "value":  "enabled"
+                          },
+                          {
+                              "@odata.type":  "#microsoft.graph.deviceManagementStringSettingInstance",
+                              "id":  "8b204b60-34f7-45bf-8005-fd5a6a06dc01",
+                              "definitionId":  "deviceConfiguration--macOSEndpointProtectionConfiguration_advancedThreatProtectionCloudDelivered",
+                              "valueJson":  "\"enabled\"",
+                              "value":  "enabled"
+                          },
+                          {
+                              "@odata.type":  "#microsoft.graph.deviceManagementStringSettingInstance",
+                              "id":  "c7bed224-fb75-425c-ac8c-85544e1641c8",
+                              "definitionId":  "deviceConfiguration--macOSEndpointProtectionConfiguration_advancedThreatProtectionAutomaticSampleSubmission",
+                              "valueJson":  "\"enabled\"",
+                              "value":  "enabled"
+                          },
+                          {
+                              "@odata.type":  "#microsoft.graph.deviceManagementStringSettingInstance",
+                              "id":  "e1344aa0-b045-4e91-8d14-2b524087fa5f",
+                              "definitionId":  "deviceConfiguration--macOSEndpointProtectionConfiguration_advancedThreatProtectionDiagnosticDataCollection",
+                              "valueJson":  "\"enabled\"",
+                              "value":  "enabled"
+                          },
+                          {
+                              "@odata.type":  "#microsoft.graph.deviceManagementCollectionSettingInstance",
+                              "id":  "4f4b2c5b-89c2-4f89-81e4-0ec61eccff6a",
+                              "definitionId":  "deviceConfiguration--macOSEndpointProtectionConfiguration_advancedThreatProtectionExcludedFolders",
+                              "valueJson":  "null"
+                          },
+                          {
+                              "@odata.type":  "#microsoft.graph.deviceManagementCollectionSettingInstance",
+                              "id":  "0899efa4-a2ae-4e40-b273-084d614a6c82",
+                              "definitionId":  "deviceConfiguration--macOSEndpointProtectionConfiguration_advancedThreatProtectionExcludedFiles",
+                              "valueJson":  "null"
+                          },
+                          {
+                              "@odata.type":  "#microsoft.graph.deviceManagementCollectionSettingInstance",
+                              "id":  "6e607445-ee6b-4245-9d36-e3146688d2f7",
+                              "definitionId":  "deviceConfiguration--macOSEndpointProtectionConfiguration_advancedThreatProtectionExcludedExtensions",
+                              "valueJson":  "null"
+                          },
+                          {
+                              "@odata.type":  "#microsoft.graph.deviceManagementCollectionSettingInstance",
+                              "id":  "9d974c18-eb28-4e6d-b0c3-e6e98a372dc2",
+                              "definitionId":  "deviceConfiguration--macOSEndpointProtectionConfiguration_advancedThreatProtectionExcludedProcesses",
+                              "valueJson":  "null"
+                          }
+                      ]
+}

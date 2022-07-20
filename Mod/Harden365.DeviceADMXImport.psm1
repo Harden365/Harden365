@@ -29,6 +29,8 @@ Function Start-DeviceADMXImport {
     #>
 
 	param(
+	[Parameter(Mandatory = $false)]
+    [String]$AccessSecret
 )
 
 Write-LogSection 'DEVICE ADMX IMPORT' -NoHostOutput
@@ -36,11 +38,7 @@ Write-LogSection 'DEVICE ADMX IMPORT' -NoHostOutput
 #region Authentification
 $ApplicationID = $(Get-AzureADApplication -Filter "DisplayName eq 'Harden365 App'").AppId
 $TenantDomainName = $(Get-AzureADTenantDetail).ObjectId
-#Jeff
-#$AccessSecret = "YjhlNjA1NWQtOWVmMC00ZjEyLWJmMDQtMTEyOGI1YjdhZWZm"
-#Demo
-$AccessSecret = "ZDIyYjFlMjctOTliYy00MTUxLTljMDItYjYyMzllOGMyZjlm"
-#$AccessSecret = $($PasswordCredential).Value
+$AccessSecret = 'Y2UxMmI3ODQtNjk1OC00OTk4LTg1MDYtY2Q3ZTliOThiMTMw'
 
 $Body = @{
 Grant_Type    = "client_credentials"
@@ -119,9 +117,8 @@ NAME: Add-DeviceConfigurationPolicy
 			$reader.BaseStream.Position = 0
 			$reader.DiscardBufferedData()
 			$responseBody = $reader.ReadToEnd();
-			Write-Host "Response content:`n$responseBody" -f Red
-			Write-Error "Request to $Uri failed with HTTP Status $($ex.Response.StatusCode) $($ex.Response.StatusDescription)"
-			write-host
+			Write-LogError "Response content:`n$responseBody"
+			Write-LogError "Request to $Uri failed with HTTP Status $($ex.Response.StatusCode) $($ex.Response.StatusDescription)"
 			break
 			
 		}
@@ -160,7 +157,7 @@ NAME: Add-DeviceConfigurationPolicy
 			if ($JSON -eq "" -or $JSON -eq $null)
 			{
 				
-				write-host "No JSON specified, please specify valid JSON for the Device Configuration Policy..." -f Red
+				Write-LogError "No JSON specified, please specify valid JSON for the Device Configuration Policy..."
 				
 			}
 			
@@ -184,9 +181,8 @@ NAME: Add-DeviceConfigurationPolicy
 			$reader.BaseStream.Position = 0
 			$reader.DiscardBufferedData()
 			$responseBody = $reader.ReadToEnd();
-			Write-Host "Response content:`n$responseBody" -f Red
-			Write-Error "Request to $Uri failed with HTTP Status $($ex.Response.StatusCode) $($ex.Response.StatusDescription)"
-			write-host
+			Write-LogError "Response content:`n$responseBody"
+			Write-LogError "Request to $Uri failed with HTTP Status $($ex.Response.StatusCode) $($ex.Response.StatusDescription)"
 			break
 			
 		}
@@ -236,7 +232,7 @@ NAME: Test-AuthHeader
 		if (!$validJson)
 		{
 			
-			Write-Host "Provided JSON isn't in valid JSON format" -f Red
+			Write-LogError "Provided JSON isn't in valid JSON format"
 			break
 			
 		}
@@ -250,13 +246,13 @@ NAME: Test-AuthHeader
 	if (!(Test-Path "$ImportPath"))
 	{
 		
-		Write-Host "Import Path doesn't exist..." -ForegroundColor Red
-		Write-Host "Script can't continue..." -ForegroundColor Red
+		Write-LogError "Import Path doesn't exist..."
+		Write-LogError "Script can't continue..."
 		break
 		
 	}
 	$PolicyName = (Get-Item $ImportPath).Name
-	Write-Host "Adding ADMX Configuration Policy '$PolicyName'" -ForegroundColor Green
+	Write-LogInfo "Adding ADMX Configuration Policy '$PolicyName'"
 	$GroupPolicyConfigurationID = Create-GroupPolicyConfigurations -DisplayName $PolicyName
 	
 	$JsonFiles = Get-ChildItem $ImportPath
@@ -268,7 +264,7 @@ NAME: Test-AuthHeader
 		
 		# Excluding entries that are not required - id,createdDateTime,lastModifiedDateTime,version
 		$JSON_Convert = $JSON_Data | ConvertFrom-Json | Select-Object -Property * -ExcludeProperty id, createdDateTime, lastModifiedDateTime, version, supportsScopeTags
-		$JSON_Output = $JSON_Convert | ConvertTo-Json -Depth 5
+		$JSON_Output = $JSON_Convert | ConvertTo-Json -Depth 20
 		Create-GroupPolicyConfigurationsDefinitionValues -JSON $JSON_Output -GroupPolicyConfigurationID $GroupPolicyConfigurationID
 
 	}

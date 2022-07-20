@@ -29,6 +29,8 @@ Function Start-DeviceSecurityImport {
     #>
 
 	param(
+	[Parameter(Mandatory = $false)]
+    [String]$AccessSecret
 )
 
 Write-LogSection 'DEVICE SECURITY IMPORT' -NoHostOutput
@@ -36,11 +38,7 @@ Write-LogSection 'DEVICE SECURITY IMPORT' -NoHostOutput
 #region Authentification
 $ApplicationID = $(Get-AzureADApplication -Filter "DisplayName eq 'Harden365 App'").AppId
 $TenantDomainName = $(Get-AzureADTenantDetail).ObjectId
-#Jeff
-#$AccessSecret = "YjhlNjA1NWQtOWVmMC00ZjEyLWJmMDQtMTEyOGI1YjdhZWZm"
-#Demo
-$AccessSecret = "ZDIyYjFlMjctOTliYy00MTUxLTljMDItYjYyMzllOGMyZjlm"
-#$AccessSecret = $($PasswordCredential).Value
+
 
 $Body = @{
 Grant_Type    = "client_credentials"
@@ -87,9 +85,8 @@ $ESP_resource = "deviceManagement/templates?`$filter=(isof(%27microsoft.graph.se
     $reader.BaseStream.Position = 0
     $reader.DiscardBufferedData()
     $responseBody = $reader.ReadToEnd();
-    Write-Host "Response content:`n$responseBody" -f Red
-    Write-Error "Request to $Uri failed with HTTP Status $($ex.Response.StatusCode) $($ex.Response.StatusDescription)"
-    write-host
+    Write-LogError "Response content:`n$responseBody"
+    Write-LogError "Request to $Uri failed with HTTP Status $($ex.Response.StatusCode) $($ex.Response.StatusDescription)"
     break
 
     }
@@ -122,13 +119,12 @@ param
 
 $graphApiVersion = "Beta"
 $ESP_resource = "deviceManagement/templates/$TemplateId/createInstance"
-Write-Verbose "Resource: $ESP_resource"
 
     try {
 
         if($JSON -eq "" -or $JSON -eq $null){
 
-        write-host "No JSON specified, please specify valid JSON for the Endpoint Security Policy..." -f Red
+        Write-LogError "No JSON specified, please specify valid JSON for the Endpoint Security Policy..."
 
         }
 
@@ -150,9 +146,8 @@ Write-Verbose "Resource: $ESP_resource"
     $reader.BaseStream.Position = 0
     $reader.DiscardBufferedData()
     $responseBody = $reader.ReadToEnd();
-    Write-Host "Response content:`n$responseBody" -f Red
-    Write-Error "Request to $Uri failed with HTTP Status $($ex.Response.StatusCode) $($ex.Response.StatusDescription)"
-    write-host
+    Write-LogError "Response content:`n$responseBody"
+    Write-LogError "Request to $Uri failed with HTTP Status $($ex.Response.StatusCode) $($ex.Response.StatusDescription)"
     break
 
     }
@@ -166,7 +161,6 @@ $Configurations = Get-ChildItem -Path .\Config\json\EndpointSecurity\
 
 foreach($Configuration in $Configurations){
     $FileName = $Configuration.Name
-    write-host $FileName
 
 ###################################################
 
@@ -181,10 +175,6 @@ $JSON_DN = $JSON_Convert.displayName
 $JSON_TemplateDisplayName = $JSON_Convert.TemplateDisplayName
 $JSON_TemplateId = $JSON_Convert.templateId
 
-Write-Host
-Write-Host "Endpoint Security Policy '$JSON_DN' found..." -ForegroundColor Cyan
-Write-Host "Template Display Name: $JSON_TemplateDisplayName"
-Write-Host "Template ID: $JSON_TemplateId"
 
 ####################################################
 
@@ -235,24 +225,22 @@ elseif($ES_Template){
 # Else If Imported JSON template ID can't be found check if Template Display Name can be used
 elseif($ES_Template -eq $null){
 
-    Write-Host "Didn't find Template with ID $JSON_TemplateId, checking if Template DisplayName '$JSON_TemplateDisplayName' can be used..." -ForegroundColor Red
+    Write-LogError "Didn't find Template with ID $JSON_TemplateId, checking if Template DisplayName '$JSON_TemplateDisplayName' can be used..."
     $ES_Template = $Templates | ?  { $_.displayName -eq "$JSON_TemplateDisplayName" }
 
     If($ES_Template){
 
         if(($ES_Template.templateType -eq "securityBaseline") -or ($ES_Template.templateType -eq "advancedThreatProtectionSecurityBaseline")){
 
-            Write-Host
-            Write-Host "TemplateID '$JSON_TemplateId' with template Name '$JSON_TemplateDisplayName' doesn't exist..." -ForegroundColor Red
-            Write-Host "Importing using the updated template could fail as settings specified may not be included in the latest template..." -ForegroundColor Red
-            Write-Host
+            Write-LogError "TemplateID '$JSON_TemplateId' with template Name '$JSON_TemplateDisplayName' doesn't exist..."
+            Write-LogError "Importing using the updated template could fail as settings specified may not be included in the latest template..."
             break
 
         }
 
         else {
 
-            Write-Host "Template with displayName '$JSON_TemplateDisplayName' found..." -ForegroundColor Green
+            Write-LogInfo "Template with displayName '$JSON_TemplateDisplayName' found..."
 
             $Template = $ES_Template | ? { $_.isDeprecated -eq $false }
 
@@ -264,10 +252,8 @@ elseif($ES_Template -eq $null){
 
     else {
 
-        Write-Host
-        Write-Host "TemplateID '$JSON_TemplateId' with template Name '$JSON_TemplateDisplayName' doesn't exist..." -ForegroundColor Red
-        Write-Host "Importing using the updated template could fail as settings specified may not be included in the latest template..." -ForegroundColor Red
-        Write-Host
+        Write-LogError "TemplateID '$JSON_TemplateId' with template Name '$JSON_TemplateDisplayName' doesn't exist..."
+        Write-LogError "Importing using the updated template could fail as settings specified may not be included in the latest template..."
         break
 
     }
@@ -283,10 +269,7 @@ $DisplayName = $JSON_Convert.displayName
 
 $JSON_Output = $JSON_Convert | ConvertTo-Json -Depth 5
 
-write-host
-$JSON_Output
-write-host
-Write-Host "Adding Endpoint Security Policy '$DisplayName'" -ForegroundColor Yellow
+Write-LogInfo "Adding Device Security '$DisplayName'"
 Add-EndpointSecurityPolicy -TemplateId $TemplateId -JSON $JSON_Output
 }
 }

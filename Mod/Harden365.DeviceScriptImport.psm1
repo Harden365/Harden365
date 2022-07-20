@@ -29,6 +29,8 @@ Function Start-DeviceScriptImport {
     #>
 
 	param(
+	[Parameter(Mandatory = $false)]
+    [String]$AccessSecret
 )
 
 Write-LogSection 'DEVICE SCRIPT IMPORT' -NoHostOutput
@@ -36,11 +38,6 @@ Write-LogSection 'DEVICE SCRIPT IMPORT' -NoHostOutput
 #region Authentification
 $ApplicationID = $(Get-AzureADApplication -Filter "DisplayName eq 'Harden365 App'").AppId
 $TenantDomainName = $(Get-AzureADTenantDetail).ObjectId
-#Jeff
-#$AccessSecret = "YjhlNjA1NWQtOWVmMC00ZjEyLWJmMDQtMTEyOGI1YjdhZWZm"
-#Demo
-$AccessSecret = "ZDIyYjFlMjctOTliYy00MTUxLTljMDItYjYyMzllOGMyZjlm"
-#$AccessSecret = $($PasswordCredential).Value
 
 $Body = @{
 Grant_Type    = "client_credentials"
@@ -87,18 +84,18 @@ NAME: Add-DeviceManagementScript
             Invoke-WebRequest -Uri $File -UseBasicParsing -OutFile $OutFile
         }
         catch {
-            Write-Host "Could not download file from URL: $File" -ForegroundColor Red
+            Write-LogError "Could not download file from URL: $File"
             break
         }
         $File = $OutFile
         if (!(Test-Path $File)) {
-            Write-Host "$File could not be located." -ForegroundColor Red
+            Write-LogError "$File could not be located."
             break
         }
     }
     elseif ($URL -eq $false) {
         if (!(Test-Path $File)) {
-            Write-Host "$File could not be located." -ForegroundColor Red
+            Write-LogError "$File could not be located."
             break
         }
         $FileName = Get-Item $File | Select-Object -ExpandProperty Name
@@ -126,7 +123,6 @@ NAME: Add-DeviceManagementScript
 
     $graphApiVersion = "Beta"
     $DMS_resource = "deviceManagement/deviceManagementScripts"
-    Write-Verbose "Resource: $DMS_resource"
 
     try {
         $uri = "https://graph.microsoft.com/$graphApiVersion/$DMS_resource"
@@ -142,9 +138,8 @@ NAME: Add-DeviceManagementScript
         $reader.BaseStream.Position = 0
         $reader.DiscardBufferedData()
         $responseBody = $reader.ReadToEnd();
-        Write-Host "Response content:`n$responseBody" -f Red
-        Write-Error "Request to $Uri failed with HTTP Status $($ex.Response.StatusCode) $($ex.Response.StatusDescription)"
-        write-host
+        Write-LogError "Response content:`n$responseBody"
+        Write-LogError "Request to $Uri failed with HTTP Status $($ex.Response.StatusCode) $($ex.Response.StatusDescription)"
         break
 
     }
@@ -154,12 +149,11 @@ NAME: Add-DeviceManagementScript
 ####################################################
 
 $Configurations = Get-ChildItem -Path .\Config\ps\
-#$FilePS = "HardenMDE - Disable Flash on AdobeReaderDC"
 $Location = $(Get-Location).Path
 
 foreach($Configuration in $Configurations){
 $FileName = $Configuration.Name
-write-host $FileName
+write-LogInfo "Adding Device Script '$FileName'"
 Add-DeviceManagementScript -File $Location\Config\ps\$FileName -Description "$FileName v1.0"
 }
 }

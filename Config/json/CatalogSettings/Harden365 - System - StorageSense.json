@@ -1,6 +1,6 @@
 {
-    "name":  "StorageSense_Config",
-    "description":  "",
+    "name":  "Harden365 - System - StorageSense",
+    "description":  "Harden365 - System - StorageSense v1.0",
     "platforms":  "windows10",
     "technologies":  "mdm",
     "settings":  [
