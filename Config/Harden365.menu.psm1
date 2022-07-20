@@ -519,9 +519,10 @@ $ApplicationMenu = CreateMenu -MenuTitle "HARDEN 365 - APPLICATIONS" -MenuOption
 
 function DeviceMenu(){
     Param(
-        [System.Management.Automation.PSCredential]$Credential
+        [System.Management.Automation.PSCredential]$Credential,
+        [String]$AccessSecret
     )
-$DeviceMenu = CreateMenu -MenuTitle "HARDEN 365 - DEVICE" -MenuOptions @("Install Harden365 App","Hardening Intune","N/A","N/A","<- Return")
+$DeviceMenu = CreateMenu -MenuTitle "HARDEN 365 - DEVICE" -MenuOptions @("Install Harden365 App","Hardening Intune","Remove device from MDE","N/A","<- Return")
         switch($DeviceMenu){
     0{
                 write-host $FrontStyle -ForegroundColor Red
@@ -537,7 +538,7 @@ $DeviceMenu = CreateMenu -MenuTitle "HARDEN 365 - DEVICE" -MenuOptions @("Instal
                 & $_.Name -ErrorAction:SilentlyContinue | Out-Null } Catch {}
                 }
                 Read-Host -Prompt "Press Enter to return_"
-                DeviceMenu -Credential $Credential
+                DeviceMenu -Credential $Credential -AccessSecret $AccessSecret
       }
     1{
                 write-host $FrontStyle -ForegroundColor Red
@@ -547,7 +548,8 @@ $DeviceMenu = CreateMenu -MenuTitle "HARDEN 365 - DEVICE" -MenuOptions @("Instal
                 Get-AzureADTenantDetail | Out-Null 
                 } catch {Connect-AzureAD -Credential $Credential | Out-Null} 
                 Connect-MsolService -Credential $Credential | Out-Null
-                write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; write-host("Please insert Secret of Harden365App :") -NoNewline -ForegroundColor Yellow ; $AccessSecret = Read-Host
+                if (!$AccessSecret) {
+                write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; write-host("Please insert Secret of Harden365App :") -NoNewline -ForegroundColor Yellow ; $AccessSecret = Read-Host}
 
                 $scriptFunctions=(Get-ChildItem function: | Where-Object { $_.source -match 'Harden365.Device'})
                 $scriptFunctions | ForEach-Object {
@@ -555,19 +557,35 @@ $DeviceMenu = CreateMenu -MenuTitle "HARDEN 365 - DEVICE" -MenuOptions @("Instal
                 & $_.Name -Accesssecret $AccessSecret -ErrorAction:SilentlyContinue | Out-Null } Catch {}
                 }
                 Read-Host -Prompt "Press Enter to return_"
-                DeviceMenu -Credential $Credential
+                DeviceMenu -Credential $Credential -AccessSecret $AccessSecret
       }
     2{
-      DeviceMenu -Credential $Credential
+                write-host $FrontStyle -ForegroundColor Red
+                write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; write-host("MDE - REMOVE DEVICE") -ForegroundColor Red
+                write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; Write-host ('Connecting to Azure AD Powershell') -ForegroundColor Green
+                try {
+                Get-AzureADTenantDetail | Out-Null 
+                } catch {Connect-AzureAD -Credential $Credential | Out-Null} 
+                Connect-MsolService -Credential $Credential | Out-Null
+                if (!$AccessSecret) {
+                write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; write-host("Please insert Secret of Harden365App :") -NoNewline -ForegroundColor Yellow ; $AccessSecret = Read-Host}
+
+                $scriptFunctions=(Get-ChildItem function: | Where-Object { $_.Name -match 'Start-MDERemoveDevice'})
+                $scriptFunctions | ForEach-Object {
+                Try { 
+                & $_.Name -Accesssecret $AccessSecret -ErrorAction:SilentlyContinue | Out-Null } Catch {}
+                }
+                Read-Host -Prompt "Press Enter to return_"
+                DeviceMenu -Credential $Credential -AccessSecret $AccessSecret
       }
     3{
-      DeviceMenu -Credential $Credential
+      DeviceMenu -Credential $Credential -AccessSecret $AccessSecret
       }
     4{
       MainMenu -Credential $Credential -TenantEdition $TenantEdition -O365ATP $O365ATP
       }
     Default{
-      DeviceMenu -Credential $Credential
+      DeviceMenu -Credential $Credential -AccessSecret $AccessSecret
       }
     }
 }

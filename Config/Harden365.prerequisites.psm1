@@ -42,6 +42,7 @@ $allModulesPathList = @(
     'Harden365.DeviceScriptImport'
     'Harden365.DeviceCatalogImport'
     'Harden365.DeviceConfigImport'
+    'Harden365.MDERemoveDevice'
     'Get-AADRolesAudit'
     'Get-MSOAuditUsers'
 

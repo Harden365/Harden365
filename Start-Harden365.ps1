@@ -62,10 +62,10 @@ $currentCountOfOperations++
 
 ## CREDENTIALS
 write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline
-Write-Host("PLEASE CONNECT ACCOUNT WITH GLOBAL ADMINISTRATOR ROLE WITHOUT MFA CONTROL") -ForegroundColor Yellow
+Write-Host("PLEASE CONNECT ACCOUNT WITH GLOBAL ADMINISTRATOR/READER ROLE WITHOUT MFA CONTROL") -ForegroundColor Yellow
 start-sleep -Seconds 1
 $ErrorActionPreference = "SilentlyContinue"
-$Credential = Get-Credential -Message "Global Administrator without MFA Control"
+$Credential = Get-Credential -Message "Global Administrator/Reader without MFA Control"
 if ($null -eq $Credential){
 Write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; write-Host("ACTION STOPPED BY USER") -ForegroundColor Red
 Pause;Break}
