@@ -7,6 +7,14 @@
   <a href="https://twitter.com/tr1ana"><img alt="Twitter" src="https://brand.linkedin.com/content/dam/me/brand/en-us/brand-home/logos/01-dsk-e8-v2.png.original.png" width="7%" height="7%"></a>
 </p>
 
+
+<p
+Harden365 is an Open Source security tool that can be used to hardening Microsoft 365 tenant with CIS and Microsoft recommendations.
+The Harden community is an association law 1901.
+It aims to help companies, especially an SMB or TPE, to improve the security of its information system.
+</p>
+
+
 # HARDEN365
 This is the version 0.7 of the Hardening 365 project by Harden Community.
 
