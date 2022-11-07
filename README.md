@@ -9,7 +9,7 @@
 
 
 <p
-Harden365 is an Open Source security tool that can be used to hardening Microsoft 365 tenant with CIS and Microsoft recommendations.
+<i>Harden365</i> is an Open Source security tool that can be used to hardening Microsoft 365 tenant with CIS and Microsoft recommendations.
 The Harden community is an association law 1901.
 It aims to help companies, especially an SMB or TPE, to improve the security of its information system.
 </p>
