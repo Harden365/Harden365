@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/102629225/200362537-6ad2362b-34e5-4dee-a9bb-ea577f1669ee.png" width="100%" height="100%" />
+</p>
+
 # HARDEN365
 This is the version 0.7 of the Hardening 365 project by Harden Community.
 
