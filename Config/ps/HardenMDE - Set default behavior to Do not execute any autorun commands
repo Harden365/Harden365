@@ -1,4 +1,0 @@
-﻿# Set default behavior for 'AutoRun' to 'Enabled: Do not execute any autorun commands'
-if ($(Get-ItemProperty -Path Registry::HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer).NoAutorun -eq $null) {
-    New-ItemProperty -Path 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer' -Name 'NoAutorun' -Value "1" -PropertyType DWORD -Force }
-else {}

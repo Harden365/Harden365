@@ -1,4 +1,0 @@
-﻿# Set LAN Manager authentication level to 'Send NTLMv2 response only. Refuse LM & NTLM'
-if ($(Get-ItemProperty -Path Registry::HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Lsa).LmCompatibilityLevel -ne 5) {
-New-ItemProperty -Path 'HKLM:\SYSTEM\CurrentControlSet\Control\Lsa' -Name 'LmCompatibilityLevel' -Value "5" -PropertyType DWORD -Force }
-else {}

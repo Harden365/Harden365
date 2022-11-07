@@ -1,4 +1,0 @@
-﻿# Enable 'Microsoft network client: Digitally sign communications (always)'
-if ($(Get-ItemProperty -Path Registry::HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\LanmanWorkstation\Parameters).RequireSecuritySignature -eq 0) {
-    New-ItemProperty -Path 'HKLM:\SYSTEM\CurrentControlSet\Services\LanmanWorkstation\Parameters' -Name 'RequireSecuritySignature' -Value "1" -PropertyType DWORD -Force }
-else {}

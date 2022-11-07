@@ -4,7 +4,10 @@ if ((Get-ChildItem -Path 'HKLM:\SOFTWARE\Policies\').Name -contains "HKEY_LOCAL_
         if ($(Get-ItemProperty -Path "Registry::HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Adobe\Adobe Acrobat\DC\FeatureLockDown") -ne $null){
             if (-not $(Get-ItemProperty -Path "Registry::HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Adobe\Adobe Acrobat\DC\FeatureLockDown").bEnableFlash) {
             New-ItemProperty -Path 'HKLM:\SOFTWARE\Policies\Adobe\Adobe Acrobat\DC\FeatureLockDown' -Name 'bDisableJavaScript' -Value "0" -PropertyType DWORD -Force }
-        }
+        }else{
+            New-Item –Path 'HKLM:\SOFTWARE\Policies\Adobe\Adobe Acrobat\DC\FeatureLockDown'
+            New-ItemProperty -Path 'HKLM:\SOFTWARE\Policies\Adobe\Adobe Acrobat\DC\FeatureLockDown' -Name 'bDisableJavaScript' -Value "0" -PropertyType DWORD -Force
+            }
     }
 }
 

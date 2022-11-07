@@ -1,4 +1,0 @@
-﻿# Set User Account Control (UAC) to automatically deny elevation requests
-if ($(Get-ItemProperty -Path Registry::HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System).ConsentPromptBehaviorUser -ne 0) {
-    Set-ItemProperty -Path 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System' -Name 'ConsentPromptBehaviorUser' -Value "0" -Force }
-else {}

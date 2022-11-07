@@ -127,7 +127,7 @@ function Test-AllPrerequisites {
     }
 
     $currentCountOfPrerequisitesCheck++
-    Test-PowerShellModule -ModuleName 'ExchangeOnlineManagement' -ModuleVersion '2.0' -OperationCount $currentCountOfPrerequisitesCheck -OperationTotal $numberOfPrerequisitesCheck
+    Test-PowerShellModule -ModuleName 'ExchangeOnlineManagement' -ModuleVersion '2.0.5' -OperationCount $currentCountOfPrerequisitesCheck -OperationTotal $numberOfPrerequisitesCheck
     $currentCountOfPrerequisitesCheck++
     Test-PowerShellModule -ModuleName 'AzureADPreview' -ModuleVersion '2.0' -OperationCount $currentCountOfPrerequisitesCheck -OperationTotal $numberOfPrerequisitesCheck
     $currentCountOfPrerequisitesCheck++
@@ -143,7 +143,7 @@ function Test-AllPrerequisites {
     $currentCountOfPrerequisitesCheck++
     Test-PowerShellModule -ModuleName 'MicrosoftTeams' -ModuleVersion '4.2.0' -OperationCount $currentCountOfPrerequisitesCheck -OperationTotal $numberOfPrerequisitesCheck
     $currentCountOfPrerequisitesCheck++
-    Test-PowerShellModule -ModuleName 'ORCA' -ModuleVersion '1.10.6' -OperationCount $currentCountOfPrerequisitesCheck -OperationTotal $numberOfPrerequisitesCheck
+    Test-PowerShellModule -ModuleName 'ORCA' -ModuleVersion '2.1' -OperationCount $currentCountOfPrerequisitesCheck -OperationTotal $numberOfPrerequisitesCheck
     $currentCountOfPrerequisitesCheck++
     Update-ProgressionBarInnerLoop -Activity 'Prerequisite check' -Status 'Complete' -OperationCount $currentCountOfPrerequisitesCheck -OperationTotal $numberOfPrerequisitesCheck
 

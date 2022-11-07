@@ -1,4 +1,0 @@
-﻿# Disable 'Installation and configuration of Network Bridge on your DNS domain network'
-if ($(Get-ItemProperty -Path Registry::HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\'Network Connections').NC_AllowNetBridge_NLA -eq $null) {
-    New-ItemProperty -Path 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\Network Connections' -Name 'NC_AllowNetBridge_NLA' -Value "0" -PropertyType DWORD -Force }
-else {}

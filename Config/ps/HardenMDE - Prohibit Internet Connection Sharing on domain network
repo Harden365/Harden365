@@ -1,4 +1,0 @@
-﻿# Prohibit use of Internet Connection Sharing on your DNS domain network
-if ($(Get-ItemProperty -Path Registry::HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\'Network Connections').NC_ShowSharedAccessUI -eq $null) {
-    New-ItemProperty -Path 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\Network Connections' -Name 'NC_ShowSharedAccessUI' -Value "0" -PropertyType DWORD -Force }
-else {}

@@ -522,7 +522,7 @@ function DeviceMenu(){
         [System.Management.Automation.PSCredential]$Credential,
         [String]$AccessSecret
     )
-$DeviceMenu = CreateMenu -MenuTitle "HARDEN 365 - DEVICE" -MenuOptions @("Install Harden365 App","Hardening Intune","Remove device from MDE","N/A","<- Return")
+$DeviceMenu = CreateMenu -MenuTitle "HARDEN 365 - DEVICE" -MenuOptions @("Install Harden365 App","Hardening Intune","<- Return")
         switch($DeviceMenu){
     0{
                 write-host $FrontStyle -ForegroundColor Red
@@ -560,28 +560,6 @@ $DeviceMenu = CreateMenu -MenuTitle "HARDEN 365 - DEVICE" -MenuOptions @("Instal
                 DeviceMenu -Credential $Credential -AccessSecret $AccessSecret
       }
     2{
-                write-host $FrontStyle -ForegroundColor Red
-                write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; write-host("MDE - REMOVE DEVICE") -ForegroundColor Red
-                write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; Write-host ('Connecting to Azure AD Powershell') -ForegroundColor Green
-                try {
-                Get-AzureADTenantDetail | Out-Null 
-                } catch {Connect-AzureAD -Credential $Credential | Out-Null} 
-                Connect-MsolService -Credential $Credential | Out-Null
-                if (!$AccessSecret) {
-                write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; write-host("Please insert Secret of Harden365App :") -NoNewline -ForegroundColor Yellow ; $AccessSecret = Read-Host}
-
-                $scriptFunctions=(Get-ChildItem function: | Where-Object { $_.Name -match 'Start-MDERemoveDevice'})
-                $scriptFunctions | ForEach-Object {
-                Try { 
-                & $_.Name -Accesssecret $AccessSecret -ErrorAction:SilentlyContinue | Out-Null } Catch {}
-                }
-                Read-Host -Prompt "Press Enter to return_"
-                DeviceMenu -Credential $Credential -AccessSecret $AccessSecret
-      }
-    3{
-      DeviceMenu -Credential $Credential -AccessSecret $AccessSecret
-      }
-    4{
       MainMenu -Credential $Credential -TenantEdition $TenantEdition -O365ATP $O365ATP
       }
     Default{
