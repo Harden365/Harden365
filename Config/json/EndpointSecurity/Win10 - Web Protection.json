@@ -1,5 +1,5 @@
 {
-    "displayName":  "HardenMDE - Web Protection",
+    "displayName":  "Win10 - Web Protection",
     "description":  "HardenMDE - Web Protection v1.0",
     "roleScopeTagIds":  [
                             "0"
@@ -10,28 +10,28 @@
     "settingsDelta":  [
                           {
                               "@odata.type":  "#microsoft.graph.deviceManagementStringSettingInstance",
-                              "id":  "81bcedf4-2297-4754-8cd9-b3faacca8d56",
+                              "id":  "1558d130-7860-4c00-8169-023f5eefcb0f",
                               "definitionId":  "deviceConfiguration--windows10EndpointProtectionConfiguration_defenderNetworkProtectionType",
                               "valueJson":  "\"enable\"",
                               "value":  "enable"
                           },
                           {
                               "@odata.type":  "#microsoft.graph.deviceManagementBooleanSettingInstance",
-                              "id":  "9ab8e2b5-0f20-4410-badf-7640b5dcf8a2",
+                              "id":  "3d7e4d74-2679-4242-8b64-14a3fcfc09d7",
                               "definitionId":  "deviceConfiguration--windows10GeneralConfiguration_edgeRequireSmartScreen",
                               "valueJson":  "true",
                               "value":  true
                           },
                           {
                               "@odata.type":  "#microsoft.graph.deviceManagementBooleanSettingInstance",
-                              "id":  "9ea5ad0e-1621-48ea-a603-b4e048fe5303",
+                              "id":  "b3a4a339-38b9-42c4-84ef-c952bde03298",
                               "definitionId":  "deviceConfiguration--windows10GeneralConfiguration_smartScreenBlockPromptOverride",
                               "valueJson":  "false",
                               "value":  false
                           },
                           {
                               "@odata.type":  "#microsoft.graph.deviceManagementBooleanSettingInstance",
-                              "id":  "92ae17a0-608c-47f8-8f4f-9dbeecd83ead",
+                              "id":  "72d3b508-2da0-472e-92e0-4d7391b7e656",
                               "definitionId":  "deviceConfiguration--windows10GeneralConfiguration_smartScreenBlockPromptOverrideForFiles",
                               "valueJson":  "false",
                               "value":  false

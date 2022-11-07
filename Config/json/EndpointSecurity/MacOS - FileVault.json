@@ -1,5 +1,5 @@
 {
-    "displayName":  "HardenMAC - FileVault",
+    "displayName":  "MacOS - FileVault",
     "description":  "",
     "roleScopeTagIds":  [
                             "0"
@@ -10,55 +10,55 @@
     "settingsDelta":  [
                           {
                               "@odata.type":  "#microsoft.graph.deviceManagementCollectionSettingInstance",
-                              "id":  "6cf05a81-7108-4555-b448-489191df44ff",
+                              "id":  "5a9c729f-50ab-44f5-a3dc-c019497250d3",
                               "definitionId":  "deviceConfiguration--macOSEndpointProtectionConfiguration_fileVaultSelectedRecoveryKeyTypes",
                               "valueJson":  "[\"personalRecoveryKey\"]"
                           },
                           {
                               "@odata.type":  "#microsoft.graph.deviceManagementIntegerSettingInstance",
-                              "id":  "2e5d8aeb-a966-4d1a-b5ae-99b0e4da03a6",
+                              "id":  "771f1749-bddb-4aa4-aa08-71dee74edf85",
                               "definitionId":  "deviceConfiguration--macOSEndpointProtectionConfiguration_fileVaultNumberOfTimesUserCanIgnore",
                               "valueJson":  "1",
                               "value":  1
                           },
                           {
                               "@odata.type":  "#microsoft.graph.deviceManagementIntegerSettingInstance",
-                              "id":  "fe7607e6-0ccc-4edc-8787-386f59672825",
+                              "id":  "43340f5c-9698-4dde-a854-5bb6f35570b0",
                               "definitionId":  "deviceConfiguration--macOSEndpointProtectionConfiguration_fileVaultPersonalRecoveryKeyRotationInMonths",
                               "valueJson":  "1",
                               "value":  1
                           },
                           {
                               "@odata.type":  "#microsoft.graph.deviceManagementBooleanSettingInstance",
-                              "id":  "65ca67fe-bebe-4fa0-8d94-c955180bc9c3",
+                              "id":  "425559ac-13cc-4b41-8e57-7ae452339916",
                               "definitionId":  "deviceConfiguration--macOSEndpointProtectionConfiguration_fileVaultEnabled",
                               "valueJson":  "true",
                               "value":  true
                           },
                           {
                               "@odata.type":  "#microsoft.graph.deviceManagementStringSettingInstance",
-                              "id":  "a2ce54de-61d9-4604-b2df-600ce04ca6df",
+                              "id":  "6359d5fa-4482-4868-85c1-ec70cd14487b",
                               "definitionId":  "deviceConfiguration--macOSEndpointProtectionConfiguration_fileVaultPersonalRecoveryKeyHelpMessage",
                               "valueJson":  "\"https://portal.manage.microsoft.com/\"",
                               "value":  "https://portal.manage.microsoft.com/"
                           },
                           {
                               "@odata.type":  "#microsoft.graph.deviceManagementBooleanSettingInstance",
-                              "id":  "b131d820-c958-44d5-a887-945727b37d37",
+                              "id":  "5b3ae4af-6917-4598-ac57-c021b759de0c",
                               "definitionId":  "deviceConfiguration--macOSEndpointProtectionConfiguration_fileVaultAllowDeferralUntilSignOut",
                               "valueJson":  "true",
                               "value":  true
                           },
                           {
                               "@odata.type":  "#microsoft.graph.deviceManagementBooleanSettingInstance",
-                              "id":  "47894451-659f-45ad-8f03-a717698aa102",
+                              "id":  "6a8ffd6f-0e64-468c-b283-0ec33b74eb7c",
                               "definitionId":  "deviceConfiguration--macOSEndpointProtectionConfiguration_fileVaultDisablePromptAtSignOut",
                               "valueJson":  "false",
                               "value":  false
                           },
                           {
                               "@odata.type":  "#microsoft.graph.deviceManagementBooleanSettingInstance",
-                              "id":  "0354a8dd-d5f8-4336-88ed-097375e6fa55",
+                              "id":  "3cce0e55-43fc-44a3-9afa-ba36dcf7edeb",
                               "definitionId":  "deviceConfiguration--macOSEndpointProtectionConfiguration_fileVaultHidePersonalRecoveryKey",
                               "valueJson":  "false",
                               "value":  false
