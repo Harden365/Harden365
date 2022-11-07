@@ -4,7 +4,7 @@
 
 <p align="center">
   <a href="https://github.com/silverhack/monkey365"><img alt="License" src="https://img.shields.io/github/license/Harden365/Harden365"></a>
-  <a href="https://twitter.com/tr1ana"><img alt="Twitter" src="https://brand.linkedin.com/content/dam/me/brand/en-us/brand-home/logos/01-dsk-e8-v2.png.original.png" width="45%" height="45%"></a>
+  <a href="https://twitter.com/tr1ana"><img alt="Twitter" src="https://brand.linkedin.com/content/dam/me/brand/en-us/brand-home/logos/01-dsk-e8-v2.png.original.png" width="5%" height="5%"></a>
 </p>
 
 # HARDEN365
