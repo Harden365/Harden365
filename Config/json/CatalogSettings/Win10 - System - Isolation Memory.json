@@ -1,0 +1,22 @@
+{
+    "name":  "Win10 - System - Isolation Memory",
+    "description":  "",
+    "platforms":  "windows10",
+    "technologies":  "mdm",
+    "settings":  [
+                     {
+                         "settingInstance":  {
+                                                 "@odata.type":  "#microsoft.graph.deviceManagementConfigurationChoiceSettingInstance",
+                                                 "settingDefinitionId":  "device_vendor_msft_policy_config_virtualizationbasedtechnology_hypervisorenforcedcodeintegrity",
+                                                 "settingInstanceTemplateReference":  null,
+                                                 "choiceSettingValue":  {
+                                                                            "settingValueTemplateReference":  null,
+                                                                            "value":  "device_vendor_msft_policy_config_virtualizationbasedtechnology_hypervisorenforcedcodeintegrity_2",
+                                                                            "children":  [
+
+                                                                                         ]
+                                                                        }
+                                             }
+                     }
+                 ]
+}

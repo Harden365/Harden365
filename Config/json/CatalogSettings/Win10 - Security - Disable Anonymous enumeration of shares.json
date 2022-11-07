@@ -1,17 +1,17 @@
 {
-    "name":  "HardenMDE - IE - Allow software to run or install even if the signature is invalid",
-    "description":  "HardenMDE - IE - Allow software to run or install even if the signature is invalid v1.0",
+    "name":  "Win10 - Security - Disable Anonymous enumeration of shares",
+    "description":  "",
     "platforms":  "windows10",
     "technologies":  "mdm",
     "settings":  [
                      {
                          "settingInstance":  {
                                                  "@odata.type":  "#microsoft.graph.deviceManagementConfigurationChoiceSettingInstance",
-                                                 "settingDefinitionId":  "device_vendor_msft_policy_config_internetexplorer_allowsoftwarewhensignatureisinvalid",
+                                                 "settingDefinitionId":  "device_vendor_msft_policy_config_localpoliciessecurityoptions_networkaccess_donotallowanonymousenumerationofsamaccountsandshares",
                                                  "settingInstanceTemplateReference":  null,
                                                  "choiceSettingValue":  {
                                                                             "settingValueTemplateReference":  null,
-                                                                            "value":  "device_vendor_msft_policy_config_internetexplorer_allowsoftwarewhensignatureisinvalid_0",
+                                                                            "value":  "device_vendor_msft_policy_config_localpoliciessecurityoptions_networkaccess_donotallowanonymousenumerationofsamaccountsandshares_1",
                                                                             "children":  [
 
                                                                                          ]

@@ -1,5 +1,5 @@
 {
-    "name":  "HardenMAC - Lock at screensaver",
+    "name":  "MacOS - Lock at screensaver",
     "description":  "HardenMAC - Lock at screensaver v1.0",
     "platforms":  "macOS",
     "technologies":  "mdm",

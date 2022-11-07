@@ -1,0 +1,22 @@
+{
+    "name":  "Win10 - Security - Allow software to run or install even if the signature is invalid",
+    "description":  "HardenMDE - IE - Allow software to run or install even if the signature is invalid v1.0",
+    "platforms":  "windows10",
+    "technologies":  "mdm",
+    "settings":  [
+                     {
+                         "settingInstance":  {
+                                                 "@odata.type":  "#microsoft.graph.deviceManagementConfigurationChoiceSettingInstance",
+                                                 "settingDefinitionId":  "device_vendor_msft_policy_config_internetexplorer_allowsoftwarewhensignatureisinvalid",
+                                                 "settingInstanceTemplateReference":  null,
+                                                 "choiceSettingValue":  {
+                                                                            "settingValueTemplateReference":  null,
+                                                                            "value":  "device_vendor_msft_policy_config_internetexplorer_allowsoftwarewhensignatureisinvalid_0",
+                                                                            "children":  [
+
+                                                                                         ]
+                                                                        }
+                                             }
+                     }
+                 ]
+}

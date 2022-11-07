@@ -1,5 +1,5 @@
 {
-    "name":  "Harden365 - Firewall",
+    "name":  "Win10 - Firewall",
     "description":  "Harden365 - Firewall v1.0",
     "platforms":  "windows10",
     "technologies":  "mdm,microsoftSense",

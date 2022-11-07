@@ -1,5 +1,5 @@
 {
-    "name":  "Harden365 - ASR Policy",
+    "name":  "Win10 - ASR Policy",
     "description":  "Harden365 - ASR Policy v1.0",
     "platforms":  "windows10",
     "technologies":  "mdm,microsoftSense",
