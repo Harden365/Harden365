@@ -1,7 +1,7 @@
 {
     "@odata.type":  "#microsoft.graph.macOSCustomConfiguration",
-    "id":  "55f1d898-8ec4-4e1f-bbc6-0b1dcdb784d7",
-    "lastModifiedDateTime":  "2022-07-07T13:16:00.8613007Z",
+    "id":  "0fb895fb-47af-4050-a85f-d313e21a1f9f",
+    "lastModifiedDateTime":  "2022-09-22T12:11:44.3738014Z",
     "roleScopeTagIds":  [
                             "0"
                         ],
@@ -9,9 +9,9 @@
     "deviceManagementApplicabilityRuleOsEdition":  null,
     "deviceManagementApplicabilityRuleOsVersion":  null,
     "deviceManagementApplicabilityRuleDeviceMode":  null,
-    "createdDateTime":  "2022-07-07T12:52:09.0036739Z",
+    "createdDateTime":  "2022-09-22T12:08:56.0068691Z",
     "description":  null,
-    "displayName":  "HardenMAC - Defender Network Filter",
+    "displayName":  "MacOS - Defender Network Filter",
     "version":  2,
     "payloadName":  "HardenMAC - Network Filter",
     "payloadFileName":  "netfilter.mobileconfig",

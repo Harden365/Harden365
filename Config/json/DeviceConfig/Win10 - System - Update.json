@@ -1,7 +1,7 @@
 {
     "@odata.type":  "#microsoft.graph.windowsDeliveryOptimizationConfiguration",
-    "id":  "f7260755-68f7-4afa-8a8d-fe9ab391f912",
-    "lastModifiedDateTime":  "2022-07-13T12:16:01.5986518Z",
+    "id":  "74bda9c7-ed5a-46a1-b2d4-8d98c48635b4",
+    "lastModifiedDateTime":  "2022-09-22T12:23:17.3758991Z",
     "roleScopeTagIds":  [
                             "0"
                         ],
@@ -9,10 +9,10 @@
     "deviceManagementApplicabilityRuleOsEdition":  null,
     "deviceManagementApplicabilityRuleOsVersion":  null,
     "deviceManagementApplicabilityRuleDeviceMode":  null,
-    "createdDateTime":  "2021-07-30T13:52:17.153888Z",
+    "createdDateTime":  "2022-09-22T12:08:55.3215089Z",
     "description":  null,
-    "displayName":  "Harden365 - System - Update",
-    "version":  3,
+    "displayName":  "Win10 - System - Update",
+    "version":  2,
     "deliveryOptimizationMode":  "httpWithPeeringNat",
     "restrictPeerSelectionBy":  "subnetMask",
     "groupIdSource":  null,

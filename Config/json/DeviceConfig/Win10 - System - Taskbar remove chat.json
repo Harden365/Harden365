@@ -1,0 +1,28 @@
+{
+    "@odata.type":  "#microsoft.graph.windows10CustomConfiguration",
+    "id":  "4685ca28-d69d-458f-a88b-64f838050248",
+    "lastModifiedDateTime":  "2022-09-27T09:43:48.0184479Z",
+    "roleScopeTagIds":  [
+                            "0"
+                        ],
+    "supportsScopeTags":  true,
+    "deviceManagementApplicabilityRuleOsEdition":  null,
+    "deviceManagementApplicabilityRuleOsVersion":  null,
+    "deviceManagementApplicabilityRuleDeviceMode":  null,
+    "createdDateTime":  "2022-09-27T09:43:48.0184479Z",
+    "description":  null,
+    "displayName":  "Win10 - System - Taskbar remove chat",
+    "version":  1,
+    "omaSettings":  [
+                        {
+                            "@odata.type":  "#microsoft.graph.omaSettingInteger",
+                            "displayName":  "Remove Chat",
+                            "description":  "Removes Windows 11 Teams Chat",
+                            "omaUri":  "./Device/Vendor/MSFT/Policy/Config/Experience/ConfigureChatIcon",
+                            "secretReferenceValueId":  null,
+                            "isEncrypted":  false,
+                            "value":  3,
+                            "isReadOnly":  false
+                        }
+                    ]
+}

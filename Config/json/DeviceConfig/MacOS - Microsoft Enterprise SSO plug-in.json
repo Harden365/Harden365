@@ -1,7 +1,7 @@
 {
     "@odata.type":  "#microsoft.graph.macOSDeviceFeaturesConfiguration",
-    "id":  "14c3ed2f-e279-4caf-92bb-76ce78ad4a55",
-    "lastModifiedDateTime":  "2022-07-07T12:10:54.7831409Z",
+    "id":  "271f093f-070c-49fa-add8-0e4f5485044a",
+    "lastModifiedDateTime":  "2022-09-22T12:11:59.0420611Z",
     "roleScopeTagIds":  [
                             "0"
                         ],
@@ -9,9 +9,9 @@
     "deviceManagementApplicabilityRuleOsEdition":  null,
     "deviceManagementApplicabilityRuleOsVersion":  null,
     "deviceManagementApplicabilityRuleDeviceMode":  null,
-    "createdDateTime":  "2022-07-06T13:01:28.6566581Z",
+    "createdDateTime":  "2022-09-22T12:08:56.9426187Z",
     "description":  null,
-    "displayName":  "HardenMAC - Microsoft Enterprise SSO plug-in",
+    "displayName":  "MacOS - Microsoft Enterprise SSO plug-in",
     "version":  2,
     "adminShowHostInfo":  false,
     "loginWindowText":  null,

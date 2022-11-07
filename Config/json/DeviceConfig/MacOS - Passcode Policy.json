@@ -1,7 +1,7 @@
 {
     "@odata.type":  "#microsoft.graph.macOSGeneralDeviceConfiguration",
-    "id":  "f1210edf-4b9c-4f22-ad62-abdb5b6febac",
-    "lastModifiedDateTime":  "2022-07-12T15:22:47.03686Z",
+    "id":  "37e5b90b-fa40-4978-9d62-b1a0d9d53576",
+    "lastModifiedDateTime":  "2022-09-22T12:12:47.8952543Z",
     "roleScopeTagIds":  [
                             "0"
                         ],
@@ -9,10 +9,10 @@
     "deviceManagementApplicabilityRuleOsEdition":  null,
     "deviceManagementApplicabilityRuleOsVersion":  null,
     "deviceManagementApplicabilityRuleDeviceMode":  null,
-    "createdDateTime":  "2022-07-12T08:09:21.1872361Z",
+    "createdDateTime":  "2022-09-22T12:08:57.2418722Z",
     "description":  null,
-    "displayName":  "HardenMAC - Passcode Policy",
-    "version":  5,
+    "displayName":  "MacOS - Passcode Policy",
+    "version":  2,
     "compliantAppListType":  "none",
     "emailInDomainSuffixes":  [
 
