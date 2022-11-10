@@ -45,7 +45,7 @@ $PasswordCredential.EndDate = $startDate.AddYears(1)
 $PasswordCredential.KeyId = $Secret
 $PasswordCredential.Value = ([System.Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes(($Secret))))
 $SecretPass = $PasswordCredential.Value
-Write-LogWarning "Please keep Harden365 App secret $SecretPass"
+Write-LogWarning "Keep Harden365App secret $SecretPass"
 #endregion
 
 #region Create Harden365 App
@@ -53,7 +53,7 @@ $DomainOnM365=(Get-AzureADDomain | Where-Object { $_.IsInitial -match $true }).N
 $appName = "Harden365 App"
 $appURI = "https://harden365." +$DomainOnM365
 $appHomePageUrl = "https://hardenad.net/"
-$appReplyURLs = @($appURI, "https://localhost:1234")
+$appReplyURLs = "https://hardenad.net"
 if(!($HardenApp = Get-AzureADApplication -Filter "DisplayName eq '$($appName)'"  -ErrorAction SilentlyContinue))
 { $HardenApp = New-AzureADApplication -DisplayName $appName -IdentifierUris $appURI -Homepage $appHomePageUrl -ReplyUrls $appReplyURLs -PasswordCredentials $PasswordCredential
   $logo = Join-Path (Get-Location) "\Config\Harden365App.jpg"
@@ -80,7 +80,8 @@ $ApplicationPermissions = @(
 'DeviceManagementServiceConfig.ReadWrite.All',
 'Directory.Read.All',
 'Group.Read.All',
-'Group.ReadWrite.All')
+'Group.ReadWrite.All'
+)
  
 #Add app permissions
 ForEach ($permission in $ApplicationPermissions) {
@@ -132,5 +133,14 @@ $requiredResourcesAccess.Add($requiredGraphAccess)
 #Set permissions in existing Azure AD App
 $appObjectId=$Harden365App.ObjectId
 Set-AzureADApplication -ObjectId $appObjectId -RequiredResourceAccess $requiredResourcesAccess
-Write-LogWarning "Please grant permissions for Harden365 App in Registered Application / AAD "
+
+#region AdminConsent
+## Get the TenantID
+$tenantID = (Get-AzureADTenantDetail).ObjectID
+## Browse this URL
+$consentURL = "https://login.microsoftonline.com/$tenantID/adminconsent?client_id=$($HardenApp.AppId)"
+## Launch the consent URL using the default browser
+Start-sleep -Seconds 30
+Start-Process -FilePath "msedge.exe"  -ArgumentList "--inprivate $consentURL --start-fullscreen"
+#endregion
 }
