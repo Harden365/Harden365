@@ -19,7 +19,7 @@
                                },
                                {
                                    "@odata.type":  "#microsoft.graph.groupPolicyPresentationValueText",
-                                   "value":  "8b4c7ea5-2913-4542-9f4b-d8dd4dca0707",
+                                   "value":  "00000000-0000-0000-0000-000000000000",
                                    "presentation@odata.bind":  "https://graph.microsoft.com/beta/deviceManagement/groupPolicyDefinitions('4875d227-e4c3-4bf3-a1e2-a7f41591fdb8')/presentations('9b39fd82-23c9-48f0-9fbd-9bcbee7380d7')"
                                },
                                {
