@@ -138,6 +138,7 @@ $AuditMenu = CreateMenu -MenuTitle "HARDEN 365 - AUDIT" -MenuOptions @("Audit Mi
                 try {Get-OrganizationConfig | Out-Null 
                 } catch {Connect-ExchangeOnline  -Credential $Credential -WarningAction:SilentlyContinue -ShowBanner:$false}
                 Invoke-ORCA -ExchangeEnvironmentName "O365Default" -Output HTML -OutputOptions @{HTML=@{OutputDirectory=".\Audit"}} -Connect $false
+                write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; Write-host ('Audit ORCA exported in folder .\Audit') -ForegroundColor Green
                 Read-Host -Prompt "Press Enter to return_"
                 AuditMenu -Credential $Credential
       }

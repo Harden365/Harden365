@@ -722,3 +722,5 @@ $CondAccPol=Get-AzureADMSConditionalAccessPolicy | Where-Object DisplayName -eq 
                   }
  }
 }
+
+Write-LogInfo "All template created is disable by default"   

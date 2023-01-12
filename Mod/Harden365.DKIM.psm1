@@ -78,6 +78,7 @@ foreach ($Domain in $Domains) {
             Write-LogInfo "$Domain : Check DMARC - $DMARCResultesStrings"
         }
           }
+Write-LogInfo "Audit file generated in folder .\Audit"   
 }
 
 

@@ -74,7 +74,7 @@ Function Start-EOPCheckAutoForward {
             "$(Get-Date -UFormat "%m-%d-%Y %T ") - Mailbox '$($rule.MailboxOwnerId)' forward to '$($rule.ForwardTo)$($rule.RedirectTo)'" | Out-File "$debugFileFullPath" -Append
             Write-LogWarning "Mailbox '$($rule.MailboxOwnerId)' forward to '$($rule.ForwardTo)$($rule.RedirectTo)'"
             }
-            
+Write-LogInfo "Audit file generated in folder .\Audit"            
 }
 
 
@@ -116,7 +116,7 @@ Write-Loginfo "Check permissions in all mailbox"
 $dateFileString = Get-Date -Format "FileDateTimeUniversal"
 mkdir -Force ".\Audit" | Out-Null
 $Permissions | Select-Object Name,UserprincipalName,Type,AccessRights,User | Export-Csv -Path ".\Audit\AuditMailboxPermission$dateFileString.csv" -Delimiter ';' -Encoding UTF8 -NoTypeInformation
-   
+Write-LogInfo "Audit file generated in folder .\Audit"      
 }
 
 
@@ -147,7 +147,7 @@ Write-Loginfo "Check permissions in all Calendars"
 $dateFileString = Get-Date -Format "FileDateTimeUniversal"
 mkdir -Force ".\Audit" | Out-Null
 $CalendarPermissions | Select-Object Identity,User,AccessRights | Export-Csv -Path ".\Audit\AuditCalendarPermission$dateFileString.csv" -Delimiter ';' -Encoding UTF8 -NoTypeInformation
-   
+Write-LogInfo "Audit file generated in folder .\Audit"      
 }
 
 
@@ -178,5 +178,5 @@ Write-Loginfo "Check permissions in all Contacts"
 $dateFileString = Get-Date -Format "FileDateTimeUniversal"
 mkdir -Force ".\Audit" | Out-Null
 $ContactPermissions | Select-Object Identity,User,AccessRights | Export-Csv -Path ".\Audit\AuditContactPermission$dateFileString.csv" -Delimiter ';' -Encoding UTF8 -NoTypeInformation
-   
+Write-LogInfo "Audit file generated in folder .\Audit"      
 }

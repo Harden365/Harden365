@@ -102,12 +102,14 @@ $ExportUsers = @()
 
             $LicenseNames = $user.LicensePlans
             Switch -Wildcard ($LicenseNames) {
-                   "*FLOW_FREE" { $LicenseNames = "" }
-                   "*TEAMS_EXPLORATORY" { $LicenseNames = "" }
+                   "*FLOW_FREE" { $LicenseNames = "Microsoft Power Automate Free" }
+                   "*TEAMS_EXPLORATORY" { $LicenseNames = "Microsoft Teams Exploratory" }
+                   "*PHONESYSTEM_VIRTUALUSER" { $LicenseNames = "Microsoft Teams Exploratory" }
                    "*STREAM" { $LicenseNames = "" }
                    "*POWER_BI_STANDARD" { $LicenseNames = "" }
                    "*POWERAPPS_VIRAL" { $LicenseNames = "" }
                    "*TEAMS_COMMERCIAL_TRIAL" { $LicenseNames = "" }
+                   "*STANDARDPACK" { $LicenseNames = "Office 365 E1" }
                    "*POWER_BI_PRO" { $LicenseNames = "PowerBI Pro" }
                    "*EXCHANGESTANDARD" { $LicenseNames = "ExchangeOnline P1" }
                    "*O365_BUSINESS_PREMIUM" { $LicenseNames = "M365 Business Standard" }
@@ -161,7 +163,7 @@ $ExportUsers | Sort-Object  UserPrincipalName,Licenses,"AD Sync","Last Logon (30
     | Out-File .\Audit\Harden365-AuditUsersDetails$dateFileString.html
 
 Invoke-Expression .\Audit\Harden365-AuditUsersDetails$dateFileString.html 
-Write-LogInfo "Audit Users Detail generated"
+Write-LogInfo "Audit Users Detail generated in folder .\Audit"
 Write-LogSection '' -NoHostOutput 
 }
 

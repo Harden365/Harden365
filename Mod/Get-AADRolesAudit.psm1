@@ -107,7 +107,6 @@ Try {
     $objrole = New-Object PSObject -Property @{
       ObjectId = $Member.ObjectId
       'Role Name' = $Role.DisplayName
-      'Last Logon (30d)' = (Get-AzureADAuditSignInLogs -top 1 -Filter "UserPrincipalName eq '$UPN'").CreatedDateTime
       Name = $Member.DisplayName
       UserPrincipalName = $Member.UserPrincipalName
       MemberType = $Member.UserType
@@ -182,6 +181,6 @@ $Export | Sort-Object UserPrincipalName,'Role Name' | Select-object 'Check','Rol
 ".\Audit\AuditRolesDetails$dateFileString.csv" -Delimiter ';' -Encoding UTF8 -NoTypeInformation
 
 Invoke-Expression .\Audit\AuditRoles$dateFileString.html
-Write-LogInfo "Audit Roles Administration generated"
+Write-LogInfo "Audit Roles Administration generated in folder .\Audit"
 Write-LogSection '' -NoHostOutput
 }
