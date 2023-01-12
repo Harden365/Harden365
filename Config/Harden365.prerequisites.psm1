@@ -93,7 +93,7 @@ function Test-PowerShellModule {
         Test-UserIsAdministrator
         [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
         Set-PSRepository -Name 'PSGallery' -InstallationPolicy Trusted
-        Write-LogWarning ("Installing $ModuleName Powershell Module")
+        Write-LogInfo ("Installing $ModuleName Powershell Module")
         Install-Module $ModuleName -AllowClobber
         Set-PSRepository -Name 'PSGallery' -InstallationPolicy Untrusted
     } elseif ($null -eq $installedPSModuleVersion) {
