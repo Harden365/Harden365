@@ -47,7 +47,7 @@ if ($(Get-OrganizationConfig).OAuth2ClientProfileEnabled -eq $false) {
 else { Write-LogInfo "Modern Auth in ExchangeOnline enabled"}    
 }
 
-
+<#
 Function Start-OUTBlockOutlookAddIns {
      <#
         .Synopsis
@@ -59,7 +59,7 @@ Function Start-OUTBlockOutlookAddIns {
         .Notes
          Version: 01.00 -- 
          
-    #>
+    #
 
 	param(
 	[Parameter(Mandatory = $false)]
@@ -78,14 +78,14 @@ if (!$OutAddins) {
     }
 else { 
     Write-LogWarning "Outlook AddIns is self activation enabled !"
-    New-RoleAssignmentPolicy -Name $PolicyName -Roles $Roles
+    New-RoleAssignmentPolicy -Name $PolicyName -Roles $OutAddins
     Set-RoleAssignmentPolicy -Identity $PolicyName -IsDefault -Confirm:$false
     Get-Mailbox -ResultSize Unlimited | Set-Mailbox -RoleAssignmentPolicy $PolicyName
     Write-LogInfo "Policy $PolicyName created"      
 }
 } catch{ Write-LogError "Module error" }
 }
-
+#>
 
 Function Start-OUTBlockStorageTiers {
      <#

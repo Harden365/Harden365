@@ -135,7 +135,7 @@ Function Start-EONotifQuarantine {
 
 
 #SCRIPT
-$CheckName=(Get-QuarantinePolicy | Where-Object { $_.DisplayName -eq $Name}).Name
+$CheckName=(Get-QuarantinePolicy | Where-Object { $_.Name -eq $Name}).Name
     if (-not $CheckName)
         {
         Try {
@@ -333,7 +333,7 @@ Function Start-EOPAntispamPolicyStandard {
     [String]$SpamAction = "MoveToJmf",
     [String]$BulkThreshold = "6",
     [String]$QuarantineRetentionPeriod = "30",
-    [Boolean]$EnableEndUserSpamNotifications = $true,
+    [Boolean]$EnableEndUserSpamNotifications = $true,  
     [String]$BulkSpamAction = "MoveToJmf",
     [String]$PhishSpamAction = "Quarantine",
     [String]$RecipientLimitExternalPerHour = "500",

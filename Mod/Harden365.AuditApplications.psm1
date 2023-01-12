@@ -117,11 +117,12 @@ Function Start-TEAAudit {
 Write-LogInfo "**** AUDIT APPLICATION TEAMS"
 
 
-#LEGACY AUTHENTIFICATION
+<#LEGACY AUTHENTIFICATION
 if ($(Get-CsOAuthConfiguration).ClientAdalAuthOverride -eq "Disallowed") { 
     Write-LogWarning "Modern Auth in Teams is disable!"
     }
 else { Write-LogInfo "Modern Auth in Teams enabled"}
+#>
 
 #PRESENTER-ROLE
 if ((Get-CsTeamsMeetingPolicy -Identity Global).DesignatedPresenterRoleMode -ne 'OrganizerOnlyUserOverride') {
@@ -190,13 +191,11 @@ Function Start-POWAudit {
 
     Param(
         [System.Management.Automation.PSCredential]$Credential
+        #$password = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($Credential.Password))
     )
 
 Write-LogInfo "**** AUDIT APPLICATION POWERPLATFORM"
 
-    Param(
-        [System.Management.Automation.PSCredential]$Credential
-    )
 
 #BLOCKFREESUBSCRIPTION
 try {
@@ -205,7 +204,7 @@ if ((Get-MsolCompanyInformation).AllowAdHocSubscriptions -eq $true) {
 else {Write-LogInfo "Standard users already disabled to create free subscriptions"}
 } catch{ Write-LogError "Module error" }
 
-#SHAREEVERYONE
+<#SHAREEVERYONE
 try {
 Add-PowerAppsAccount -Username $Credential.UserName -Password $Credential.Password
 if ((Get-TenantSettings).powerPlatform.powerApps.disableShareWithEveryone -eq $false) {
@@ -220,6 +219,7 @@ if (((Get-AllowedConsentPlans).Types -eq "Internal") -or ((Get-AllowedConsentPla
     Write-LogWarning "Prevent standard users from creating trial/developer subscriptions"}
 else {Write-LogInfo "Standard users already disabled to create trial/developer subscriptions"}
 } catch{ Write-LogError "Module error" }
+#>
 
 #BLOCKPAYABLESUBSCRIPTION
 try{
