@@ -290,6 +290,22 @@ Function Start-MFAUsers {
 $ExcludeCAGroup = (Get-AzureADGroup -All $true | Where-Object DisplayName -eq $GroupExclude).ObjectId
 $DomainOnM365=(Get-AzureADDomain | Where-Object { $_.IsInitial -match $true }).Name
 $CondAccPol=Get-AzureADMSConditionalAccessPolicy | Where-Object DisplayName -eq $Name
+$CARoles = @(
+(Get-AzureADDirectoryRoleTemplate | Where-Object {$_.DisplayName -eq "Global Administrator"}).ObjectId,
+(Get-AzureADDirectoryRoleTemplate | Where-Object {$_.DisplayName -eq "Application Administrator"}).ObjectId,
+(Get-AzureADDirectoryRoleTemplate | Where-Object {$_.DisplayName -eq "Authentication Administrator"}).ObjectId,
+(Get-AzureADDirectoryRoleTemplate | Where-Object {$_.DisplayName -eq "Billing Administrator"}).ObjectId,
+(Get-AzureADDirectoryRoleTemplate | Where-Object {$_.DisplayName -eq "Cloud Application Administrator"}).ObjectId,
+(Get-AzureADDirectoryRoleTemplate | Where-Object {$_.DisplayName -eq "Conditional Access Administrator"}).ObjectId,
+(Get-AzureADDirectoryRoleTemplate | Where-Object {$_.DisplayName -eq "Directory Synchronization Accounts"}).ObjectId,
+(Get-AzureADDirectoryRoleTemplate | Where-Object {$_.DisplayName -eq "Exchange Administrator"}).ObjectId,
+(Get-AzureADDirectoryRoleTemplate | Where-Object {$_.DisplayName -eq "Helpdesk administrator"}).ObjectId,
+(Get-AzureADDirectoryRoleTemplate | Where-Object {$_.DisplayName -eq "Password administrator"}).ObjectId,
+(Get-AzureADDirectoryRoleTemplate | Where-Object {$_.DisplayName -eq "Privileged authentication administrator"}).ObjectId,
+(Get-AzureADDirectoryRoleTemplate | Where-Object {$_.DisplayName -eq "Privileged Role Administrator"}).ObjectId,
+(Get-AzureADDirectoryRoleTemplate | Where-Object {$_.DisplayName -eq "Security administrator"}).ObjectId,
+(Get-AzureADDirectoryRoleTemplate | Where-Object {$_.DisplayName -eq "SharePoint administrator"}).ObjectId,
+(Get-AzureADDirectoryRoleTemplate | Where-Object {$_.DisplayName -eq "User administrator"}).ObjectId)
 
     if (-not $CondAccPol){
         Try {
@@ -301,7 +317,7 @@ $CondAccPol=Get-AzureADMSConditionalAccessPolicy | Where-Object DisplayName -eq 
             $conditions.Users.IncludeUsers = "All"
             $conditions.Users.ExcludeUsers = "GuestsOrExternalUsers",(Get-AzureADUser -Filter "userPrincipalName eq 'u-admin@$DomainOnM365'").ObjectId
             $conditions.Users.ExcludeGroups = $ExcludeCAGroup
-            $conditions.Users.ExcludeRoles = (Get-AzureADDirectoryRoleTemplate).ObjectId
+            $conditions.Users.ExcludeRoles = $CARoles
             $conditions.ClientAppTypes = @('Browser', 'MobileAppsAndDesktopClients')
             $conditions.Locations = New-Object -TypeName Microsoft.Open.MSGraph.Model.ConditionalAccessLocationCondition
             $conditions.Locations.IncludeLocations = "All"
@@ -324,58 +340,6 @@ $CondAccPol=Get-AzureADMSConditionalAccessPolicy | Where-Object DisplayName -eq 
             else { 
                   Write-LogWarning "CA '$Name' already created!"
                   }
-}
-
-Function Start-BlockUnmanagedDownloads {
-     <#
-        .Synopsis
-         Create CA to block downloads in unmanaged devices.
-        
-        .Description
-         This function will create Conditional Access to block downloads in unmanaged devices.
-        
-        .Notes
-         Version: 01.00 -- 
-         
-    #>
-
-	param(
-	[Parameter(Mandatory = $false)]
-	[String]$Name = "Harden365 - Block Unmanaged File Downloads",
-	[String]$GroupExclude = "Harden365 - CA Exclusion - BlockUnmanagedDownloads Exclude"   
-)
-
-
-#SCRIPT
-$ExcludeCAGroup = (Get-AzureADGroup -All $true | Where-Object DisplayName -eq $GroupExclude).ObjectId
-$DomainOnM365=(Get-AzureADDomain | Where-Object { $_.IsInitial -match $true }).Name
-$CondAccPol=Get-AzureADMSConditionalAccessPolicy | Where-Object DisplayName -eq $Name
-
-    if (-not $CondAccPol){
-        Try {
-            $conditions = New-Object -TypeName Microsoft.Open.MSGraph.Model.ConditionalAccessConditionSet
-            $conditions.Applications = New-Object -TypeName Microsoft.Open.MSGraph.Model.ConditionalAccessApplicationCondition
-            $conditions.Applications.IncludeApplications = (Get-AzureADServicePrincipal -Filter "DisplayName eq 'Office 365 Exchange Online'").AppId,(Get-AzureADServicePrincipal -Filter "DisplayName eq 'Office 365 SharePoint Online'").AppId
-            $conditions.Users = New-Object -TypeName Microsoft.Open.MSGraph.Model.ConditionalAccessUserCondition
-            $conditions.Users.IncludeUsers = "All"
-            $conditions.Users.ExcludeUsers = (Get-AzureADUser -Filter "userPrincipalName eq 'u-admin@$DomainOnM365'").ObjectId
-            $conditions.Users.ExcludeGroups = $ExcludeCAGroup
-            $conditions.ClientAppTypes = @('Browser')
-            $sessions = New-Object -TypeName Microsoft.Open.MSGraph.Model.ConditionalAccessSessionControls
-            $sessions.ApplicationEnforcedRestrictions = New-Object -TypeName Microsoft.Open.MSGraph.Model.ConditionalAccessApplicationEnforcedRestrictions
-            $sessions.ApplicationEnforcedRestrictions.IsEnabled = "true"
-            New-AzureADMSConditionalAccessPolicy -DisplayName $Name -State "Disabled" -Conditions $conditions -SessionControls $sessions
-            Write-LogInfo "CA '$Name' created"
-            }
-                 Catch {
-                        Write-LogError "CA '$Name' not created"
-                        }
-            }
-            else { 
-                  Write-LogWarning "CA '$Name' already created!"
-                  }
- Write-LogSection '' -NoHostOutput
-
 }
 
 Function Start-UnsupportedDevicePlatforms {
@@ -583,6 +547,70 @@ $CondAccPol=Get-AzureADMSConditionalAccessPolicy | Where-Object DisplayName -eq 
                   Write-LogWarning "CA '$Name' already created!"
                   }
 }
+
+<#region
+ Function Start-BlockEnumerateAAD {
+     
+        .Synopsis
+         Create CA to block AAD enumerate.
+        
+        .Description
+         This function will create Conditional Access Guest Access (Allowed Apps Excluded).
+        
+        .Notes
+         Version: 01.00 -- 
+         
+    
+
+	param(
+	[Parameter(Mandatory = $false)]
+	[String]$Name = "Harden365 - Block Enumerate AAD"   
+)
+
+
+#POSTSCRIPT
+$DomainOnM365=(Get-AzureADDomain | Where-Object { $_.IsInitial -match $true }).Name
+$CondAccPol=Get-AzureADMSConditionalAccessPolicy | Where-Object DisplayName -eq $Name
+$CARoles = (Get-AzureADDirectoryRoleTemplate).ObjectId
+
+
+#CREATE SPN IF NOT PRESENT
+$SPNs = @('1b730954-1685-4b74-9bfd-dac224a7b894')
+ForEach ($SPN in $SPNs) {
+$AppId=@()
+$AppId = Get-AzureADServicePrincipal -All $true -Filter "AppId eq '$SPN'"
+if ($AppId.Appid -eq $SPN) {}else{
+    New-AzureADServicePrincipal -AppId $SPN | Out-Null
+    Write-LogInfo 'create SPN for '$SPN
+}
+}
+#SCRIPT
+    if (-not $CondAccPol){
+        Try {
+            $conditions = New-Object -TypeName Microsoft.Open.MSGraph.Model.ConditionalAccessConditionSet
+            $conditions.Applications = New-Object -TypeName Microsoft.Open.MSGraph.Model.ConditionalAccessApplicationCondition
+            $conditions.Applications.IncludeApplications = "1b730954-1685-4b74-9bfd-dac224a7b894"#,"797f4846-ba00-4fd7-ba43-dac1f8f63013"
+            $conditions.Users = New-Object -TypeName Microsoft.Open.MSGraph.Model.ConditionalAccessUserCondition
+            $conditions.Users.IncludeUsers = "All"
+            $conditions.Users.ExcludeUsers = (Get-AzureADUser -Filter "userPrincipalName eq 'u-admin@$DomainOnM365'").ObjectId
+            $conditions.Users.ExcludeRoles = $CARoles
+            $conditions.ClientAppTypes = @('Browser', 'MobileAppsAndDesktopClients')
+            $controls = New-Object -TypeName Microsoft.Open.MSGraph.Model.ConditionalAccessGrantControls
+            $controls._Operator = "OR"
+            $controls.BuiltInControls = @('Block')
+            New-AzureADMSConditionalAccessPolicy -DisplayName $Name -State "Disabled" -Conditions $conditions -GrantControls $controls
+            Write-LogInfo "Conditional Access '$Name' created"
+            }
+                 Catch {
+                        Write-LogError "CA '$Name' not created"
+                        }
+            }
+            else { 
+                  Write-LogWarning "CA '$Name' already created!"
+                  }
+}
+#endregion
+#>
 
 Function Start-HighRiskUsers {
      <#
