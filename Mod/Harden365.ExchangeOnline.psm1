@@ -112,6 +112,46 @@ $GroupEOL=(Get-UnifiedGroup | Where-Object { $_.DisplayName -eq $Name}).Name
 }
 
 
+Function Start-EONotifQuarantine {
+     <#
+        .Synopsis
+         Create group for Antispam strict policy
+        
+        .Description
+         This function will create new group for Antispam strict policy
+
+        .Notes
+         Version: 01.00 -- 
+         
+    #>
+
+	param(
+	[Parameter(Mandatory = $false)]
+	[String]$Name = "Harden365 - User Notifications",
+    [String]$EndUserQuarantinePermissionsValue = "23",
+    [String]$EndUserSpamNotificationFrequencyInDays = "3",
+    [Boolean]$EsnEnabled = $true
+)
+
+
+#SCRIPT
+$CheckName=(Get-QuarantinePolicy | Where-Object { $_.DisplayName -eq $Name}).Name
+    if (-not $CheckName)
+        {
+        Try {
+            New-QuarantinePolicy -Name $Name -EndUserQuarantinePermissionsValue $EndUserQuarantinePermissionsValue -EndUserSpamNotificationFrequencyInDays $EndUserSpamNotificationFrequencyInDays -EsnEnabled $EsnEnabled | Out-Null
+            Write-LogInfo "Quarantine Policy '$Name' created"
+            }
+                 Catch {
+                        Write-LogError "Quarantine Policy '$Name' not created"
+                        }
+    }
+    else { 
+         Write-LogWarning "Quarantine Policy '$Name' already created!"
+         }
+}
+
+
 Function Start-EOPAlertsMailbox {
      <#
         .Synopsis
@@ -361,8 +401,8 @@ Function Start-EOPAntiForwardPolicy {
 
 	param(
 	[Parameter(Mandatory = $false)]
-    [String]$PolicyOutboundName = "Harden365 - AntiForward Outbound Policy",
-    [String]$RuleOutboundName = "Harden365 - AntiForward Outbound Rule",
+    [String]$PolicyOutboundName = "Harden365 - AutoForward Outbound Policy",
+    [String]$RuleOutboundName = "Harden365 - AutoForward Outbound Rule",
     [String]$RecipientLimitExternalPerHour = "500",
 	[String]$RecipientLimitInternalPerHour = "1000",
 	[String]$RecipientLimitPerDay = "1000",

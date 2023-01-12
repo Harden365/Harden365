@@ -39,7 +39,7 @@ Function Start-Tiers0EmergencyAccount {
     [Boolean]$Digits = $true,
     [Boolean]$SpecialCharacters = $true,
     [String]$ExcludeCharacters = "@",
-    [String]$Lengt = "128",
+    [String]$Lengt = "24",
     [String]$Title = "0Tiers_EmergencyAccount"
 )
 
@@ -116,7 +116,7 @@ Function Start-Tiers0GlobalAdminAccount {
     [Boolean]$Digits = $true,
     [Boolean]$SpecialCharacters = $true,
     [String]$ExcludeCharacters = "@",
-    [String]$Lengt = "16",
+    [String]$Lengt = "24",
     [String]$Title = "0Tiers_GlobalAdmin"
 )
 

@@ -46,7 +46,7 @@ Function Start-DefenderO365P1AntiPhishingPolicy {
     [Boolean]$EnableOrganizationDomainsProtection = $true,
     [String]$TargetedDomainProtectionAction = "Quarantine",
     [Boolean]$EnableUnusualCharactersSafetyTips = $true,
-    [String]$PhishThresholdLevel = "2",
+    [String]$PhishThresholdLevel = "3",
 	[String]$Priority = "0"
 )
 
@@ -151,14 +151,12 @@ Function Start-DefenderO365P1SafeLinks {
     if ((Get-SafeLinksRule).name -ne $RuleName)
     {
         Try { 
-            New-SafeLinksPolicy -Name $PolicyName -EnableSafeLinksForTeams $EnableSafeLinksForTeams -ScanUrls $ScanUrls -DeliverMessageAfterScan $DeliverMessageAfterScan -EnableForInternalSenders $EnableForInternalSenders -DoNotRewriteUrls $DoNotRewriteUrls -AllowClickThrough $AllowClickThrough
+            New-SafeLinksPolicy -Name $PolicyName -EnableSafeLinksForTeams $EnableSafeLinksForTeams -ScanUrls $ScanUrls -DeliverMessageAfterScan $DeliverMessageAfterScan -EnableForInternalSenders $EnableForInternalSenders -DoNotRewriteUrls $DoNotRewriteUrls -AllowClickThrough $AllowClickThrough -TrackClicks $TrackClicks
          if (-not (Get-SafeLinksPolicy -Identity $PolicyName).DoNotAllowClickThrough)
             {} else {  Set-SafeLinksPolicy -Identity $PolicyName  -DoNotAllowClickThrough $DoNotAllowClickThrough }
          if ($(Get-SafeLinksPolicy -Identity $PolicyName).EnableSafeLinksForEmail -eq $false)
             {Set-SafeLinksPolicy -Identity $PolicyName  -EnableSafeLinksForEmail $EnableSafeLinksForEmail } else {   }          
             New-SafeLinksRule -Name $RuleName -SafeLinksPolicy $PolicyName -Priority $Priority -RecipientDomainIs ((Get-AcceptedDomain).Name)
-            $WarningActionPreference = "SilentlyContinue"
-            Set-AtpPolicyForO365 -TrackClicks $TrackClicks -EnableSafeLinksForO365Clients $EnableSafeLinksForO365Clients
             Write-LogInfo "$PolicyName created"  
         } Catch {
                 Write-LogError "$PolicyName not created!" }

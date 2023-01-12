@@ -78,6 +78,8 @@ Pause;Break}
 
 #TENANT DETAIL
 Connect-MsolService -Credential $Credential | Out-Null
+#TENANT NAME
+$TenantName = (Get-MsolDomain | Where-Object { $_.IsDefault -eq $true }).Name
 #AZUREADEDITION
 if (((Get-MsolAccountSku | Where-Object { $_.ActiveUnits -ne "0" }| Select-Object -ExpandProperty ServiceStatus).ServicePlan).ServiceName -match "AAD_PREMIUM_P2")
 { $TenantEdition = "Azure AD Premium P2"} 
@@ -95,5 +97,5 @@ elseif (((Get-MsolAccountSku | Where-Object { $_.ActiveUnits -ne "0" } | Select-
 
 
 ## RUN MAIN MENU
-MainMenu -Credential $Credential -TenantEdition $TenantEdition -O365ATP $O365ATP
+MainMenu -Credential $Credential -TenantName $TenantName -TenantEdition $TenantEdition -O365ATP $O365ATP
 
