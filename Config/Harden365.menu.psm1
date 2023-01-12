@@ -256,7 +256,7 @@ $IdentityMenu = CreateMenu -MenuTitle "HARDEN 365 - IDENTITY" -MenuOptions @("Em
                     write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; write-host(" --> Harden365.TierModel module not working") -ForegroundColor Red}
                     }
                     write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; Write-host ('Emergency Accounts credentials are saved in .\Keepass file') -ForegroundColor Green
-                    write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; Write-host ('Password Keepass is : ') -ForegroundColor Green -NoNewline ; Write-host ('Harden365')
+                    write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; Write-host ('Password Keepass is : ') -ForegroundColor Green -NoNewline ; Write-host ('Harden365') -ForegroundColor Red
                     Read-Host -Prompt "Press Enter to return_"
                     IdentityMenu -Credential $Credential
                 }
@@ -299,6 +299,7 @@ $IdentityMenu = CreateMenu -MenuTitle "HARDEN 365 - IDENTITY" -MenuOptions @("Em
                     } Catch {
                     write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; write-host(" --> Harden365.CA module not working") -ForegroundColor Red}
                     }
+                    write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; Write-host ('All CA Template created is disable by default') -ForegroundColor Green
                     Read-Host -Prompt "Press Enter to return_"
                     IdentityMenu -Credential $Credential
                     }
