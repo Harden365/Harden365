@@ -233,8 +233,7 @@ $DomainOnM365=(Get-MsolDomain | Where-Object { $_.IsInitial -match $true}).Name
 
 }
 
-Write-LogInfo "Emergency Accounts credentials are saved in .\Keepass file"
-Write-LogError "Password Keepass is : Harden365"    
+  
 
 
 
