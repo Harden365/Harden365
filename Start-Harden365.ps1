@@ -16,6 +16,8 @@
         Security Default disable
 
     .UPDATES
+    0.8 - 01/15/2023
+        Rewrite debug system
     0.7 - 11/27/2021
         Rewrite debug system
     0.6 - 11/26/2021
