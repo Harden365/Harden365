@@ -1,89 +1,67 @@
 {
-    "@odata.type":  "#microsoft.graph.macOSDeviceFeaturesConfiguration",
-    "id":  "271f093f-070c-49fa-add8-0e4f5485044a",
-    "lastModifiedDateTime":  "2022-09-22T12:11:59.0420611Z",
-    "roleScopeTagIds":  [
-                            "0"
-                        ],
-    "supportsScopeTags":  true,
-    "deviceManagementApplicabilityRuleOsEdition":  null,
-    "deviceManagementApplicabilityRuleOsVersion":  null,
-    "deviceManagementApplicabilityRuleDeviceMode":  null,
-    "createdDateTime":  "2022-09-22T12:08:56.9426187Z",
-    "description":  null,
-    "displayName":  "MacOS - Microsoft Enterprise SSO plug-in",
-    "version":  2,
-    "adminShowHostInfo":  false,
-    "loginWindowText":  null,
-    "authorizedUsersListHidden":  false,
-    "authorizedUsersListHideLocalUsers":  false,
-    "authorizedUsersListHideMobileAccounts":  false,
-    "authorizedUsersListIncludeNetworkUsers":  false,
-    "authorizedUsersListHideAdminUsers":  false,
-    "authorizedUsersListShowOtherManagedUsers":  false,
-    "shutDownDisabled":  false,
-    "restartDisabled":  false,
-    "sleepDisabled":  false,
-    "consoleAccessDisabled":  false,
-    "shutDownDisabledWhileLoggedIn":  false,
-    "restartDisabledWhileLoggedIn":  false,
-    "powerOffDisabledWhileLoggedIn":  false,
-    "logOutDisabledWhileLoggedIn":  false,
-    "screenLockDisableImmediate":  false,
-    "singleSignOnExtension":  null,
-    "contentCachingEnabled":  false,
-    "contentCachingType":  "notConfigured",
-    "contentCachingMaxSizeBytes":  null,
-    "contentCachingDataPath":  null,
-    "contentCachingDisableConnectionSharing":  false,
-    "contentCachingForceConnectionSharing":  false,
-    "contentCachingClientPolicy":  "notConfigured",
-    "contentCachingPeerPolicy":  "notConfigured",
-    "contentCachingParentSelectionPolicy":  "notConfigured",
-    "contentCachingParents":  [
-
-                              ],
-    "contentCachingLogClientIdentities":  false,
-    "contentCachingBlockDeletion":  false,
-    "contentCachingShowAlerts":  false,
-    "contentCachingKeepAwake":  false,
-    "contentCachingPort":  null,
-    "airPrintDestinations":  [
-
-                             ],
-    "autoLaunchItems":  [
-
-                        ],
-    "associatedDomains":  [
-
-                          ],
-    "appAssociatedDomains":  [
-
-                             ],
-    "macOSSingleSignOnExtension":  {
-                                       "@odata.type":  "#microsoft.graph.macOSAzureAdSingleSignOnExtension",
-                                       "enableSharedDeviceMode":  false,
-                                       "bundleIdAccessControlList":  [
-
-                                                                     ],
-                                       "configurations":  [
-                                                              {
-                                                                  "@odata.type":  "#microsoft.graph.keyStringValuePair",
-                                                                  "key":  "AppPrefixAllowList",
-                                                                  "value":  "com.microsoft."
-                                                              }
-                                                          ]
-                                   },
-    "contentCachingClientListenRanges":  [
-
-                                         ],
-    "contentCachingPeerListenRanges":  [
-
-                                       ],
-    "contentCachingPeerFilterRanges":  [
-
-                                       ],
-    "contentCachingPublicRanges":  [
-
-                                   ]
+  "@odata.type": "#microsoft.graph.macOSDeviceFeaturesConfiguration",
+  "id": "271f093f-070c-49fa-add8-0e4f5485044a",
+  "lastModifiedDateTime": "2022-09-22T12:11:59.0420611Z",
+  "roleScopeTagIds": ["0"],
+  "supportsScopeTags": true,
+  "deviceManagementApplicabilityRuleOsEdition": null,
+  "deviceManagementApplicabilityRuleOsVersion": null,
+  "deviceManagementApplicabilityRuleDeviceMode": null,
+  "createdDateTime": "2022-09-22T12:08:56.9426187Z",
+  "description": null,
+  "displayName": "MacOS - Microsoft Enterprise SSO plug-in",
+  "version": 2,
+  "adminShowHostInfo": false,
+  "loginWindowText": null,
+  "authorizedUsersListHidden": false,
+  "authorizedUsersListHideLocalUsers": false,
+  "authorizedUsersListHideMobileAccounts": false,
+  "authorizedUsersListIncludeNetworkUsers": false,
+  "authorizedUsersListHideAdminUsers": false,
+  "authorizedUsersListShowOtherManagedUsers": false,
+  "shutDownDisabled": false,
+  "restartDisabled": false,
+  "sleepDisabled": false,
+  "consoleAccessDisabled": false,
+  "shutDownDisabledWhileLoggedIn": false,
+  "restartDisabledWhileLoggedIn": false,
+  "powerOffDisabledWhileLoggedIn": false,
+  "logOutDisabledWhileLoggedIn": false,
+  "screenLockDisableImmediate": false,
+  "singleSignOnExtension": null,
+  "contentCachingEnabled": false,
+  "contentCachingType": "notConfigured",
+  "contentCachingMaxSizeBytes": null,
+  "contentCachingDataPath": null,
+  "contentCachingDisableConnectionSharing": false,
+  "contentCachingForceConnectionSharing": false,
+  "contentCachingClientPolicy": "notConfigured",
+  "contentCachingPeerPolicy": "notConfigured",
+  "contentCachingParentSelectionPolicy": "notConfigured",
+  "contentCachingParents": [],
+  "contentCachingLogClientIdentities": false,
+  "contentCachingBlockDeletion": false,
+  "contentCachingShowAlerts": false,
+  "contentCachingKeepAwake": false,
+  "contentCachingPort": null,
+  "airPrintDestinations": [],
+  "autoLaunchItems": [],
+  "associatedDomains": [],
+  "appAssociatedDomains": [],
+  "macOSSingleSignOnExtension": {
+    "@odata.type": "#microsoft.graph.macOSAzureAdSingleSignOnExtension",
+    "enableSharedDeviceMode": false,
+    "bundleIdAccessControlList": [],
+    "configurations": [
+      {
+        "@odata.type": "#microsoft.graph.keyStringValuePair",
+        "key": "AppPrefixAllowList",
+        "value": "com.microsoft."
+      }
+    ]
+  },
+  "contentCachingClientListenRanges": [],
+  "contentCachingPeerListenRanges": [],
+  "contentCachingPeerFilterRanges": [],
+  "contentCachingPublicRanges": []
 }

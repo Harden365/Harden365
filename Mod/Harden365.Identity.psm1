@@ -17,11 +17,11 @@ Function Start-UserConsentToApp {
          
     #>
 
-#SCRIPT
-if ((Get-MsolCompanyInformation).UsersPermissionToUserConsentToAppEnabled  -eq $true) {
-Set-MsolCompanySettings -UsersPermissionToUserConsentToAppEnabled $false
-Write-LogInfo 'Disable User permission consent App registration' 
-}
+     #SCRIPT
+     if ((Get-MsolCompanyInformation).UsersPermissionToUserConsentToAppEnabled -eq $true) {
+          Set-MsolCompanySettings -UsersPermissionToUserConsentToAppEnabled $false
+          Write-LogInfo 'Disable User permission consent App registration' 
+     }
       
 }
 

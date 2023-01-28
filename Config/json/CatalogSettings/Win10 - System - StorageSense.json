@@ -1,48 +1,44 @@
 {
-    "name":  "Win10 - System - StorageSense",
-    "description":  "Harden365 - System - StorageSense v1.0",
-    "platforms":  "windows10",
-    "technologies":  "mdm",
-    "settings":  [
-                     {
-                         "settingInstance":  {
-                                                 "@odata.type":  "#microsoft.graph.deviceManagementConfigurationChoiceSettingInstance",
-                                                 "settingDefinitionId":  "device_vendor_msft_policy_config_storage_allowstoragesensetemporaryfilescleanup",
-                                                 "settingInstanceTemplateReference":  null,
-                                                 "choiceSettingValue":  {
-                                                                            "settingValueTemplateReference":  null,
-                                                                            "value":  "device_vendor_msft_policy_config_storage_allowstoragesensetemporaryfilescleanup_1",
-                                                                            "children":  [
-
-                                                                                         ]
-                                                                        }
-                                             }
-                     },
-                     {
-                         "settingInstance":  {
-                                                 "@odata.type":  "#microsoft.graph.deviceManagementConfigurationChoiceSettingInstance",
-                                                 "settingDefinitionId":  "device_vendor_msft_policy_config_storage_allowstoragesenseglobal",
-                                                 "settingInstanceTemplateReference":  null,
-                                                 "choiceSettingValue":  {
-                                                                            "settingValueTemplateReference":  null,
-                                                                            "value":  "device_vendor_msft_policy_config_storage_allowstoragesenseglobal_1",
-                                                                            "children":  [
-
-                                                                                         ]
-                                                                        }
-                                             }
-                     },
-                     {
-                         "settingInstance":  {
-                                                 "@odata.type":  "#microsoft.graph.deviceManagementConfigurationSimpleSettingInstance",
-                                                 "settingDefinitionId":  "device_vendor_msft_policy_config_storage_configstoragesensecloudcontentdehydrationthreshold",
-                                                 "settingInstanceTemplateReference":  null,
-                                                 "simpleSettingValue":  {
-                                                                            "@odata.type":  "#microsoft.graph.deviceManagementConfigurationIntegerSettingValue",
-                                                                            "settingValueTemplateReference":  null,
-                                                                            "value":  30
-                                                                        }
-                                             }
-                     }
-                 ]
+  "name": "Win10 - System - StorageSense",
+  "description": "Harden365 - System - StorageSense v1.0",
+  "platforms": "windows10",
+  "technologies": "mdm",
+  "settings": [
+    {
+      "settingInstance": {
+        "@odata.type": "#microsoft.graph.deviceManagementConfigurationChoiceSettingInstance",
+        "settingDefinitionId": "device_vendor_msft_policy_config_storage_allowstoragesensetemporaryfilescleanup",
+        "settingInstanceTemplateReference": null,
+        "choiceSettingValue": {
+          "settingValueTemplateReference": null,
+          "value": "device_vendor_msft_policy_config_storage_allowstoragesensetemporaryfilescleanup_1",
+          "children": []
+        }
+      }
+    },
+    {
+      "settingInstance": {
+        "@odata.type": "#microsoft.graph.deviceManagementConfigurationChoiceSettingInstance",
+        "settingDefinitionId": "device_vendor_msft_policy_config_storage_allowstoragesenseglobal",
+        "settingInstanceTemplateReference": null,
+        "choiceSettingValue": {
+          "settingValueTemplateReference": null,
+          "value": "device_vendor_msft_policy_config_storage_allowstoragesenseglobal_1",
+          "children": []
+        }
+      }
+    },
+    {
+      "settingInstance": {
+        "@odata.type": "#microsoft.graph.deviceManagementConfigurationSimpleSettingInstance",
+        "settingDefinitionId": "device_vendor_msft_policy_config_storage_configstoragesensecloudcontentdehydrationthreshold",
+        "settingInstanceTemplateReference": null,
+        "simpleSettingValue": {
+          "@odata.type": "#microsoft.graph.deviceManagementConfigurationIntegerSettingValue",
+          "settingValueTemplateReference": null,
+          "value": 30
+        }
+      }
+    }
+  ]
 }

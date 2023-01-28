@@ -30,18 +30,27 @@ function Get-MsolUsersMFAStatusCSVExport {
 
     Write-LogInfo 'Request all accounts MFA status roles'
     
-    $msolUsersWithMFAStatus = Get-MsolUser -all | select UserPrincipalName, UserType, ObjectId, WhenCreated, `
-    LastPasswordChangeTimestamp, PasswordNeverExpires, PasswordResetNotRequiredDuringActivate, `
-    ValidationStatus, IsLicensed, BlockCredential, `
-    @{N="MFAStatus"; E={ if( $_.StrongAuthenticationRequirements.State -ne $null) `
-        { $_.StrongAuthenticationRequirements.State} else { "Disabled"}}}, `
-    @{N="MFAMethod"; E={ if( $_.StrongAuthenticationMethods.MethodType -ne $null){ `
-        $_.StrongAuthenticationMethods.MethodType}}}, StrongPasswordRequired, `
+    $msolUsersWithMFAStatus = Get-MsolUser -all | Select-Object UserPrincipalName, UserType, ObjectId, WhenCreated, `
+        LastPasswordChangeTimestamp, PasswordNeverExpires, PasswordResetNotRequiredDuringActivate, `
+        ValidationStatus, IsLicensed, BlockCredential, `
+    @{N = 'MFAStatus'; E = { if ( $_.StrongAuthenticationRequirements.State -ne $null) `
+            {
+                $_.StrongAuthenticationRequirements.State
+            }
+            else {
+                'Disabled'
+            } }
+    }, `
+    @{N = 'MFAMethod'; E = { if ( $_.StrongAuthenticationMethods.MethodType -ne $null) {
+ `
+                    $_.StrongAuthenticationMethods.MethodType
+            } }
+    }, StrongPasswordRequired, `
         StrongAuthenticationProofupTim
 
     Write-LogInfo "$($msolUsersWithMFAStatus.Count) accounts found"
     
-    $exportFullPath = ".\Audit\MsolUsersMFAStatus.csv"
+    $exportFullPath = '.\Audit\MsolUsersMFAStatus.csv'
     Write-LogInfo "Export to CSV at $exportFullPath"
     $msolUsersWithMFAStatus | Export-Csv -Path $exportFullPath -Delimiter ';' -Encoding UTF8 -NoTypeInformation
 
@@ -75,16 +84,16 @@ function Get-MsolAdminRolesCSVExport {
 
     Write-LogInfo 'Request all accounts with Azure AD roles'
     
-    $allAdminRoles = Get-MsolRole | %{ $roleName = $_.Name; `
-        Get-MsolRoleMember -RoleObjectId $_.ObjectId | Select DisplayName, EmailAddress, `
-        @{Name = 'M365Role'; Expression = {$roleName}}}
+    $allAdminRoles = Get-MsolRole | ForEach-Object { $roleName = $_.Name; `
+            Get-MsolRoleMember -RoleObjectId $_.ObjectId | Select-Object DisplayName, EmailAddress, `
+        @{Name = 'M365Role'; Expression = { $roleName } } }
 
     Write-LogInfo "$($allAdminRoles.Count) accounts.roles found"
 
-    if($MsolUsersWithMFAStatus) {
+    if ($MsolUsersWithMFAStatus) {
         Write-LogInfo 'Joining AD roles table with users MFA Status table'
         $allAdminRoles = Join-Object -Left $allAdminRoles -Right $MsolUsersWithMFAStatus `
-        -LeftJoinProperty 'EmailAddress' -RightJoinProperty 'UserPrincipalName'
+            -LeftJoinProperty 'EmailAddress' -RightJoinProperty 'UserPrincipalName'
         Write-Verbose "$($allAdminRoles.count) accounts.roles with MFA status found"
     }
     
@@ -117,14 +126,14 @@ function Get-MsolPasswordPolicyCSVExport {
 
     Write-LogInfo 'Request all accounts with Azure AD roles'
     
-    $passwordPolicies = Get-MsolDomain | % {
-            Write-Verbose "Request $($_.Name) domains password policies";
-            $CurrentName = $_.Name;
-            Get-MsolPasswordPolicy -DomainName $_.Name 
-        } | Select-Object `
-        @{Label="Domain";Expression={$CurrentName}}, `
-        @{Label="NotificationDays";Expression={$_.NotificationDays}}, `
-        @{Label="ValidityPeriod";Expression={$_.ValidityPeriod}} 
+    $passwordPolicies = Get-MsolDomain | ForEach-Object {
+        Write-Verbose "Request $($_.Name) domains password policies"
+        $CurrentName = $_.Name
+        Get-MsolPasswordPolicy -DomainName $_.Name 
+    } | Select-Object `
+    @{Label = 'Domain'; Expression = { $CurrentName } }, `
+    @{Label = 'NotificationDays'; Expression = { $_.NotificationDays } }, `
+    @{Label = 'ValidityPeriod'; Expression = { $_.ValidityPeriod } } 
 
     Write-LogInfo "$($passwordPolicies.Count) password policies found"
     
@@ -196,7 +205,7 @@ function Get-MsolM365CompanyInfoTXTExport {
     
     $exportFullPath = "$pwd\Audit\$ExportName\MsolM365CompanyInfo-$ExportName-$DateFileString.txt"
     Write-LogInfo "Export to CSV at $exportFullPath"
-    $companyInformation | select * > $exportFullPath 
+    $companyInformation | Select-Object * > $exportFullPath 
 
     $companyInformation
 }
