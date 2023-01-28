@@ -1,16 +1,16 @@
 {
-    "definition@odata.bind":  "https://graph.microsoft.com/beta/deviceManagement/groupPolicyDefinitions('29814681-ac59-4920-b4a9-07b380e5b530')",
-    "enabled":  "true",
-    "presentationValues":  [
-                               {
-                                   "@odata.type":  "#microsoft.graph.groupPolicyPresentationValueList",
-                                   "values":  [
-                                                  {
-                                                      "name":  "*.lnk",
-                                                      "value":  null
-                                                  }
-                                              ],
-                                   "presentation@odata.bind":  "https://graph.microsoft.com/beta/deviceManagement/groupPolicyDefinitions('29814681-ac59-4920-b4a9-07b380e5b530')/presentations('adc8f759-4405-417a-a8d9-2a4ea6df2e1d')"
-                               }
-                           ]
+  "definition@odata.bind": "https://graph.microsoft.com/beta/deviceManagement/groupPolicyDefinitions('29814681-ac59-4920-b4a9-07b380e5b530')",
+  "enabled": "true",
+  "presentationValues": [
+    {
+      "@odata.type": "#microsoft.graph.groupPolicyPresentationValueList",
+      "values": [
+        {
+          "name": "*.lnk",
+          "value": null
+        }
+      ],
+      "presentation@odata.bind": "https://graph.microsoft.com/beta/deviceManagement/groupPolicyDefinitions('29814681-ac59-4920-b4a9-07b380e5b530')/presentations('adc8f759-4405-417a-a8d9-2a4ea6df2e1d')"
+    }
+  ]
 }

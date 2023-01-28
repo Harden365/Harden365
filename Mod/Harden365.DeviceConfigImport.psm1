@@ -16,7 +16,7 @@
 #>
 
 Function Start-DeviceConfigImport {
-     <#
+    <#
         .Synopsis
          DeviceConfigImport
         
@@ -28,44 +28,44 @@ Function Start-DeviceConfigImport {
          
     #>
 
-	param(
-	[Parameter(Mandatory = $false)]
-    [String]$AccessSecret
-)
+    param(
+        [Parameter(Mandatory = $false)]
+        [String]$AccessSecret
+    )
 
-Write-LogSection 'DEVICE CONFIGURATION IMPORT' -NoHostOutput
+    Write-LogSection 'DEVICE CONFIGURATION IMPORT' -NoHostOutput
 
 
-#region Authentification
-$ApplicationID = $(Get-AzureADApplication -Filter "DisplayName eq 'Harden365 App'").AppId
-$TenantDomainName = $(Get-AzureADTenantDetail).ObjectId
+    #region Authentification
+    $ApplicationID = $(Get-AzureADApplication -Filter "DisplayName eq 'Harden365 App'").AppId
+    $TenantDomainName = $(Get-AzureADTenantDetail).ObjectId
 
-$Body = @{
-Grant_Type    = "client_credentials"
-Scope         = "https://graph.microsoft.com/.default"
-client_Id     = $ApplicationID
-Client_Secret = $AccessSecret
-}
-$ConnectGraph = Invoke-RestMethod -Uri https://login.microsoftonline.com/$TenantDomainName/oauth2/v2.0/token -Method POST -Body $Body
-$token = $ConnectGraph.access_token
-#endregion
+    $Body = @{
+        Grant_Type    = 'client_credentials'
+        Scope         = 'https://graph.microsoft.com/.default'
+        client_Id     = $ApplicationID
+        Client_Secret = $AccessSecret
+    }
+    $ConnectGraph = Invoke-RestMethod -Uri https://login.microsoftonline.com/$TenantDomainName/oauth2/v2.0/token -Method POST -Body $Body
+    $token = $ConnectGraph.access_token
+    #endregion
 
-    $graphApiVersion = "Beta"
-    $ESP_resource = "deviceManagement/deviceConfigurations"
+    $graphApiVersion = 'Beta'
+    $ESP_resource = 'deviceManagement/deviceConfigurations'
     $uri = "https://graph.microsoft.com/$graphApiVersion/$($ESP_resource)"
 
     $Configurations = Get-ChildItem -Path .\Config\json\DeviceConfig\
 
-foreach($Configuration in $Configurations){
-    $FileName = $Configuration.Name
-    write-LogInfo "Adding Device Configuration '$FileName'"
-    $JSON_Data = Get-Content -Path ".\Config\json\DeviceConfig\$FileName"
-    $JSON_Convert = $JSON_Data | ConvertFrom-Json | Select-Object -Property * -ExcludeProperty id,createdDateTime,lastModifiedDateTime,version,supportsScopeTags
-    $JSON_Output = $JSON_Convert | ConvertTo-Json -Depth 5
+    foreach ($Configuration in $Configurations) {
+        $FileName = $Configuration.Name
+        write-LogInfo "Adding Device Configuration '$FileName'"
+        $JSON_Data = Get-Content -Path ".\Config\json\DeviceConfig\$FileName"
+        $JSON_Convert = $JSON_Data | ConvertFrom-Json | Select-Object -Property * -ExcludeProperty id, createdDateTime, lastModifiedDateTime, version, supportsScopeTags
+        $JSON_Output = $JSON_Convert | ConvertTo-Json -Depth 5
 
-    #region CONNECT GRAPH
-    Invoke-RestMethod -Uri $uri -Headers @{Authorization = "Bearer $($token)"} -Method Post -Body $JSON_Output -ContentType "application/json"
-    #endregion
+        #region CONNECT GRAPH
+        Invoke-RestMethod -Uri $uri -Headers @{Authorization = "Bearer $($token)" } -Method Post -Body $JSON_Output -ContentType 'application/json'
+        #endregion
 
     }
 }

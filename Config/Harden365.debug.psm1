@@ -37,7 +37,8 @@ function Update-ProgressionBarOuterLoop {
     )
     if ($OperationCount -eq $OperationTotal) {
         Write-Progress -Activity $Activity -Status "$Status : Complete" -Complete
-    } else {
+    }
+    else {
         $perventageComplete = [math]::Round( ($OperationCount * 100) / $OperationTotal, 3)
         Write-Progress -Activity $Activity -Status "$Status : $perventageComplete%" -PercentComplete $perventageComplete 
     }
@@ -53,7 +54,8 @@ function Update-ProgressionBarInnerLoop {
 
     if ($OperationCount -eq $OperationTotal) {
         Write-Progress -Id 1 -Activity $Activity -Status "$Status : Complete" -Complete
-    } else {
+    }
+    else {
         $perventageComplete = [math]::Round( ($OperationCount * 100) / $OperationTotal, 3)
         Write-Progress -Id 1 -Activity $Activity -Status "$Status : $perventageComplete%" -PercentComplete $perventageComplete 
     }
@@ -77,7 +79,7 @@ function Write-LogInfo {
     )
 
     if (!$NoHostOutput) {
-        write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline
+        Write-Host $(Get-Date -UFormat '%m-%d-%Y %T ') -NoNewline
         Write-Host $Text -ForegroundColor Green
     }
     Write-LogInternal -Text $Text -InfoType '---> INFO:'
@@ -90,7 +92,7 @@ function Write-LogWarning {
         [switch]$NoHostOutput
     )
     if (!$NoHostOutput) {
-        write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline
+        Write-Host $(Get-Date -UFormat '%m-%d-%Y %T ') -NoNewline
         Write-Warning $Text
     }
     Write-LogInternal -Text $Text -InfoType '---! WARNING:'
@@ -103,7 +105,7 @@ function Write-LogError {
         [switch]$NoHostOutput
     )
     if (!$NoHostOutput) {
-        write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline
+        Write-Host $(Get-Date -UFormat '%m-%d-%Y %T ') -NoNewline
         Write-Host $Text -ForegroundColor Red
     }
     Write-LogInternal -Text $Text -InfoType '---! ERROR:'
@@ -115,6 +117,6 @@ function Write-LogInternal {
         [String]$Text,
         [Parameter(Mandatory = $true)]
         [String]$InfoType
-        )
-    "$(Get-Date -UFormat "%m-%d-%Y %T ") $InfoType $Text" | Out-File "$debugFileFullPath" -Append
+    )
+    "$(Get-Date -UFormat '%m-%d-%Y %T ') $InfoType $Text" | Out-File "$debugFileFullPath" -Append
 }

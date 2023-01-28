@@ -19,7 +19,7 @@
         SSPR
 #>
 Function Check-TenantInfos {
-     <#
+    <#
         .Synopsis
          Check Tenant Azure AD Edition plan.
         
@@ -31,14 +31,14 @@ Function Check-TenantInfos {
          
     #>
 
-#SCRIPT
-$TenantDisplayName = (Get-MsolCompanyInformation).DisplayName
-$TenantPrimaryDomain = (Get-MsolDomain | Where-Object { $_.IsDefault -eq $true }).Name
-$TenantDirectorySync = (Get-MsolCompanyInformation).DirectorySynchronizationEnabled
+    #SCRIPT
+    $TenantDisplayName = (Get-MsolCompanyInformation).DisplayName
+    $TenantPrimaryDomain = (Get-MsolDomain | Where-Object { $_.IsDefault -eq $true }).Name
+    $TenantDirectorySync = (Get-MsolCompanyInformation).DirectorySynchronizationEnabled
 }
 
 Function Check-TenantEdition {
-     <#
+    <#
         .Synopsis
          Check Tenant Azure AD Edition plan.
         
@@ -50,18 +50,22 @@ Function Check-TenantEdition {
          
     #>
 
-#SCRIPT
-if (((Get-MsolAccountSku | Where-Object { $_.ActiveUnits -ne "0" }| Select -ExpandProperty ServiceStatus).ServicePlan).ServiceName -match "AAD_PREMIUM_P2")
-    { $TenantEdition = ((Get-MsolAccountSku | Where-Object { $_.ActiveUnits -ne "0" } | Select -ExpandProperty ServiceStatus).ServicePlan | Where-Object { $_.ServiceName -match "AAD_PREMIUM_P2" }).ServiceName
-      $TenantEdition = "Azure AD Premium P2" }    
-elseif (((Get-MsolAccountSku | Where-Object { $_.ActiveUnits -ne "0" } | Select -ExpandProperty ServiceStatus).ServicePlan).ServiceName -match "AAD_PREMIUM")
-    { $TenantEdition = ((Get-MsolAccountSku | Where-Object { $_.ActiveUnits -ne "0" } | Select -ExpandProperty ServiceStatus).ServicePlan | Where-Object { $_.ServiceName -match "AAD_PREMIUM" }).ServiceName
-       $TenantEdition = "Azure AD Premium P1" }  
-else { $TenantEdition = "Azure AD Free" }  
+    #SCRIPT
+    if (((Get-MsolAccountSku | Where-Object { $_.ActiveUnits -ne '0' } | Select-Object -ExpandProperty ServiceStatus).ServicePlan).ServiceName -match 'AAD_PREMIUM_P2') {
+        $TenantEdition = ((Get-MsolAccountSku | Where-Object { $_.ActiveUnits -ne '0' } | Select-Object -ExpandProperty ServiceStatus).ServicePlan | Where-Object { $_.ServiceName -match 'AAD_PREMIUM_P2' }).ServiceName
+        $TenantEdition = 'Azure AD Premium P2' 
+    }    
+    elseif (((Get-MsolAccountSku | Where-Object { $_.ActiveUnits -ne '0' } | Select-Object -ExpandProperty ServiceStatus).ServicePlan).ServiceName -match 'AAD_PREMIUM') {
+        $TenantEdition = ((Get-MsolAccountSku | Where-Object { $_.ActiveUnits -ne '0' } | Select-Object -ExpandProperty ServiceStatus).ServicePlan | Where-Object { $_.ServiceName -match 'AAD_PREMIUM' }).ServiceName
+        $TenantEdition = 'Azure AD Premium P1' 
+    }  
+    else {
+        $TenantEdition = 'Azure AD Free' 
+    }  
 }
 
 Function Check-DefenderATP {
-     <#
+    <#
         .Synopsis
          Check Defender ATP plan.
         
@@ -73,20 +77,23 @@ Function Check-DefenderATP {
          
     #>
 
-#SCRIPT
-if (((Get-MsolAccountSku | Where-Object { $_.ActiveUnits -ne "0" } | Select -ExpandProperty ServiceStatus).ServicePlan).ServiceName -match "THREAT_INTELLIGENCE")
-    { $O365ATP = ((Get-MsolAccountSku | Where-Object { $_.ActiveUnits -ne "0" } | Select -ExpandProperty ServiceStatus).ServicePlan | Where-Object { $_.ServiceName -match "THREAT_INTELLIGENCE" }).ServiceName
-      $TenantEdition = "Defender for Office365 P2" }   
-elseif (((Get-MsolAccountSku | Where-Object { $_.ActiveUnits -ne "0" } | Select -ExpandProperty ServiceStatus).ServicePlan).ServiceName -match "ATP_ENTERPRISE")
-    { $O365ATP = ((Get-MsolAccountSku | Where-Object { $_.ActiveUnits -ne "0" } | Select -ExpandProperty ServiceStatus).ServicePlan | Where-Object { $_.ServiceName -match "ATP_ENTERPRISE" }).ServiceName
-      $TenantEdition = "Defender for Office365 P1" }  
-elseif (((Get-MsolAccountSku | Where-Object { $_.ActiveUnits -ne "0" } | Select -ExpandProperty ServiceStatus).ServicePlan).ServiceName -match "EOP_ENTERPRISE")
-    { $O365ATP = ((Get-MsolAccountSku | Where-Object { $_.ActiveUnits -ne "0" } | Select -ExpandProperty ServiceStatus).ServicePlan | Where-Object { $_.ServiceName -match "EOP_ENTERPRISE" }).ServiceName
-      $TenantEdition = "Exchange Online Protection" }  
+    #SCRIPT
+    if (((Get-MsolAccountSku | Where-Object { $_.ActiveUnits -ne '0' } | Select-Object -ExpandProperty ServiceStatus).ServicePlan).ServiceName -match 'THREAT_INTELLIGENCE') {
+        $O365ATP = ((Get-MsolAccountSku | Where-Object { $_.ActiveUnits -ne '0' } | Select-Object -ExpandProperty ServiceStatus).ServicePlan | Where-Object { $_.ServiceName -match 'THREAT_INTELLIGENCE' }).ServiceName
+        $TenantEdition = 'Defender for Office365 P2' 
+    }   
+    elseif (((Get-MsolAccountSku | Where-Object { $_.ActiveUnits -ne '0' } | Select-Object -ExpandProperty ServiceStatus).ServicePlan).ServiceName -match 'ATP_ENTERPRISE') {
+        $O365ATP = ((Get-MsolAccountSku | Where-Object { $_.ActiveUnits -ne '0' } | Select-Object -ExpandProperty ServiceStatus).ServicePlan | Where-Object { $_.ServiceName -match 'ATP_ENTERPRISE' }).ServiceName
+        $TenantEdition = 'Defender for Office365 P1' 
+    }  
+    elseif (((Get-MsolAccountSku | Where-Object { $_.ActiveUnits -ne '0' } | Select-Object -ExpandProperty ServiceStatus).ServicePlan).ServiceName -match 'EOP_ENTERPRISE') {
+        $O365ATP = ((Get-MsolAccountSku | Where-Object { $_.ActiveUnits -ne '0' } | Select-Object -ExpandProperty ServiceStatus).ServicePlan | Where-Object { $_.ServiceName -match 'EOP_ENTERPRISE' }).ServiceName
+        $TenantEdition = 'Exchange Online Protection' 
+    }  
 }
 
 Function Check-HashSyncPassword {
-     <#
+    <#
         .Synopsis
          Check Hash Sync Password
         
@@ -98,21 +105,21 @@ Function Check-HashSyncPassword {
          
     #>
 
-#SCRIPT
-if ($(Get-MsolCompanyInformation).DirectorySynchronizationEnabled -eq $true) {
-if ($(Get-MsolCompanyInformation).PasswordSynchronizationEnabled -eq $false){ 
-    Write-LogWarning "Hash Sync Password not enabled!"
-    $HashSync = $false
+    #SCRIPT
+    if ($(Get-MsolCompanyInformation).DirectorySynchronizationEnabled -eq $true) {
+        if ($(Get-MsolCompanyInformation).PasswordSynchronizationEnabled -eq $false) { 
+            Write-LogWarning 'Hash Sync Password not enabled!'
+            $HashSync = $false
+        }
+        else {
+            Write-LogInfo 'Hash Sync Password enabled'
+            $HashSync = $true
+        }
     }
-else {
-      Write-LogInfo "Hash Sync Password enabled"
-      $HashSync = $true
-      }
-}
 }
 
 Function Check-SSPR {
-     <#
+    <#
         .Synopsis
          Check SSPR
         
@@ -124,15 +131,15 @@ Function Check-SSPR {
          
     #>
 
-#SCRIPT
-if ($(Get-MsolCompanyInformation).SelfServePasswordResetEnabled -eq $false) { 
-    Write-LogWarning "SSPR not enabled!"
-    $SSPR = $false
+    #SCRIPT
+    if ($(Get-MsolCompanyInformation).SelfServePasswordResetEnabled -eq $false) { 
+        Write-LogWarning 'SSPR not enabled!'
+        $SSPR = $false
     }
-else {
-      Write-LogInfo "SSPR enabled"
-      $SSPR = $true
-      }
+    else {
+        Write-LogInfo 'SSPR enabled'
+        $SSPR = $true
+    }
 }
 
 <#

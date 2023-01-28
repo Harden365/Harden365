@@ -16,9 +16,8 @@
 #>
 
 
-Function Start-LegacyPerUserMFA
-{
-     <#
+Function Start-LegacyPerUserMFA {
+    <#
         .Synopsis
          Import csv for activate MFA by SMS.
         
@@ -31,41 +30,43 @@ Function Start-LegacyPerUserMFA
     #>
 
 
-	param(
-	[Parameter(Mandatory = $false)]
-    [String]$Name = "Legacy MFA per User Activation",
-    [String]$ImportCSV = "ImportPhoneNumbers.csv",
-    [String]$UPN = ""
-)
+    param(
+        [Parameter(Mandatory = $false)]
+        [String]$Name = 'Legacy MFA per User Activation',
+        [String]$ImportCSV = 'ImportPhoneNumbers.csv',
+        [String]$UPN = ''
+    )
 
 
-Write-LogSection 'MFA PER USER' -NoHostOutput
+    Write-LogSection 'MFA PER USER' -NoHostOutput
 
 
-#SCRIPT
+    #SCRIPT
 
-Write-LogInfo "Import CSV File : $ImportCSV"
+    Write-LogInfo "Import CSV File : $ImportCSV"
 
-Try {
-     Import-CSV ".\Input\$ImportCSV" -Delimiter ";" | ForEach-Object {
-     if($_.ImportPhoneNumber -eq "YES")
-     {
-            $Requirements = @()
-        if ($State -ne "Disabled") {
-            $Requirement = [Microsoft.Online.Administration.StrongAuthenticationRequirement]::new()
-            $Requirement.RelyingParty = "*"
-            $Requirement.State = "Enabled"
-            $Requirements += $Requirement
+    Try {
+        Import-Csv ".\Input\$ImportCSV" -Delimiter ';' | ForEach-Object {
+            if ($_.ImportPhoneNumber -eq 'YES') {
+                $Requirements = @()
+                if ($State -ne 'Disabled') {
+                    $Requirement = [Microsoft.Online.Administration.StrongAuthenticationRequirement]::new()
+                    $Requirement.RelyingParty = '*'
+                    $Requirement.State = 'Enabled'
+                    $Requirements += $Requirement
+                }
+                Set-MsolUser -UserPrincipalName $_.UserPrincipalName -StrongAuthenticationRequirements $Requirements
+                Write-LogInfo "$($_.UserPrincipalName) : PhoneNumber $($_.PhoneNumbers) added"
+            }
+            else {
+                Write-LogError "$($_.UserPrincipalName) : MFA not activated !" 
+            }
         }
-        Set-MsolUser -UserPrincipalName $_.UserPrincipalName -StrongAuthenticationRequirements $Requirements
-     Write-LogInfo "$($_.UserPrincipalName) : PhoneNumber $($_.PhoneNumbers) added"
-     }
-     else {
-     Write-LogError "$($_.UserPrincipalName) : MFA not activated !" 
-     }
-     }
-     } catch { Write-LogError "$($_.UserPrincipalName) : MFA ERROR !" }
+    }
+    catch {
+        Write-LogError "$($_.UserPrincipalName) : MFA ERROR !" 
+    }
 
- Write-LogSection '' -NoHostOutput
+    Write-LogSection '' -NoHostOutput
 
 }

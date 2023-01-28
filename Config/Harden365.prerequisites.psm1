@@ -72,7 +72,7 @@ function Test-UserIsAdministrator {
     if (!$isAdmin) {
         Write-LogError 'You must run this script as an administrator to update or install powershell module'
         Write-LogError 'Script execution cancelled'
-        Pause;Break
+        Pause; Break
     }
 }
 
@@ -88,7 +88,7 @@ function Test-PowerShellModule {
 
     $installedPSModule = Get-InstalledModule $ModuleName -ErrorAction Ignore
     $installedPSModuleVersion = Get-InstalledModule $ModuleName -MinimumVersion $ModuleVersion -ErrorAction Ignore
-    if($null -eq $installedPSModule){
+    if ($null -eq $installedPSModule) {
         Write-LogWarning "$ModuleName Powershell Module necessary"
         Test-UserIsAdministrator
         [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
@@ -96,7 +96,8 @@ function Test-PowerShellModule {
         Write-LogInfo ("Installing $ModuleName Powershell Module")
         Install-Module $ModuleName -AllowClobber
         Set-PSRepository -Name 'PSGallery' -InstallationPolicy Untrusted
-    } elseif ($null -eq $installedPSModuleVersion) {
+    }
+    elseif ($null -eq $installedPSModuleVersion) {
         Write-LogInfo ("Updating $ModuleName Powershell Module")
         Test-UserIsAdministrator
         Pause
@@ -121,16 +122,17 @@ function Test-AllPrerequisites {
     Update-ProgressionBarInnerLoop -Activity 'Check PowerShell version' -Status 'In progress' -OperationCount $currentCountOfPrerequisitesCheck -OperationTotal $numberOfPrerequisitesCheck
 
     # CHECK POWERSHELL
-    if(($PSVersionTable.PSVersion.Major -lt 5) -or ($PSVersionTable.PSVersion.Major -eq 5 -and $PSVersionTable.PSVersion.Minor -eq 0)){
+    if (($PSVersionTable.PSVersion.Major -lt 5) -or ($PSVersionTable.PSVersion.Major -eq 5 -and $PSVersionTable.PSVersion.Minor -eq 0)) {
         Write-LogError 'Please install Powershell version 5.1'
         Write-LogError 'https://www.microsoft.com/en-us/download/details.aspx?id=54616'
         break Script
-    } else {
+    }
+    else {
         Write-LogInfo 'Powershell Version OK'
     }
     # CHECK / INSTALL NUGET
-    if($(Get-PackageProvider).Name -notcontains 'NuGet'){
-        Write-LogWarning "NuGet Provider necessary"
+    if ($(Get-PackageProvider).Name -notcontains 'NuGet') {
+        Write-LogWarning 'NuGet Provider necessary'
         Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force | Out-Null
     }
 

@@ -36,7 +36,7 @@ function Get-SPOSitesCollectionCSVExport {
     
     $exportFullPath = "$pwd\Audit\$ExportName\SPOSitesCollection-$ExportName-$DateFileString.csv"
     Write-LogInfo "Export to CSV at $exportFullPath"
-    $allSPOSites | Select * | Export-Csv -Path $exportFullPath -Delimiter ';' -Encoding UTF8 -NoTypeInformation
+    $allSPOSites | Select-Object * | Export-Csv -Path $exportFullPath -Delimiter ';' -Encoding UTF8 -NoTypeInformation
 
     $allSPOSites
 }
@@ -63,13 +63,13 @@ function Get-SPOOneDrivesCSVExport {
 
     Write-LogInfo 'Request all OneDrives '
     
-    $allO4BSites = Get-SPOSite -Template "SPSPERS" -limit ALL -includepersonalsite $True
+    $allO4BSites = Get-SPOSite -Template 'SPSPERS' -limit ALL -includepersonalsite $True
 
     Write-LogInfo "$($allO4BSites.Count) onedrives found"
     
     $exportFullPath = "$pwd\Audit\$ExportName\SPOOneDrives-$ExportName-$DateFileString.csv"
     Write-LogInfo "Export to CSV at $exportFullPath"
-    $allO4BSites | Select * | Export-Csv -Path $exportFullPath -Delimiter ';' -Encoding UTF8 -NoTypeInformation
+    $allO4BSites | Select-Object * | Export-Csv -Path $exportFullPath -Delimiter ';' -Encoding UTF8 -NoTypeInformation
 
     $allO4BSites
 }

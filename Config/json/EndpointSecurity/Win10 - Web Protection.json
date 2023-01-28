@@ -1,40 +1,38 @@
 {
-    "displayName":  "Win10 - Web Protection",
-    "description":  "HardenMDE - Web Protection v1.0",
-    "roleScopeTagIds":  [
-                            "0"
-                        ],
-    "TemplateDisplayName":  "Web protection (Microsoft Edge Legacy)",
-    "TemplateId":  "72a62602-80d7-4e0e-a680-9a6ee84d019d",
-    "versionInfo":  "2005",
-    "settingsDelta":  [
-                          {
-                              "@odata.type":  "#microsoft.graph.deviceManagementStringSettingInstance",
-                              "id":  "1558d130-7860-4c00-8169-023f5eefcb0f",
-                              "definitionId":  "deviceConfiguration--windows10EndpointProtectionConfiguration_defenderNetworkProtectionType",
-                              "valueJson":  "\"enable\"",
-                              "value":  "enable"
-                          },
-                          {
-                              "@odata.type":  "#microsoft.graph.deviceManagementBooleanSettingInstance",
-                              "id":  "3d7e4d74-2679-4242-8b64-14a3fcfc09d7",
-                              "definitionId":  "deviceConfiguration--windows10GeneralConfiguration_edgeRequireSmartScreen",
-                              "valueJson":  "true",
-                              "value":  true
-                          },
-                          {
-                              "@odata.type":  "#microsoft.graph.deviceManagementBooleanSettingInstance",
-                              "id":  "b3a4a339-38b9-42c4-84ef-c952bde03298",
-                              "definitionId":  "deviceConfiguration--windows10GeneralConfiguration_smartScreenBlockPromptOverride",
-                              "valueJson":  "false",
-                              "value":  false
-                          },
-                          {
-                              "@odata.type":  "#microsoft.graph.deviceManagementBooleanSettingInstance",
-                              "id":  "72d3b508-2da0-472e-92e0-4d7391b7e656",
-                              "definitionId":  "deviceConfiguration--windows10GeneralConfiguration_smartScreenBlockPromptOverrideForFiles",
-                              "valueJson":  "false",
-                              "value":  false
-                          }
-                      ]
+  "displayName": "Win10 - Web Protection",
+  "description": "HardenMDE - Web Protection v1.0",
+  "roleScopeTagIds": ["0"],
+  "TemplateDisplayName": "Web protection (Microsoft Edge Legacy)",
+  "TemplateId": "72a62602-80d7-4e0e-a680-9a6ee84d019d",
+  "versionInfo": "2005",
+  "settingsDelta": [
+    {
+      "@odata.type": "#microsoft.graph.deviceManagementStringSettingInstance",
+      "id": "1558d130-7860-4c00-8169-023f5eefcb0f",
+      "definitionId": "deviceConfiguration--windows10EndpointProtectionConfiguration_defenderNetworkProtectionType",
+      "valueJson": "\"enable\"",
+      "value": "enable"
+    },
+    {
+      "@odata.type": "#microsoft.graph.deviceManagementBooleanSettingInstance",
+      "id": "3d7e4d74-2679-4242-8b64-14a3fcfc09d7",
+      "definitionId": "deviceConfiguration--windows10GeneralConfiguration_edgeRequireSmartScreen",
+      "valueJson": "true",
+      "value": true
+    },
+    {
+      "@odata.type": "#microsoft.graph.deviceManagementBooleanSettingInstance",
+      "id": "b3a4a339-38b9-42c4-84ef-c952bde03298",
+      "definitionId": "deviceConfiguration--windows10GeneralConfiguration_smartScreenBlockPromptOverride",
+      "valueJson": "false",
+      "value": false
+    },
+    {
+      "@odata.type": "#microsoft.graph.deviceManagementBooleanSettingInstance",
+      "id": "72d3b508-2da0-472e-92e0-4d7391b7e656",
+      "definitionId": "deviceConfiguration--windows10GeneralConfiguration_smartScreenBlockPromptOverrideForFiles",
+      "valueJson": "false",
+      "value": false
+    }
+  ]
 }

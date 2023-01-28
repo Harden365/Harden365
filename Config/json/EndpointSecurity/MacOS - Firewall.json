@@ -1,39 +1,37 @@
 {
-    "displayName":  "MacOS - Firewall",
-    "description":  "",
-    "roleScopeTagIds":  [
-                            "0"
-                        ],
-    "TemplateDisplayName":  "macOS firewall",
-    "TemplateId":  "5340aa10-47a8-4e67-893f-690984e4d5da",
-    "versionInfo":  "2005",
-    "settingsDelta":  [
-                          {
-                              "@odata.type":  "#microsoft.graph.deviceManagementBooleanSettingInstance",
-                              "id":  "cf45ab17-2ad4-4596-b2c7-b4ffac5ffd5b",
-                              "definitionId":  "deviceConfiguration--macOSEndpointProtectionConfiguration_firewallEnabled",
-                              "valueJson":  "true",
-                              "value":  true
-                          },
-                          {
-                              "@odata.type":  "#microsoft.graph.deviceManagementBooleanSettingInstance",
-                              "id":  "3942f20d-33e4-4adf-9725-9ea4341d7842",
-                              "definitionId":  "deviceConfiguration--macOSEndpointProtectionConfiguration_firewallBlockAllIncoming",
-                              "valueJson":  "false",
-                              "value":  false
-                          },
-                          {
-                              "@odata.type":  "#microsoft.graph.deviceManagementBooleanSettingInstance",
-                              "id":  "3aa163ab-8697-48ef-90a2-25b9ad8ccd50",
-                              "definitionId":  "deviceConfiguration--macOSEndpointProtectionConfiguration_firewallEnableStealthMode",
-                              "valueJson":  "false",
-                              "value":  false
-                          },
-                          {
-                              "@odata.type":  "#microsoft.graph.deviceManagementCollectionSettingInstance",
-                              "id":  "e19f9a4c-0f48-4952-af7f-d9f5f85e606e",
-                              "definitionId":  "deviceConfiguration--macOSEndpointProtectionConfiguration_firewallApplications",
-                              "valueJson":  "null"
-                          }
-                      ]
+  "displayName": "MacOS - Firewall",
+  "description": "",
+  "roleScopeTagIds": ["0"],
+  "TemplateDisplayName": "macOS firewall",
+  "TemplateId": "5340aa10-47a8-4e67-893f-690984e4d5da",
+  "versionInfo": "2005",
+  "settingsDelta": [
+    {
+      "@odata.type": "#microsoft.graph.deviceManagementBooleanSettingInstance",
+      "id": "cf45ab17-2ad4-4596-b2c7-b4ffac5ffd5b",
+      "definitionId": "deviceConfiguration--macOSEndpointProtectionConfiguration_firewallEnabled",
+      "valueJson": "true",
+      "value": true
+    },
+    {
+      "@odata.type": "#microsoft.graph.deviceManagementBooleanSettingInstance",
+      "id": "3942f20d-33e4-4adf-9725-9ea4341d7842",
+      "definitionId": "deviceConfiguration--macOSEndpointProtectionConfiguration_firewallBlockAllIncoming",
+      "valueJson": "false",
+      "value": false
+    },
+    {
+      "@odata.type": "#microsoft.graph.deviceManagementBooleanSettingInstance",
+      "id": "3aa163ab-8697-48ef-90a2-25b9ad8ccd50",
+      "definitionId": "deviceConfiguration--macOSEndpointProtectionConfiguration_firewallEnableStealthMode",
+      "valueJson": "false",
+      "value": false
+    },
+    {
+      "@odata.type": "#microsoft.graph.deviceManagementCollectionSettingInstance",
+      "id": "e19f9a4c-0f48-4952-af7f-d9f5f85e606e",
+      "definitionId": "deviceConfiguration--macOSEndpointProtectionConfiguration_firewallApplications",
+      "valueJson": "null"
+    }
+  ]
 }

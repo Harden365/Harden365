@@ -1,195 +1,193 @@
 {
-    "displayName":  "Win10 - Bitlocker",
-    "description":  "Harden365 - Bitlocker v1.0",
-    "roleScopeTagIds":  [
-                            "0"
-                        ],
-    "TemplateDisplayName":  "BitLocker",
-    "TemplateId":  "d1174162-1dd2-4976-affc-6667049ab0ae",
-    "versionInfo":  "2106",
-    "settingsDelta":  [
-                          {
-                              "@odata.type":  "#microsoft.graph.deviceManagementBooleanSettingInstance",
-                              "id":  "806cc657-1f8c-4998-a6cf-52b52c75029f",
-                              "definitionId":  "deviceConfiguration--windows10EndpointProtectionConfiguration_bitLockerEncryptDevice",
-                              "valueJson":  "true",
-                              "value":  true
-                          },
-                          {
-                              "@odata.type":  "#microsoft.graph.deviceManagementBooleanSettingInstance",
-                              "id":  "a1714ae2-0da7-41a5-b592-501a2ba35329",
-                              "definitionId":  "deviceConfiguration--windows10EndpointProtectionConfiguration_bitLockerEnableStorageCardEncryptionOnMobile",
-                              "valueJson":  "false",
-                              "value":  false
-                          },
-                          {
-                              "@odata.type":  "#microsoft.graph.deviceManagementBooleanSettingInstance",
-                              "id":  "340a4ced-d0a6-4aed-a858-d7b367694f4f",
-                              "definitionId":  "deviceConfiguration--windows10EndpointProtectionConfiguration_bitLockerDisableWarningForOtherDiskEncryption",
-                              "valueJson":  "true",
-                              "value":  true
-                          },
-                          {
-                              "@odata.type":  "#microsoft.graph.deviceManagementBooleanSettingInstance",
-                              "id":  "6093af08-1919-4db8-a4d1-a7e6efb608ee",
-                              "definitionId":  "deviceConfiguration--windows10EndpointProtectionConfiguration_bitLockerAllowStandardUserEncryption",
-                              "valueJson":  "true",
-                              "value":  true
-                          },
-                          {
-                              "@odata.type":  "#microsoft.graph.deviceManagementStringSettingInstance",
-                              "id":  "5e6edf8f-849b-45a2-ba62-a5c650440c06",
-                              "definitionId":  "deviceConfiguration--windows10EndpointProtectionConfiguration_bitLockerRecoveryPasswordRotation",
-                              "valueJson":  "\"enabledForAzureAdAndHybrid\"",
-                              "value":  "enabledForAzureAdAndHybrid"
-                          },
-                          {
-                              "@odata.type":  "#microsoft.graph.deviceManagementComplexSettingInstance",
-                              "id":  "4f066152-123d-4772-96ef-515257daca7f",
-                              "definitionId":  "deviceConfiguration--windows10EndpointProtectionConfiguration_bitLockerSystemDrivePolicy",
-                              "valueJson":  "{\"startupAuthenticationRequired\":true,\"startupAuthenticationTpmUsage\":\"allowed\",\"startupAuthenticationTpmPinUsage\":null,\"startupAuthenticationTpmKeyUsage\":\"blocked\",\"startupAuthenticationTpmPinAndKeyUsage\":null,\"startupAuthenticationBlockWithoutTpmChip\":true,\"prebootRecoveryEnableMessageAndUrl\":false,\"prebootRecoveryMessage\":null,\"prebootRecoveryUrl\":null,\"recoveryOptions\":{\"recoveryKeyUsage\":\"allowed\",\"recoveryInformationToStore\":\"passwordAndKey\",\"enableRecoveryInformationSaveToStore\":true,\"recoveryPasswordUsage\":\"allowed\",\"hideRecoveryOptions\":true,\"enableBitLockerAfterRecoveryInformationToStore\":true,\"blockDataRecoveryAgent\":false},\"encryptionMethod\":\"xtsAes256\",\"minimumPinLength\":null}",
-                              "value":  [
-                                            {
-                                                "@odata.type":  "#microsoft.graph.deviceManagementBooleanSettingInstance",
-                                                "id":  "b69124fa-642f-4bed-8560-d1198bda691d",
-                                                "definitionId":  "deviceConfiguration--bitLockerSystemDrivePolicy_startupAuthenticationRequired",
-                                                "valueJson":  "true",
-                                                "value":  true
-                                            },
-                                            {
-                                                "@odata.type":  "#microsoft.graph.deviceManagementStringSettingInstance",
-                                                "id":  "62eb5b67-6fc3-4785-9699-0ab31f019066",
-                                                "definitionId":  "deviceConfiguration--bitLockerSystemDrivePolicy_startupAuthenticationTpmUsage",
-                                                "valueJson":  "\"allowed\"",
-                                                "value":  "allowed"
-                                            },
-                                            {
-                                                "@odata.type":  "#microsoft.graph.deviceManagementStringSettingInstance",
-                                                "id":  "e913c3ee-f121-4a7f-8115-1ac24dd29eca",
-                                                "definitionId":  "deviceConfiguration--bitLockerSystemDrivePolicy_startupAuthenticationTpmPinUsage",
-                                                "valueJson":  "null",
-                                                "value":  null
-                                            },
-                                            {
-                                                "@odata.type":  "#microsoft.graph.deviceManagementStringSettingInstance",
-                                                "id":  "9ec08075-f0a8-4f26-a05c-2213236dc4d8",
-                                                "definitionId":  "deviceConfiguration--bitLockerSystemDrivePolicy_startupAuthenticationTpmKeyUsage",
-                                                "valueJson":  "\"blocked\"",
-                                                "value":  "blocked"
-                                            },
-                                            {
-                                                "@odata.type":  "#microsoft.graph.deviceManagementStringSettingInstance",
-                                                "id":  "d8d12e56-21fe-465f-b681-4b0848be50da",
-                                                "definitionId":  "deviceConfiguration--bitLockerSystemDrivePolicy_startupAuthenticationTpmPinAndKeyUsage",
-                                                "valueJson":  "null",
-                                                "value":  null
-                                            },
-                                            {
-                                                "@odata.type":  "#microsoft.graph.deviceManagementBooleanSettingInstance",
-                                                "id":  "a1401232-a61c-4d5c-af15-1affc456b8e7",
-                                                "definitionId":  "deviceConfiguration--bitLockerSystemDrivePolicy_startupAuthenticationBlockWithoutTpmChip",
-                                                "valueJson":  "true",
-                                                "value":  true
-                                            },
-                                            {
-                                                "@odata.type":  "#microsoft.graph.deviceManagementBooleanSettingInstance",
-                                                "id":  "c4d62483-06df-4981-ab25-2b96d5e67d46",
-                                                "definitionId":  "deviceConfiguration--bitLockerSystemDrivePolicy_prebootRecoveryEnableMessageAndUrl",
-                                                "valueJson":  "false",
-                                                "value":  false
-                                            },
-                                            {
-                                                "@odata.type":  "#microsoft.graph.deviceManagementStringSettingInstance",
-                                                "id":  "0b8702ce-ac57-4cc9-9265-d17b66dacffe",
-                                                "definitionId":  "deviceConfiguration--bitLockerSystemDrivePolicy_prebootRecoveryMessage",
-                                                "valueJson":  "null",
-                                                "value":  null
-                                            },
-                                            {
-                                                "@odata.type":  "#microsoft.graph.deviceManagementStringSettingInstance",
-                                                "id":  "271f9791-ffea-4dae-bb19-3e1e6b283d3d",
-                                                "definitionId":  "deviceConfiguration--bitLockerSystemDrivePolicy_prebootRecoveryUrl",
-                                                "valueJson":  "null",
-                                                "value":  null
-                                            },
-                                            {
-                                                "@odata.type":  "#microsoft.graph.deviceManagementComplexSettingInstance",
-                                                "id":  "148a9333-4048-4e18-9315-a466bf545705",
-                                                "definitionId":  "deviceConfiguration--bitLockerSystemDrivePolicy_recoveryOptions",
-                                                "valueJson":  "{\"recoveryKeyUsage\":\"allowed\",\"recoveryInformationToStore\":\"passwordAndKey\",\"enableRecoveryInformationSaveToStore\":true,\"recoveryPasswordUsage\":\"allowed\",\"hideRecoveryOptions\":true,\"enableBitLockerAfterRecoveryInformationToStore\":true,\"blockDataRecoveryAgent\":false}"
-                                            },
-                                            {
-                                                "@odata.type":  "#microsoft.graph.deviceManagementStringSettingInstance",
-                                                "id":  "fa1468d0-9aa4-4c82-89b1-8e5711425ce4",
-                                                "definitionId":  "deviceConfiguration--bitLockerSystemDrivePolicy_encryptionMethod",
-                                                "valueJson":  "\"xtsAes256\"",
-                                                "value":  "xtsAes256"
-                                            },
-                                            {
-                                                "@odata.type":  "#microsoft.graph.deviceManagementIntegerSettingInstance",
-                                                "id":  "86ad3fdb-0cf7-40c6-a913-d1d48d0ec8e0",
-                                                "definitionId":  "deviceConfiguration--bitLockerSystemDrivePolicy_minimumPinLength",
-                                                "valueJson":  "null",
-                                                "value":  null
-                                            }
-                                        ]
-                          },
-                          {
-                              "@odata.type":  "#microsoft.graph.deviceManagementComplexSettingInstance",
-                              "id":  "a70121d2-5bc4-47e3-b66e-5a9a8e5263e1",
-                              "definitionId":  "deviceConfiguration--windows10EndpointProtectionConfiguration_bitLockerFixedDrivePolicy",
-                              "valueJson":  "{\"recoveryOptions\":{\"recoveryKeyUsage\":\"allowed\",\"recoveryInformationToStore\":\"passwordAndKey\",\"enableRecoveryInformationSaveToStore\":true,\"recoveryPasswordUsage\":\"allowed\",\"hideRecoveryOptions\":true,\"enableBitLockerAfterRecoveryInformationToStore\":true,\"blockDataRecoveryAgent\":false},\"requireEncryptionForWriteAccess\":true,\"encryptionMethod\":\"xtsAes256\"}",
-                              "value":  [
-                                            {
-                                                "@odata.type":  "#microsoft.graph.deviceManagementComplexSettingInstance",
-                                                "id":  "569f6448-c7f0-4f7f-9ee7-d81b6cdfa41e",
-                                                "definitionId":  "deviceConfiguration--bitLockerFixedDrivePolicy_recoveryOptions",
-                                                "valueJson":  "{\"recoveryKeyUsage\":\"allowed\",\"recoveryInformationToStore\":\"passwordAndKey\",\"enableRecoveryInformationSaveToStore\":true,\"recoveryPasswordUsage\":\"allowed\",\"hideRecoveryOptions\":true,\"enableBitLockerAfterRecoveryInformationToStore\":true,\"blockDataRecoveryAgent\":false}"
-                                            },
-                                            {
-                                                "@odata.type":  "#microsoft.graph.deviceManagementBooleanSettingInstance",
-                                                "id":  "29b011bd-6551-4e4d-9691-b77a5ee3de04",
-                                                "definitionId":  "deviceConfiguration--bitLockerFixedDrivePolicy_requireEncryptionForWriteAccess",
-                                                "valueJson":  "true",
-                                                "value":  true
-                                            },
-                                            {
-                                                "@odata.type":  "#microsoft.graph.deviceManagementStringSettingInstance",
-                                                "id":  "53749999-6d14-4dc8-be8d-53bba65e64d1",
-                                                "definitionId":  "deviceConfiguration--bitLockerFixedDrivePolicy_encryptionMethod",
-                                                "valueJson":  "\"xtsAes256\"",
-                                                "value":  "xtsAes256"
-                                            }
-                                        ]
-                          },
-                          {
-                              "@odata.type":  "#microsoft.graph.deviceManagementComplexSettingInstance",
-                              "id":  "e70e48fc-e8b8-4568-9a14-b8784d49d5ed",
-                              "definitionId":  "deviceConfiguration--windows10EndpointProtectionConfiguration_bitLockerRemovableDrivePolicy",
-                              "valueJson":  "{\"encryptionMethod\":\"aesCbc256\",\"requireEncryptionForWriteAccess\":false,\"blockCrossOrganizationWriteAccess\":false}",
-                              "value":  [
-                                            {
-                                                "@odata.type":  "#microsoft.graph.deviceManagementStringSettingInstance",
-                                                "id":  "7bbe052b-1a17-4f1c-8cc3-10be461eaa12",
-                                                "definitionId":  "deviceConfiguration--bitLockerRemovableDrivePolicy_encryptionMethod",
-                                                "valueJson":  "\"aesCbc256\"",
-                                                "value":  "aesCbc256"
-                                            },
-                                            {
-                                                "@odata.type":  "#microsoft.graph.deviceManagementBooleanSettingInstance",
-                                                "id":  "dcdd8a2b-d2f1-432b-9512-0d4078663dd0",
-                                                "definitionId":  "deviceConfiguration--bitLockerRemovableDrivePolicy_requireEncryptionForWriteAccess",
-                                                "valueJson":  "false",
-                                                "value":  false
-                                            },
-                                            {
-                                                "@odata.type":  "#microsoft.graph.deviceManagementBooleanSettingInstance",
-                                                "id":  "3c5316d5-8d21-4c4a-a644-e2d73cbff222",
-                                                "definitionId":  "deviceConfiguration--bitLockerRemovableDrivePolicy_blockCrossOrganizationWriteAccess",
-                                                "valueJson":  "false",
-                                                "value":  false
-                                            }
-                                        ]
-                          }
-                      ]
+  "displayName": "Win10 - Bitlocker",
+  "description": "Harden365 - Bitlocker v1.0",
+  "roleScopeTagIds": ["0"],
+  "TemplateDisplayName": "BitLocker",
+  "TemplateId": "d1174162-1dd2-4976-affc-6667049ab0ae",
+  "versionInfo": "2106",
+  "settingsDelta": [
+    {
+      "@odata.type": "#microsoft.graph.deviceManagementBooleanSettingInstance",
+      "id": "806cc657-1f8c-4998-a6cf-52b52c75029f",
+      "definitionId": "deviceConfiguration--windows10EndpointProtectionConfiguration_bitLockerEncryptDevice",
+      "valueJson": "true",
+      "value": true
+    },
+    {
+      "@odata.type": "#microsoft.graph.deviceManagementBooleanSettingInstance",
+      "id": "a1714ae2-0da7-41a5-b592-501a2ba35329",
+      "definitionId": "deviceConfiguration--windows10EndpointProtectionConfiguration_bitLockerEnableStorageCardEncryptionOnMobile",
+      "valueJson": "false",
+      "value": false
+    },
+    {
+      "@odata.type": "#microsoft.graph.deviceManagementBooleanSettingInstance",
+      "id": "340a4ced-d0a6-4aed-a858-d7b367694f4f",
+      "definitionId": "deviceConfiguration--windows10EndpointProtectionConfiguration_bitLockerDisableWarningForOtherDiskEncryption",
+      "valueJson": "true",
+      "value": true
+    },
+    {
+      "@odata.type": "#microsoft.graph.deviceManagementBooleanSettingInstance",
+      "id": "6093af08-1919-4db8-a4d1-a7e6efb608ee",
+      "definitionId": "deviceConfiguration--windows10EndpointProtectionConfiguration_bitLockerAllowStandardUserEncryption",
+      "valueJson": "true",
+      "value": true
+    },
+    {
+      "@odata.type": "#microsoft.graph.deviceManagementStringSettingInstance",
+      "id": "5e6edf8f-849b-45a2-ba62-a5c650440c06",
+      "definitionId": "deviceConfiguration--windows10EndpointProtectionConfiguration_bitLockerRecoveryPasswordRotation",
+      "valueJson": "\"enabledForAzureAdAndHybrid\"",
+      "value": "enabledForAzureAdAndHybrid"
+    },
+    {
+      "@odata.type": "#microsoft.graph.deviceManagementComplexSettingInstance",
+      "id": "4f066152-123d-4772-96ef-515257daca7f",
+      "definitionId": "deviceConfiguration--windows10EndpointProtectionConfiguration_bitLockerSystemDrivePolicy",
+      "valueJson": "{\"startupAuthenticationRequired\":true,\"startupAuthenticationTpmUsage\":\"allowed\",\"startupAuthenticationTpmPinUsage\":null,\"startupAuthenticationTpmKeyUsage\":\"blocked\",\"startupAuthenticationTpmPinAndKeyUsage\":null,\"startupAuthenticationBlockWithoutTpmChip\":true,\"prebootRecoveryEnableMessageAndUrl\":false,\"prebootRecoveryMessage\":null,\"prebootRecoveryUrl\":null,\"recoveryOptions\":{\"recoveryKeyUsage\":\"allowed\",\"recoveryInformationToStore\":\"passwordAndKey\",\"enableRecoveryInformationSaveToStore\":true,\"recoveryPasswordUsage\":\"allowed\",\"hideRecoveryOptions\":true,\"enableBitLockerAfterRecoveryInformationToStore\":true,\"blockDataRecoveryAgent\":false},\"encryptionMethod\":\"xtsAes256\",\"minimumPinLength\":null}",
+      "value": [
+        {
+          "@odata.type": "#microsoft.graph.deviceManagementBooleanSettingInstance",
+          "id": "b69124fa-642f-4bed-8560-d1198bda691d",
+          "definitionId": "deviceConfiguration--bitLockerSystemDrivePolicy_startupAuthenticationRequired",
+          "valueJson": "true",
+          "value": true
+        },
+        {
+          "@odata.type": "#microsoft.graph.deviceManagementStringSettingInstance",
+          "id": "62eb5b67-6fc3-4785-9699-0ab31f019066",
+          "definitionId": "deviceConfiguration--bitLockerSystemDrivePolicy_startupAuthenticationTpmUsage",
+          "valueJson": "\"allowed\"",
+          "value": "allowed"
+        },
+        {
+          "@odata.type": "#microsoft.graph.deviceManagementStringSettingInstance",
+          "id": "e913c3ee-f121-4a7f-8115-1ac24dd29eca",
+          "definitionId": "deviceConfiguration--bitLockerSystemDrivePolicy_startupAuthenticationTpmPinUsage",
+          "valueJson": "null",
+          "value": null
+        },
+        {
+          "@odata.type": "#microsoft.graph.deviceManagementStringSettingInstance",
+          "id": "9ec08075-f0a8-4f26-a05c-2213236dc4d8",
+          "definitionId": "deviceConfiguration--bitLockerSystemDrivePolicy_startupAuthenticationTpmKeyUsage",
+          "valueJson": "\"blocked\"",
+          "value": "blocked"
+        },
+        {
+          "@odata.type": "#microsoft.graph.deviceManagementStringSettingInstance",
+          "id": "d8d12e56-21fe-465f-b681-4b0848be50da",
+          "definitionId": "deviceConfiguration--bitLockerSystemDrivePolicy_startupAuthenticationTpmPinAndKeyUsage",
+          "valueJson": "null",
+          "value": null
+        },
+        {
+          "@odata.type": "#microsoft.graph.deviceManagementBooleanSettingInstance",
+          "id": "a1401232-a61c-4d5c-af15-1affc456b8e7",
+          "definitionId": "deviceConfiguration--bitLockerSystemDrivePolicy_startupAuthenticationBlockWithoutTpmChip",
+          "valueJson": "true",
+          "value": true
+        },
+        {
+          "@odata.type": "#microsoft.graph.deviceManagementBooleanSettingInstance",
+          "id": "c4d62483-06df-4981-ab25-2b96d5e67d46",
+          "definitionId": "deviceConfiguration--bitLockerSystemDrivePolicy_prebootRecoveryEnableMessageAndUrl",
+          "valueJson": "false",
+          "value": false
+        },
+        {
+          "@odata.type": "#microsoft.graph.deviceManagementStringSettingInstance",
+          "id": "0b8702ce-ac57-4cc9-9265-d17b66dacffe",
+          "definitionId": "deviceConfiguration--bitLockerSystemDrivePolicy_prebootRecoveryMessage",
+          "valueJson": "null",
+          "value": null
+        },
+        {
+          "@odata.type": "#microsoft.graph.deviceManagementStringSettingInstance",
+          "id": "271f9791-ffea-4dae-bb19-3e1e6b283d3d",
+          "definitionId": "deviceConfiguration--bitLockerSystemDrivePolicy_prebootRecoveryUrl",
+          "valueJson": "null",
+          "value": null
+        },
+        {
+          "@odata.type": "#microsoft.graph.deviceManagementComplexSettingInstance",
+          "id": "148a9333-4048-4e18-9315-a466bf545705",
+          "definitionId": "deviceConfiguration--bitLockerSystemDrivePolicy_recoveryOptions",
+          "valueJson": "{\"recoveryKeyUsage\":\"allowed\",\"recoveryInformationToStore\":\"passwordAndKey\",\"enableRecoveryInformationSaveToStore\":true,\"recoveryPasswordUsage\":\"allowed\",\"hideRecoveryOptions\":true,\"enableBitLockerAfterRecoveryInformationToStore\":true,\"blockDataRecoveryAgent\":false}"
+        },
+        {
+          "@odata.type": "#microsoft.graph.deviceManagementStringSettingInstance",
+          "id": "fa1468d0-9aa4-4c82-89b1-8e5711425ce4",
+          "definitionId": "deviceConfiguration--bitLockerSystemDrivePolicy_encryptionMethod",
+          "valueJson": "\"xtsAes256\"",
+          "value": "xtsAes256"
+        },
+        {
+          "@odata.type": "#microsoft.graph.deviceManagementIntegerSettingInstance",
+          "id": "86ad3fdb-0cf7-40c6-a913-d1d48d0ec8e0",
+          "definitionId": "deviceConfiguration--bitLockerSystemDrivePolicy_minimumPinLength",
+          "valueJson": "null",
+          "value": null
+        }
+      ]
+    },
+    {
+      "@odata.type": "#microsoft.graph.deviceManagementComplexSettingInstance",
+      "id": "a70121d2-5bc4-47e3-b66e-5a9a8e5263e1",
+      "definitionId": "deviceConfiguration--windows10EndpointProtectionConfiguration_bitLockerFixedDrivePolicy",
+      "valueJson": "{\"recoveryOptions\":{\"recoveryKeyUsage\":\"allowed\",\"recoveryInformationToStore\":\"passwordAndKey\",\"enableRecoveryInformationSaveToStore\":true,\"recoveryPasswordUsage\":\"allowed\",\"hideRecoveryOptions\":true,\"enableBitLockerAfterRecoveryInformationToStore\":true,\"blockDataRecoveryAgent\":false},\"requireEncryptionForWriteAccess\":true,\"encryptionMethod\":\"xtsAes256\"}",
+      "value": [
+        {
+          "@odata.type": "#microsoft.graph.deviceManagementComplexSettingInstance",
+          "id": "569f6448-c7f0-4f7f-9ee7-d81b6cdfa41e",
+          "definitionId": "deviceConfiguration--bitLockerFixedDrivePolicy_recoveryOptions",
+          "valueJson": "{\"recoveryKeyUsage\":\"allowed\",\"recoveryInformationToStore\":\"passwordAndKey\",\"enableRecoveryInformationSaveToStore\":true,\"recoveryPasswordUsage\":\"allowed\",\"hideRecoveryOptions\":true,\"enableBitLockerAfterRecoveryInformationToStore\":true,\"blockDataRecoveryAgent\":false}"
+        },
+        {
+          "@odata.type": "#microsoft.graph.deviceManagementBooleanSettingInstance",
+          "id": "29b011bd-6551-4e4d-9691-b77a5ee3de04",
+          "definitionId": "deviceConfiguration--bitLockerFixedDrivePolicy_requireEncryptionForWriteAccess",
+          "valueJson": "true",
+          "value": true
+        },
+        {
+          "@odata.type": "#microsoft.graph.deviceManagementStringSettingInstance",
+          "id": "53749999-6d14-4dc8-be8d-53bba65e64d1",
+          "definitionId": "deviceConfiguration--bitLockerFixedDrivePolicy_encryptionMethod",
+          "valueJson": "\"xtsAes256\"",
+          "value": "xtsAes256"
+        }
+      ]
+    },
+    {
+      "@odata.type": "#microsoft.graph.deviceManagementComplexSettingInstance",
+      "id": "e70e48fc-e8b8-4568-9a14-b8784d49d5ed",
+      "definitionId": "deviceConfiguration--windows10EndpointProtectionConfiguration_bitLockerRemovableDrivePolicy",
+      "valueJson": "{\"encryptionMethod\":\"aesCbc256\",\"requireEncryptionForWriteAccess\":false,\"blockCrossOrganizationWriteAccess\":false}",
+      "value": [
+        {
+          "@odata.type": "#microsoft.graph.deviceManagementStringSettingInstance",
+          "id": "7bbe052b-1a17-4f1c-8cc3-10be461eaa12",
+          "definitionId": "deviceConfiguration--bitLockerRemovableDrivePolicy_encryptionMethod",
+          "valueJson": "\"aesCbc256\"",
+          "value": "aesCbc256"
+        },
+        {
+          "@odata.type": "#microsoft.graph.deviceManagementBooleanSettingInstance",
+          "id": "dcdd8a2b-d2f1-432b-9512-0d4078663dd0",
+          "definitionId": "deviceConfiguration--bitLockerRemovableDrivePolicy_requireEncryptionForWriteAccess",
+          "valueJson": "false",
+          "value": false
+        },
+        {
+          "@odata.type": "#microsoft.graph.deviceManagementBooleanSettingInstance",
+          "id": "3c5316d5-8d21-4c4a-a644-e2d73cbff222",
+          "definitionId": "deviceConfiguration--bitLockerRemovableDrivePolicy_blockCrossOrganizationWriteAccess",
+          "valueJson": "false",
+          "value": false
+        }
+      ]
+    }
+  ]
 }

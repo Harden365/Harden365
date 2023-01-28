@@ -1,64 +1,62 @@
 {
-    "displayName":  "MacOS - NextGen Antivirus",
-    "description":  "",
-    "roleScopeTagIds":  [
-                            "0"
-                        ],
-    "TemplateDisplayName":  "Antivirus",
-    "TemplateId":  "2a68aa33-f853-4572-94bc-7dbdc87fd51e",
-    "versionInfo":  "2005",
-    "settingsDelta":  [
-                          {
-                              "@odata.type":  "#microsoft.graph.deviceManagementStringSettingInstance",
-                              "id":  "3838b84b-2dfb-43f7-ab8a-72248a45bb98",
-                              "definitionId":  "deviceConfiguration--macOSEndpointProtectionConfiguration_advancedThreatProtectionRealTime",
-                              "valueJson":  "\"enabled\"",
-                              "value":  "enabled"
-                          },
-                          {
-                              "@odata.type":  "#microsoft.graph.deviceManagementStringSettingInstance",
-                              "id":  "9a3ecf7f-0cb4-4051-8133-4b658ce8e247",
-                              "definitionId":  "deviceConfiguration--macOSEndpointProtectionConfiguration_advancedThreatProtectionCloudDelivered",
-                              "valueJson":  "\"enabled\"",
-                              "value":  "enabled"
-                          },
-                          {
-                              "@odata.type":  "#microsoft.graph.deviceManagementStringSettingInstance",
-                              "id":  "8e6a431d-ef78-4ee9-b7b8-ff1d4b26e0ee",
-                              "definitionId":  "deviceConfiguration--macOSEndpointProtectionConfiguration_advancedThreatProtectionAutomaticSampleSubmission",
-                              "valueJson":  "\"enabled\"",
-                              "value":  "enabled"
-                          },
-                          {
-                              "@odata.type":  "#microsoft.graph.deviceManagementStringSettingInstance",
-                              "id":  "74aead9c-ca0c-4797-bb04-c86c1e75992f",
-                              "definitionId":  "deviceConfiguration--macOSEndpointProtectionConfiguration_advancedThreatProtectionDiagnosticDataCollection",
-                              "valueJson":  "\"enabled\"",
-                              "value":  "enabled"
-                          },
-                          {
-                              "@odata.type":  "#microsoft.graph.deviceManagementCollectionSettingInstance",
-                              "id":  "78770005-3624-4e67-8dd1-0ae6fa0a2d97",
-                              "definitionId":  "deviceConfiguration--macOSEndpointProtectionConfiguration_advancedThreatProtectionExcludedFolders",
-                              "valueJson":  "null"
-                          },
-                          {
-                              "@odata.type":  "#microsoft.graph.deviceManagementCollectionSettingInstance",
-                              "id":  "44735fd0-788a-4ec6-9784-f1b0517b9e9d",
-                              "definitionId":  "deviceConfiguration--macOSEndpointProtectionConfiguration_advancedThreatProtectionExcludedFiles",
-                              "valueJson":  "null"
-                          },
-                          {
-                              "@odata.type":  "#microsoft.graph.deviceManagementCollectionSettingInstance",
-                              "id":  "159146f6-cdad-49d7-927b-f3b1df68594a",
-                              "definitionId":  "deviceConfiguration--macOSEndpointProtectionConfiguration_advancedThreatProtectionExcludedExtensions",
-                              "valueJson":  "null"
-                          },
-                          {
-                              "@odata.type":  "#microsoft.graph.deviceManagementCollectionSettingInstance",
-                              "id":  "f31188f9-5338-4c45-a016-1ebd1bce756e",
-                              "definitionId":  "deviceConfiguration--macOSEndpointProtectionConfiguration_advancedThreatProtectionExcludedProcesses",
-                              "valueJson":  "null"
-                          }
-                      ]
+  "displayName": "MacOS - NextGen Antivirus",
+  "description": "",
+  "roleScopeTagIds": ["0"],
+  "TemplateDisplayName": "Antivirus",
+  "TemplateId": "2a68aa33-f853-4572-94bc-7dbdc87fd51e",
+  "versionInfo": "2005",
+  "settingsDelta": [
+    {
+      "@odata.type": "#microsoft.graph.deviceManagementStringSettingInstance",
+      "id": "3838b84b-2dfb-43f7-ab8a-72248a45bb98",
+      "definitionId": "deviceConfiguration--macOSEndpointProtectionConfiguration_advancedThreatProtectionRealTime",
+      "valueJson": "\"enabled\"",
+      "value": "enabled"
+    },
+    {
+      "@odata.type": "#microsoft.graph.deviceManagementStringSettingInstance",
+      "id": "9a3ecf7f-0cb4-4051-8133-4b658ce8e247",
+      "definitionId": "deviceConfiguration--macOSEndpointProtectionConfiguration_advancedThreatProtectionCloudDelivered",
+      "valueJson": "\"enabled\"",
+      "value": "enabled"
+    },
+    {
+      "@odata.type": "#microsoft.graph.deviceManagementStringSettingInstance",
+      "id": "8e6a431d-ef78-4ee9-b7b8-ff1d4b26e0ee",
+      "definitionId": "deviceConfiguration--macOSEndpointProtectionConfiguration_advancedThreatProtectionAutomaticSampleSubmission",
+      "valueJson": "\"enabled\"",
+      "value": "enabled"
+    },
+    {
+      "@odata.type": "#microsoft.graph.deviceManagementStringSettingInstance",
+      "id": "74aead9c-ca0c-4797-bb04-c86c1e75992f",
+      "definitionId": "deviceConfiguration--macOSEndpointProtectionConfiguration_advancedThreatProtectionDiagnosticDataCollection",
+      "valueJson": "\"enabled\"",
+      "value": "enabled"
+    },
+    {
+      "@odata.type": "#microsoft.graph.deviceManagementCollectionSettingInstance",
+      "id": "78770005-3624-4e67-8dd1-0ae6fa0a2d97",
+      "definitionId": "deviceConfiguration--macOSEndpointProtectionConfiguration_advancedThreatProtectionExcludedFolders",
+      "valueJson": "null"
+    },
+    {
+      "@odata.type": "#microsoft.graph.deviceManagementCollectionSettingInstance",
+      "id": "44735fd0-788a-4ec6-9784-f1b0517b9e9d",
+      "definitionId": "deviceConfiguration--macOSEndpointProtectionConfiguration_advancedThreatProtectionExcludedFiles",
+      "valueJson": "null"
+    },
+    {
+      "@odata.type": "#microsoft.graph.deviceManagementCollectionSettingInstance",
+      "id": "159146f6-cdad-49d7-927b-f3b1df68594a",
+      "definitionId": "deviceConfiguration--macOSEndpointProtectionConfiguration_advancedThreatProtectionExcludedExtensions",
+      "valueJson": "null"
+    },
+    {
+      "@odata.type": "#microsoft.graph.deviceManagementCollectionSettingInstance",
+      "id": "f31188f9-5338-4c45-a016-1ebd1bce756e",
+      "definitionId": "deviceConfiguration--macOSEndpointProtectionConfiguration_advancedThreatProtectionExcludedProcesses",
+      "valueJson": "null"
+    }
+  ]
 }

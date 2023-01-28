@@ -22,7 +22,7 @@
 
 
 Function Start-LegacyAuthSPO {
-     <#
+    <#
         .Synopsis
          Disable User permission consent App registration
         
@@ -34,16 +34,18 @@ Function Start-LegacyAuthSPO {
          
     #>
 
-Write-LogSection 'HARDENING SHAREPOINT' -NoHostOutput
+    Write-LogSection 'HARDENING SHAREPOINT' -NoHostOutput
 
-#SCRIPT
+    #SCRIPT
 
-if ($(Get-SPOTenant).LegacyAuthProtocolsEnabled -eq $true) { 
-    Write-LogWarning "Modern Auth in SharepointOnline is disable!"
-    Set-SPOTenant -LegacyAuthProtocolsEnabled $false
-    Write-LogInfo "Modern Auth in Teams set to enable"
+    if ($(Get-SPOTenant).LegacyAuthProtocolsEnabled -eq $true) { 
+        Write-LogWarning 'Modern Auth in SharepointOnline is disable!'
+        Set-SPOTenant -LegacyAuthProtocolsEnabled $false
+        Write-LogInfo 'Modern Auth in Teams set to enable'
     }
-else { Write-LogInfo "Modern Auth in SharepointOnline enabled"}
+    else {
+        Write-LogInfo 'Modern Auth in SharepointOnline enabled'
+    }
 
 
 }

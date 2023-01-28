@@ -1,0 +1,10 @@
+{
+  "recommendations": [
+    "esbenp.prettier-vscode",
+    "ms-vscode.PowerShell",
+    "streetsidesoftware.code-spell-checker",
+    "AquaSecurityOfficial.trivy-vulnerability-scanner",
+    "MS-CST-E.vscode-devskim",
+    "Bridgecrew.checkov"
+  ]
+}
