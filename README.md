@@ -16,7 +16,7 @@ It aims to help companies, especially an SMB or TPE, to improve the security of 
 
 
 # HARDEN365
-This is the version 0.7 of the Hardening 365 project by Harden Community.
+This is the version beta 8 of the Hardening 365 project by Harden Community.
 
 Feel free to use it and adapt following your needs!
 
