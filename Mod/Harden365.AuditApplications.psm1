@@ -202,7 +202,7 @@ try {
 if ((Get-MsolCompanyInformation).AllowAdHocSubscriptions -eq $true) {
     Write-LogWarning "Standard users enabled to creating free subscriptions"}
 else {Write-LogInfo "Standard users already disabled to create free subscriptions"}
-} catch{ Write-LogError "Module error" }
+} catch{ Write-LogError "Module error BLOCKFREESUBSCRIPTION" }
 
 <#SHAREEVERYONE
 try {
@@ -222,7 +222,6 @@ else {Write-LogInfo "Standard users already disabled to create trial/developer s
 #>
 
 #BLOCKPAYABLESUBSCRIPTION
-try{
 Connect-MSCommerce
 $Products = Get-MSCommerceProductPolicies -PolicyId AllowSelfServicePurchase
 ForEach ($Product in $Products) {
@@ -231,7 +230,7 @@ ForEach ($Product in $Products) {
         Write-LogWarning "Prevent standard users from creating $ProductName payable subscriptions"}
     else {Write-LogInfo "Standard users already disabled to subscribe $ProductName payable subscriptions"}
     }
-} catch{ Write-LogError "Module error" }
+# catch{ Write-LogError "Module error BLOCKPAYABLESUBSCRIPTION" }
 Write-LogSection '' -NoHostOutput
 }
 

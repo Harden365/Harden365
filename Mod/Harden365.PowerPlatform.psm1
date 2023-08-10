@@ -33,14 +33,15 @@ Function Start-BlockShareAppsEveryone {
     #>
 
     Param(
-        [System.Management.Automation.PSCredential]$Credential
+        
     )
 
 Write-LogSection 'POWERPLATFORM' -NoHostOutput
 
 #SCRIPT
-Add-PowerAppsAccount -Username $Credential.UserName -Password $Credential.Password
-$upn = $Credential.UserName
+try {
+Get-TenantSettings | Out-Null }
+catch {}
 if ((Get-TenantSettings).powerPlatform.powerApps.disableShareWithEveryone -eq $false) {
     Write-LogWarning "User allow to share apps with everyone"
     $settings = Get-TenantSettings
@@ -113,11 +114,10 @@ Function Start-BlockSubscriptionTrials {
     #>
 
         Param(
-        [System.Management.Automation.PSCredential]$Credential
+        
     )
 
 #SCRIPT
-Add-PowerAppsAccount -Username $Credential.UserName -Password $Credential.Password
 if (((Get-AllowedConsentPlans).Types -eq "Internal") -or ((Get-AllowedConsentPlans).Types -eq "Viral")) {
     Write-LogWarning "Prevent standard users from creating trial/developer subscriptions"
     Remove-AllowedConsentPlans -Types @("Internal", "Viral") -Prompt $false

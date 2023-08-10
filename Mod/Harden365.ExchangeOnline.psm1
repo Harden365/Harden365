@@ -14,8 +14,6 @@
     .DESCRIPTION
         Create SharedMailbox for alerts
         Create group for autoforward excluded
-        Create group for Antispam strict policy
-        Create Antispam Strict Policy and Rule
         Create Antispam Standard Policy and Rule
         Create Antiforward Standard Policy and Rule
         Create Antimalware Policy and Rule
@@ -67,7 +65,7 @@ Write-LogSection 'EXCHANGE ONLINE PROTECTION' -NoHostOutput
                 }
     } else
     {
-         Write-LogWarning "Unified Audit Log already enabled!"
+         Write-LogInfo "Unified Audit Log already enabled!"
          }
 }
 
@@ -128,7 +126,7 @@ Function Start-EONotifQuarantine {
 	param(
 	[Parameter(Mandatory = $false)]
 	[String]$Name = "Harden365 - User Notifications",
-    [String]$EndUserQuarantinePermissionsValue = "23",
+    [String]$EndUserQuarantinePermissionsValue = "27",
     [String]$EndUserSpamNotificationFrequencyInDays = "3",
     [Boolean]$EsnEnabled = $true
 )
@@ -194,119 +192,6 @@ $DomainOnM365=(Get-AcceptedDomain | Where-Object { $_.InitialDomain -match $true
                         Write-LogError "Mailbox '$alias@$DomainOnM365' not created"
                         }
           }
-}
-
-
-Function Start-EOPAntispamGroupStrict {
-     <#
-        .Synopsis
-         Create group for Antispam strict policy
-        
-        .Description
-         This function will create new group for Antispam strict policy
-
-        .Notes
-         Version: 01.00 -- 
-         
-    #>
-
-	param(
-	[Parameter(Mandatory = $false)]
-	[String]$Name = "Harden365 - GP Antispam strict",
-    [String]$Alias = "gp_antispam_strict",
-    [String]$Members = ""
-)
-
-
-#SCRIPT
-$GroupEOL=(Get-UnifiedGroup | Where-Object { $_.DisplayName -eq $Name}).Name
-    if (-not $GroupEOL)
-        {
-        Try {
-            New-UnifiedGroup -Name $name -DisplayName $Name  -Alias $Alias -AccessType Private -Confirm:$false | Out-Null
-            Set-UnifiedGroup -Identity $Name -HiddenFromAddressListsEnabled $true -HiddenFromExchangeClientsEnabled -UnifiedGroupWelcomeMessageEnabled:$false
-            Write-LogInfo "Group '$Name' created"
-            }
-                 Catch {
-                        Write-LogError "Group '$Name' not created"
-                        }
-    }
-    else { 
-         Write-LogWarning "Group '$Name' already created!"
-         }
-}
-
-
-Function Start-EOPAntispamPolicyStrict {
-     <#
-        .Synopsis
-         Create Antispam Strict Policy and Rule
-        
-        .Description
-         This function will create new Antispam Strict Policy
-        
-        .Notes
-         Version: 01.00 -- 
-         
-    #>
-
-	param(
-	[Parameter(Mandatory = $false)]
-	[String]$PolicyInboundName = "Harden365 - AntiSpam Inbound Policy Strict",
-    [String]$RuleInboundName = "Harden365 - AntiSpam Inbound Rule Strict",
-    [String]$PolicyOutboundName = "Harden365 - AntiSpam Outbound Policy Strict",
-    [String]$RuleOutboundName = "Harden365 - AntiSpam Outbound Rule Strict",
-    [String]$HighConfidenceSpamAction = "Quarantine",
-    [String]$SpamAction = "MoveToJmf",
-    [String]$BulkThreshold = "4",
-    [String]$QuarantineRetentionPeriod = "30",
-    [Boolean]$EnableEndUserSpamNotifications = $true,
-    [String]$BulkSpamAction = "MoveToJmf",
-    [String]$PhishSpamAction = "Quarantine",
-    [String]$RecipientLimitExternalPerHour = "400",
-	[String]$RecipientLimitInternalPerHour = "800",
-	[String]$RecipientLimitPerDay = "800",
-	[String]$ActionWhenThresholdReached = "BlockUser",
-    [String]$AutoForwardingMode = "Off",
-	[String]$GroupStrict = "Harden365 - GP Antispam strict",
-	[String]$Priority = "0"
-)
-
-
-#SCRIPT INBOUND
-    if ((Get-HostedContentFilterRule).Name -eq $RuleInboundName)
-    {
-            Write-LogWarning "$PolicyInboundName already created!"
-            
-    } else
-    {
-            Try { 
-            New-HostedContentFilterPolicy -Name $PolicyInboundName -HighConfidenceSpamAction $HighConfidenceSpamAction -SpamAction $SpamAction -BulkThreshold $BulkThreshold -QuarantineRetentionPeriod $QuarantineRetentionPeriod -EnableEndUserSpamNotifications $EnableEndUserSpamNotifications -BulkSpamAction $BulkSpamAction -PhishSpamAction $PhishSpamAction
-            write-LogInfo "$PolicyInboundName created"
-            New-HostedContentFilterRule -Name $RuleInboundName -HostedContentFilterPolicy $PolicyInboundName -Priority $Priority -SentToMemberOf $GroupStrict
-            Write-LogInfo "$RuleInboundName created"
-             } Catch {
-                Write-LogError "$PolicyInboundName not created!"
-                }
-         }      
-
-
-#SCRIPT OUTBOUND
-    if ((Get-HostedOutboundSpamFilterRule).name -eq $RuleOutboundName)
-    {
-        Write-LogWarning "$PolicyOutboundName already created!"
-        
-    } else
-    {
-        Try { 
-            New-HostedOutboundSpamFilterPolicy -Name $PolicyOutboundName -RecipientLimitExternalPerHour $RecipientLimitExternalPerHour -RecipientLimitInternalPerHour $RecipientLimitInternalPerHour -RecipientLimitPerDay $RecipientLimitPerDay -ActionWhenThresholdReached $ActionWhenThresholdReached -AutoForwardingMode $AutoForwardingMode
-            Write-LogInfo "$PolicyOutboundName created"
-            New-HostedOutboundSpamFilterRule -Name $RuleOutboundName -HostedOutboundSpamFilterPolicy $PolicyOutboundName -Priority $Priority -FromMemberOf $GroupStrict
-            Write-LogInfo "$RuleOutboundName created"
-        } Catch {
-                Write-LogError "$PolicyOutboundName not created!"
-                }
-         }
 }
 
 

@@ -39,11 +39,11 @@ Write-LogSection 'HARDENING SHAREPOINT' -NoHostOutput
 #SCRIPT
 
 if ($(Get-SPOTenant).LegacyAuthProtocolsEnabled -eq $true) { 
-    Write-LogWarning "Modern Auth in SharepointOnline is disable!"
+    Write-LogWarning "Legacy Auth in SharepointOnline is enable!"
     Set-SPOTenant -LegacyAuthProtocolsEnabled $false
-    Write-LogInfo "Modern Auth in Teams set to enable"
+    Write-LogInfo "legacy Auth in Sharepoint set to disable"
     }
-else { Write-LogInfo "Modern Auth in SharepointOnline enabled"}
+else { Write-LogInfo "Legacy Auth in SharepointOnline disabled"}
 
 
 }

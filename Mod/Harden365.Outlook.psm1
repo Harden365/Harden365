@@ -114,6 +114,7 @@ Write-LogSection '' -NoHostOutput
 }
 
 
+
 Function Start-OUTCalendarSharing {
      <#
         .Synopsis
@@ -138,6 +139,34 @@ if (Get-SharingPolicy | Where-Object { ($_.Domains -like '*CalendarSharing*') -a
     }
     else { Write-LogInfo 'Policy with Calendar Sharing not found' }
 } catch{ Write-LogError "Module error" }
-Write-LogSection '' -NoHostOutput        
+      
+}
+
+
+Function Start-OUTExternalTag {
+     <#
+        .Synopsis
+         Configure external tags to highlight emails which are sent from external.
+        
+        .Description
+         Configure external tags to highlight emails which are sent from external.
+
+        .Notes
+         Version: 01.00 -- 
+         
+    #>
+
+#SCRIPT
+try {
+if ((Get-ExternalInOutlook).Enabled -eq '$false') { 
+    Set-ExternalInOutlook -Enabled $true
+    Write-LogInfo 'External Tag Enabled in Outlook'
+    }
+    else { 
+    Write-LogInfo 'External Tag Enabled in Outlook' }
+} catch{ Write-LogError "Module error in Start-OUTExternalTag" } 
+
+Write-LogSection '' -NoHostOutput  
+      
 }
 

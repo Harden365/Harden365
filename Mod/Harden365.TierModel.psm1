@@ -18,7 +18,7 @@
 #>
 
 
-Function Start-Tiers0EmergencyAccount {
+Function Start-EmergencyAccount1 {
      <#
         .Synopsis
          create user with Global admin assignment.
@@ -33,37 +33,109 @@ Function Start-Tiers0EmergencyAccount {
 
 	param(
 	[Parameter(Mandatory = $false)]
-	[String]$Name = "Harden365 - Emergency Account",
+	[String]$Name = "Harden365 - Emergency Account 1",
     [Boolean]$UpperCase = $true,
     [Boolean]$LowerCase = $true,
     [Boolean]$Digits = $true,
     [Boolean]$SpecialCharacters = $true,
     [String]$ExcludeCharacters = "@",
-    [String]$Lengt = "24",
-    [String]$Title = "0Tiers_EmergencyAccount"
+    [String]$Lengt = "48",
+    [String]$Title = "Brice_Glass"
 )
 
-Write-LogSection 'TIER MODEL' -NoHostOutput
+Write-LogSection 'EMERGENCY ACCOUNTS' -NoHostOutput
 
+#CHECKIS ADMIN	
+               $currentPrincipal = New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())
+               $isAdmin = $currentPrincipal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+               if (!$isAdmin) {
+               Write-LogError 'You must run this script as an administrator to install or execute PoshKeepass module'
+               Write-LogError 'Script execution cancelled'
+               Pause;break }
 
 #POSHKEEPASS INSTALL MODULE	
-$poshkeepassinstalled = $false
-try {
-    Get-KeePassDatabaseConfiguration | Out-Null    
-    $poshkeepassinstalled = $true
-} catch {} 
-if (-not $poshkeepassinstalled) {
-    Write-LogInfo "Installing PoshKeepass Module!"
-    Install-Module -Name PoShKeePass -Force
+try { Get-InstalledModule -Name PoShKeePass -ErrorAction Stop > $null}
+    catch {  
+                Write-LogInfo "Installing PoshKeepass Module!"
+                Install-Module -Name PoShKeePass -Force
+                Import-Module -Name PoShKeePass
+                }
+
+#SCRIPT
+$DomainOnM365=(Get-MgDomain | Where-Object { $_.IsInitial -match $true }).Id
+    if ((Get-MgUser).UserPrincipalName -eq "brice.glass@$DomainOnM365")
+        {
+        Write-LogWarning "User 'brice.glass@$DomainOnM365' already created!"      
+    }
+    else { 
+            Try {
+            $WarningActionPreference = "SilentlyContinue"
+            Remove-KeePassDatabaseConfiguration -DatabaseProfileName "Harden365_uadmin" -Confirm:$false
+            $WarningActionPreference = "SilentlyContinue"
+            New-KeePassDatabaseConfiguration -DatabaseProfileName "Harden365_uadmin" -DatabasePath ".\Keepass\Harden365.kdbx" -UseMasterKey
+            $SecureString128=ConvertTo-SecureString "Harden365" -AsPlainText -Force
+            if ((Get-KeePassEntry -DatabaseProfileName "Harden365_uadmin" -KeePassEntryGroupPath "Harden365" -Title $Title -MasterKey $SecureString128) -eq $null)
+            {
+            $Pass_uadmin = New-KeePassPassword -UpperCase:$UpperCase -LowerCase:$LowerCase -Digits:$Digits -SpecialCharacters:$SpecialCharacters  -ExcludeCharacters:$ExcludeCharacters -Length $Lengt
+            $SecureString128=ConvertTo-SecureString "Harden365" -AsPlainText -Force
+            New-KeePassEntry -DatabaseProfileName "Harden365_uadmin" -KeePassEntryGroupPath "Harden365" -Title $Title -UserName "brice.glass@$DomainOnM365" -KeePassPassword $Pass_uadmin -MasterKey $SecureString128
+            $U_PasswordProfile = @{
+              Password = (Get-KeePassEntry -AsPlainText -DatabaseProfileName "Harden365_uadmin" -Title $Title -MasterKey $SecureString128).Password
+              ForceChangePasswordNextSignIn = $False
+              }
+            New-MgUser -DisplayName $Title -PasswordProfile $U_PasswordProfile -UserPrincipalName "brice.glass@$DomainOnM365" -AccountEnabled -MailNickName $Title
+            Remove-KeePassDatabaseConfiguration -DatabaseProfileName "Harden365_uadmin" -Confirm:$false
+            $uadmin = Get-MgUser -UserId "brice.glass@$DomainOnM365"
+            $globalAdmin = Get-MgRoleManagementDirectoryRoleDefinition -Filter "displayName eq 'Global Administrator'"
+            Start-Sleep -Seconds 10
+            $params = @{
+            	"@odata.type" = "#microsoft.graph.unifiedRoleAssignment"
+            	RoleDefinitionId = $globalAdmin.Id
+            	PrincipalId = $uadmin.Id
+            	DirectoryScopeId = "/"
+            }
+            New-MgRoleManagementDirectoryRoleAssignment -BodyParameter $params
+            Write-LogInfo "User 'brice.glass@$DomainOnM365' created"
+            } else {
+            Write-LogWarning "User 'brice.glass@$DomainOnM365' already created"}
+            }
+                 Catch {
+                        Write-LogError "User 'brice.glass@$DomainOnM365' not created"
+                       }
+          }
 }
+
+Function Start-EmergencyAccount2 {
+     <#
+        .Synopsis
+         create user with Global admin assignment.
+        
+        .Description
+         This function will create new account with global admin rule
+
+        .Notes
+         Version: 01.00 -- 
+         
+    #>
+
+	param(
+	[Parameter(Mandatory = $false)]
+	[String]$Name = "Harden365 - Emergency Account 2",
+    [Boolean]$UpperCase = $true,
+    [Boolean]$LowerCase = $true,
+    [Boolean]$Digits = $true,
+    [Boolean]$SpecialCharacters = $true,
+    [String]$ExcludeCharacters = "@",
+    [String]$Lengt = "48",
+    [String]$Title = "Brice_Douglass"
+)
 
 
 #SCRIPT
-
-$DomainOnM365=(Get-AzureADDomain | Where-Object { $_.IsInitial -match $true }).Name
-    if ((Get-AzureADUser).UserPrincipalName -eq "u-admin@$DomainOnM365")
+$DomainOnM365=(Get-MgDomain | Where-Object { $_.IsInitial -match $true }).Id
+    if ((Get-MgUser).UserPrincipalName -eq "brice.douglass@$DomainOnM365")
         {
-        Write-LogWarning "User 'u-admin@$DomainOnM365' already created!"      
+        Write-LogWarning "User 'brice.douglass@$DomainOnM365' already created!"      
     }
     else { 
             Try {
@@ -74,105 +146,37 @@ $DomainOnM365=(Get-AzureADDomain | Where-Object { $_.IsInitial -match $true }).N
             {
             $Pass_uadmin = New-KeePassPassword -UpperCase:$UpperCase -LowerCase:$LowerCase -Digits:$Digits -SpecialCharacters:$SpecialCharacters  -ExcludeCharacters:$ExcludeCharacters -Length $Lengt
             $SecureString128=ConvertTo-SecureString "Harden365" -AsPlainText -Force
-            New-KeePassEntry -DatabaseProfileName "Harden365_uadmin" -KeePassEntryGroupPath "Harden365" -Title $Title -UserName "u-admin@$DomainOnM365" -KeePassPassword $Pass_uadmin -MasterKey $SecureString128
-            $U_PasswordProfile = New-Object -TypeName Microsoft.Open.AzureAD.Model.PasswordProfile
-            $U_PasswordProfile.ForceChangePasswordNextLogin = $False
-            $U_PasswordProfile.Password = (Get-KeePassEntry -AsPlainText -DatabaseProfileName "Harden365_uadmin" -Title $Title -MasterKey $SecureString128).Password
-            New-AzureADUser -DisplayName $Title -PasswordProfile $U_PasswordProfile -UserPrincipalName "u-admin@$DomainOnM365" -AccountEnabled $true -MailNickName $Title
+            New-KeePassEntry -DatabaseProfileName "Harden365_uadmin" -KeePassEntryGroupPath "Harden365" -Title $Title -UserName "brice.douglass@$DomainOnM365" -KeePassPassword $Pass_uadmin -MasterKey $SecureString128
+            $U_PasswordProfile = @{
+              Password = (Get-KeePassEntry -AsPlainText -DatabaseProfileName "Harden365_uadmin" -Title $Title -MasterKey $SecureString128).Password
+              ForceChangePasswordNextSignIn = $False
+              }
+            New-MgUser -DisplayName $Title -PasswordProfile $U_PasswordProfile -UserPrincipalName "brice.douglass@$DomainOnM365" -AccountEnabled -MailNickName $Title
             Remove-KeePassDatabaseConfiguration -DatabaseProfileName "Harden365_uadmin" -Confirm:$false
-            $uadmin = Get-AzureADUser -Filter "userPrincipalName eq 'u-admin@$DomainOnM365'"
-            $globalAdmin = Get-AzureADMSRoleDefinition -Filter "displayName eq 'Global Administrator'"
+            $uadmin = Get-MgUser -UserId "brice.douglass@$DomainOnM365"
+            $globalAdmin = Get-MgRoleManagementDirectoryRoleDefinition -Filter "displayName eq 'Global Administrator'"
             Start-Sleep -Seconds 10
-            New-AzureADMSRoleAssignment -DirectoryScopeId '/' -RoleDefinitionId $globalAdmin.Id -PrincipalId $uadmin.objectId
-            Write-LogInfo "User 'u-admin@$DomainOnM365' created"
+            $params = @{
+            	"@odata.type" = "#microsoft.graph.unifiedRoleAssignment"
+            	RoleDefinitionId = $globalAdmin.Id
+            	PrincipalId = $uadmin.Id
+            	DirectoryScopeId = "/"
+            }
+            New-MgRoleManagementDirectoryRoleAssignment -BodyParameter $params
+            Write-LogInfo "User 'brice.douglass@$DomainOnM365' created"
             } else {
-            Write-LogWarning "User 'u-admin@$DomainOnM365' already created"}
+            Write-LogWarning "User 'brice.douglass@$DomainOnM365' already created"}
             }
                  Catch {
-                        Write-LogError "User 'u-admin@$DomainOnM365' not created"
+                        Write-LogError "User 'brice.douglass@$DomainOnM365' not created"
                        }
           }
 }
-
-
-Function Start-Tiers0GlobalAdminAccount {
-     <#
-        .Synopsis
-         create user with Global admin assignment.
-        
-        .Description
-         This function will create new account with global admin rule
-
-        .Notes
-         Version: 01.00 -- 
-         
-    #>
-
-	param(
-	[Parameter(Mandatory = $false)]
-	[String]$Name = "Harden365 - Global Admin Account",
-    [Boolean]$UpperCase = $true,
-    [Boolean]$LowerCase = $true,
-    [Boolean]$Digits = $true,
-    [Boolean]$SpecialCharacters = $true,
-    [String]$ExcludeCharacters = "@",
-    [String]$Lengt = "24",
-    [String]$Title = "0Tiers_GlobalAdmin"
-)
-
-
-#POSHKEEPASS INSTALL MODULE	
-$poshkeepassinstalled = $false
-try {
-    Get-KeePassDatabaseConfiguration | Out-Null    
-    $poshkeepassinstalled = $true
-} catch {} 
-if (-not $poshkeepassinstalled) {
-    Write-LogInfo "Installing PoshKeepass Module!" 
-    Install-Module -Name PoShKeePass -Force
-}
-
-#SCRIPT
-
-$DomainOnM365=(Get-AzureADDomain | Where-Object { $_.IsInitial -match $true }).Name
-    if ((Get-AzureADUser).UserPrincipalName -eq "s-admin@$DomainOnM365")
-        {
-        Write-LogWarning "User 's-admin@$DomainOnM365' already created!"   
-    }
-    else { 
-            Try {
-            Remove-KeePassDatabaseConfiguration -DatabaseProfileName "Harden365_sadmin" -Confirm:$false
-            New-KeePassDatabaseConfiguration -DatabaseProfileName "Harden365_sadmin" -DatabasePath ".\Keepass\Harden365.kdbx" -UseMasterKey
-            $SecureString16=ConvertTo-SecureString "Harden365" -AsPlainText -Force
-            if ((Get-KeePassEntry -DatabaseProfileName "Harden365_sadmin" -KeePassEntryGroupPath "Harden365" -Title $Title -MasterKey $SecureString16) -eq $null)
-            {
-            $Pass_sadmin = New-KeePassPassword -UpperCase:$UpperCase -LowerCase:$LowerCase -Digits:$Digits -SpecialCharacters:$SpecialCharacters  -ExcludeCharacters:$ExcludeCharacters -Length $Lengt
-            $SecureString16=ConvertTo-SecureString "Harden365" -AsPlainText -Force
-            New-KeePassEntry -DatabaseProfileName "Harden365_sadmin" -KeePassEntryGroupPath "Harden365" -Title $Title -UserName "s-admin@$DomainOnM365" -KeePassPassword $Pass_sadmin -MasterKey $SecureString16
-            $S_PasswordProfile = New-Object -TypeName Microsoft.Open.AzureAD.Model.PasswordProfile
-            $S_PasswordProfile.ForceChangePasswordNextLogin = $False
-            $S_PasswordProfile.Password = (Get-KeePassEntry -AsPlainText -DatabaseProfileName "Harden365_sadmin" -Title $Title -MasterKey $SecureString16).Password
-            New-AzureADUser -DisplayName $Title -PasswordProfile $S_PasswordProfile -UserPrincipalName "s-admin@$DomainOnM365" -AccountEnabled $true -MailNickName $Title
-            Remove-KeePassDatabaseConfiguration -DatabaseProfileName "Harden365_sadmin" -Confirm:$false
-            $sadmin = Get-AzureADUser -Filter "userPrincipalName eq 's-admin@$DomainOnM365'"
-            $globalAdmin = Get-AzureADMSRoleDefinition -Filter "displayName eq 'Global Administrator'"
-            Start-Sleep -Seconds 10
-            New-AzureADMSRoleAssignment -DirectoryScopeId '/' -RoleDefinitionId $globalAdmin.Id -PrincipalId $sadmin.objectId
-            Write-LogInfo "User 's-admin@$DomainOnM365' created"
-            } else {
-            Write-LogWarning "User 's-admin@$DomainOnM365' already created"}
-            }
-                 Catch {
-                        Write-LogError "User 's-admin@$DomainOnM365' not created"
-                       }
-          }
-}
-
 
 Function Start-TiersAdminNoExpire {
      <#
         .Synopsis
-         Remove users with Global admin assignment.
+         This function configure never expire password
         
         .Description
          This function configure never expire password
@@ -189,45 +193,38 @@ Function Start-TiersAdminNoExpire {
 
 
 #SCRIPT
-$DomainOnM365=(Get-MsolDomain | Where-Object { $_.IsInitial -match $true}).Name
-         Try {
-           Set-MsolCompanySettings -SelfServePasswordResetEnabled $false
-           Write-LogInfo "SSPR for Admin disabled"
-           }
-                 Catch {
-                        Write-LogError "SSPR for Admin not disabled"
-                       }
+$DomainOnM365=(Get-MgDomain | Where-Object { $_.IsInitial -match $true }).Id
 
-     if ((Get-MsolUser -All).UserPrincipalName -eq "u-admin@$DomainOnM365")
+     if ((Get-MgUser).UserPrincipalName -eq "brice.glass@$DomainOnM365")
         {
          Try {
               Start-Sleep -Seconds 5
-              Set-MsolUser -UserPrincipalName "u-admin@$DomainOnM365" -PasswordNeverExpires $true
-              Write-LogInfo "User 'u-admin@$DomainOnM365' never expires"
+              Update-MgUser -UserId "brice.glass@$DomainOnM365" -PasswordPolicies DisablePasswordExpiration
+              Write-LogInfo "User 'brice.glass@$DomainOnM365' never expires"
               }
                  Catch {
-                        Write-LogError "User 'u-admin@$DomainOnM365' not configured to never expire"
+                        Write-LogError "User 'brice.glass@$DomainOnM365' not configured to never expire"
                        }
         }
     else { 
-          Write-LogWarning "User 'u-admin@$DomainOnM365' not exist"
+          Write-LogWarning "User 'brice.glass@$DomainOnM365' not exist"
           }
 
-
-     if ((Get-MsolUser -All).UserPrincipalName -eq "s-admin@$DomainOnM365")
+     if ((Get-MgUser).UserPrincipalName -eq "brice.douglass@$DomainOnM365")
         {
          Try {
               Start-Sleep -Seconds 5
-              Set-MsolUser -UserPrincipalName "s-admin@$DomainOnM365" -PasswordNeverExpires $true
-              Write-LogInfo "User 's-admin@$DomainOnM365' never expires"
+              Update-MgUser -UserId "brice.douglass@$DomainOnM365" -PasswordPolicies DisablePasswordExpiration
+              Write-LogInfo "User 'brice.douglass@$DomainOnM365' never expires"
               }
                  Catch {
-                        Write-LogError "User 's-admin@$DomainOnM365' not configured to never expire"
-                        }
+                        Write-LogError "User 'brice.douglass@$DomainOnM365' not configured to never expire"
+                       }
         }
     else { 
-          Write-LogWarning "User 's-admin@$DomainOnM365' not exist"
+          Write-LogWarning "User 'brice.douglass@$DomainOnM365' not exist"
           }
+
 
  Write-LogSection '' -NoHostOutput
 

@@ -42,24 +42,6 @@ Function Start-ImportPhoneNumbers
 
 Write-LogSection 'IMPORT PHONE NUMBERS' -NoHostOutput
 
-# Module Graph Identity
-if($null -eq $(Get-Command "Get-MgUserAuthenticationPhoneMethod" -ErrorAction:SilentlyContinue).Version){
-
-Write-LogInfo "Installing Powershell Module Graph Identity"
-Install-module Microsoft.Graph.Identity.Signins -ErrorAction:SilentlyContinue -Scope CurrentUser -Confirm -Force
-Start-Sleep -Seconds 1
-}
-else{
-Write-LogInfo "Loading Powershell Module Graph Identity"
-Start-Sleep -Seconds 1
-}
-
-# Connect MgGraph
-Write-LogInfo "Connect to Module Graph Identity"
-Connect-MgGraph -Scopes UserAuthenticationMethod.ReadWrite.All
-Select-MgProfile -Name beta
-
-
 #SCRIPT
 Write-LogInfo "Import CSV File : $ImportCSV"
 

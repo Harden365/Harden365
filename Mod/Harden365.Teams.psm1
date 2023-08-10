@@ -19,7 +19,7 @@
         Block file sharing for other cloud storage services
 
 #>
-
+<# 
 Function Start-TeamsAdalAuthOverride {
      <#
         .Synopsis
@@ -31,7 +31,7 @@ Function Start-TeamsAdalAuthOverride {
         .Notes
          Version: 01.00 -- 
          
-    #>
+
 
 Write-LogSection 'MICROSOFT TEAMS' -NoHostOutput
 
@@ -44,6 +44,7 @@ if ($(Get-CsOAuthConfiguration).ClientAdalAuthOverride -eq "Disallowed") {
 else { Write-LogInfo "Modern Auth in Teams enabled"}
     
 }
+#>
 
 Function Start-TeamsAutoAdmitUsers {
      <#
@@ -57,6 +58,8 @@ Function Start-TeamsAutoAdmitUsers {
          Version: 01.00 -- 
          
     #>
+
+Write-LogSection 'MICROSOFT TEAMS' -NoHostOutput
 
 #SCRIPT
 if ((Get-CsTeamsMeetingPolicy -Identity Global).AutoAdmittedUsers -ne 'InvitedUsers') {

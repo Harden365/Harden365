@@ -36,8 +36,8 @@ Function Start-DeviceScriptImport {
 Write-LogSection 'DEVICE SCRIPT IMPORT' -NoHostOutput
 
 #region Authentification
-$ApplicationID = $(Get-AzureADApplication -Filter "DisplayName eq 'Harden365 App'").AppId
-$TenantDomainName = $(Get-AzureADTenantDetail).ObjectId
+$ApplicationID = $(Get-MgApplication -Filter "DisplayName eq 'Harden365 App'").AppId
+$TenantDomainName = $(Get-MgContext).TenantId
 
 $Body = @{
 Grant_Type    = "client_credentials"

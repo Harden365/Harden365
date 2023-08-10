@@ -35,6 +35,7 @@ Function Start-DefenderO365P1AntiPhishingPolicy {
 	[Parameter(Mandatory = $false)]
 	[String]$PolicyName = "Harden365 - AntiPhishing Policy",
     [String]$RuleName = "Harden365 - AntiPhishing Rule",
+    [Boolean]$EnableFirstContactSafetyTips = $true,
     [Boolean]$EnableMailboxIntelligenceProtection = $true,
     [Boolean]$EnableMailboxIntelligence = $true,
     [String]$MailboxIntelligenceProtectionAction = "MoveToJmf",
@@ -46,7 +47,7 @@ Function Start-DefenderO365P1AntiPhishingPolicy {
     [Boolean]$EnableOrganizationDomainsProtection = $true,
     [String]$TargetedDomainProtectionAction = "Quarantine",
     [Boolean]$EnableUnusualCharactersSafetyTips = $true,
-    [String]$PhishThresholdLevel = "3",
+    [String]$PhishThresholdLevel = "2",
 	[String]$Priority = "0"
 )
 
@@ -58,8 +59,8 @@ Write-LogSection 'MICROSOFT DEFENDER FOR OFFICE365' -NoHostOutput
     {
         Try { 
             $WarningActionPreference = "SilentlyContinue"
-            Set-AntiPhishPolicy -Identity "Office365 AntiPhish Default" -EnableMailboxIntelligenceProtection $EnableMailboxIntelligenceProtection -EnableMailboxIntelligence $EnableMailboxIntelligenceProtection -MailboxIntelligenceProtectionAction $MailboxIntelligenceProtectionAction -EnableSimilarDomainsSafetyTips $EnableSimilarDomainsSafetyTips -EnableSimilarUsersSafetyTips $EnableSimilarUsersSafetyTips -TargetedUserProtectionAction $TargetedUserProtectionAction -EnableTargetedUserProtection $EnableTargetedUserProtection -EnableTargetedDomainsProtection $EnableTargetedDomainsProtection -EnableOrganizationDomainsProtection $EnableOrganizationDomainsProtection -TargetedDomainProtectionAction $TargetedDomainProtectionAction -EnableUnusualCharactersSafetyTips $EnableUnusualCharactersSafetyTips -PhishThresholdLevel $PhishThresholdLevel
-            New-AntiPhishPolicy -Name $PolicyName -AdminDisplayName $PolicyName -TargetedDomainsToProtect ((Get-AcceptedDomain).Name) -EnableMailboxIntelligenceProtection $EnableMailboxIntelligenceProtection -EnableMailboxIntelligence $EnableMailboxIntelligence -MailboxIntelligenceProtectionAction $MailboxIntelligenceProtectionAction -EnableSimilarDomainsSafetyTips $EnableSimilarDomainsSafetyTips -EnableSimilarUsersSafetyTips $EnableSimilarUsersSafetyTips -TargetedUserProtectionAction $TargetedUserProtectionAction -EnableTargetedUserProtection $EnableTargetedUserProtection -EnableTargetedDomainsProtection $EnableTargetedDomainsProtection -EnableOrganizationDomainsProtection $EnableOrganizationDomainsProtection -TargetedDomainProtectionAction $TargetedDomainProtectionAction -EnableUnusualCharactersSafetyTips $EnableUnusualCharactersSafetyTips -PhishThresholdLevel $PhishThresholdLevel
+            Set-AntiPhishPolicy -Identity "Office365 AntiPhish Default" -EnableMailboxIntelligenceProtection $EnableMailboxIntelligenceProtection -EnableMailboxIntelligence $EnableMailboxIntelligenceProtection -MailboxIntelligenceProtectionAction $MailboxIntelligenceProtectionAction -EnableFirstContactSafetyTips $EnableFirstContactSafetyTips -EnableSimilarDomainsSafetyTips $EnableSimilarDomainsSafetyTips -EnableSimilarUsersSafetyTips $EnableSimilarUsersSafetyTips -TargetedUserProtectionAction $TargetedUserProtectionAction -EnableTargetedUserProtection $EnableTargetedUserProtection -EnableTargetedDomainsProtection $EnableTargetedDomainsProtection -EnableOrganizationDomainsProtection $EnableOrganizationDomainsProtection -TargetedDomainProtectionAction $TargetedDomainProtectionAction -EnableUnusualCharactersSafetyTips $EnableUnusualCharactersSafetyTips -PhishThresholdLevel $PhishThresholdLevel
+            New-AntiPhishPolicy -Name $PolicyName -AdminDisplayName $PolicyName -TargetedDomainsToProtect ((Get-AcceptedDomain).Name) -EnableMailboxIntelligenceProtection $EnableMailboxIntelligenceProtection -EnableFirstContactSafetyTips $EnableFirstContactSafetyTips -EnableMailboxIntelligence $EnableMailboxIntelligence -MailboxIntelligenceProtectionAction $MailboxIntelligenceProtectionAction -EnableSimilarDomainsSafetyTips $EnableSimilarDomainsSafetyTips -EnableSimilarUsersSafetyTips $EnableSimilarUsersSafetyTips -TargetedUserProtectionAction $TargetedUserProtectionAction -EnableTargetedUserProtection $EnableTargetedUserProtection -EnableTargetedDomainsProtection $EnableTargetedDomainsProtection -EnableOrganizationDomainsProtection $EnableOrganizationDomainsProtection -TargetedDomainProtectionAction $TargetedDomainProtectionAction -EnableUnusualCharactersSafetyTips $EnableUnusualCharactersSafetyTips -PhishThresholdLevel $PhishThresholdLevel
             New-AntiPhishRule -Name $RuleName -AntiPhishPolicy $PolicyName -Priority $Priority -RecipientDomainIs ((Get-AcceptedDomain).Name)
             Write-LogInfo "$PolicyName created"  
         } Catch {
@@ -105,7 +106,7 @@ $DomainOnM365=(Get-AcceptedDomain | Where-Object { $_.InitialDomain -match $true
         Try { 
             New-SafeAttachmentPolicy -Name $PolicyName -Enable $Enable -Action $Action -Redirect $Redirect -RedirectAddress "$Alias@$DomainOnM365"
             New-SafeAttachmentRule -Name $RuleName -SafeAttachmentPolicy $PolicyName -Priority $Priority -RecipientDomainIs ((Get-AcceptedDomain).Name)
-            Set-AtpPolicyForO365 -EnableATPForSPOTeamsODB $EnableATPForSPOTeamsODB -EnableSafeDocs $EnableSafeDocs -AllowSafeDocsOpen $AllowSafeDocsOpen
+            Set-AtpPolicyForO365 -EnableATPForSPOTeamsODB $EnableATPForSPOTeamsODB -EnableSafeDocs $EnableSafeDocs -AllowSafeDocsOpen $AllowSafeDocsOpen -WarningAction:SilentlyContinue
             Write-LogInfo "$PolicyName created"  
         } Catch {
                 Write-LogError "$PolicyName not created!" }

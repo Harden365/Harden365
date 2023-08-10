@@ -58,46 +58,39 @@ if ($reloadModules) {
 
 ## PREREQUISITES
 Test-AllPrerequisites -OperationCount $currentCountOfOperations -OperationTotal $totalCountofOperations
-$currentCountOfOperations++
+$currentCountOfOperaions++
 Import-AllScriptModules -OperationCount $currentCountOfOperations -OperationTotal $totalCountofOperations
 $currentCountOfOperations++
 
 ## CREDENTIALS
 write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline
-Write-Host("PLEASE CONNECT ACCOUNT WITH GLOBAL ADMINISTRATOR/READER ROLE WITHOUT MFA CONTROL") -ForegroundColor Yellow
+Write-Host("PLEASE CONNECT TO GRAPH WITH GLOBAL ADMIN OR GLOBAL READER") -ForegroundColor Yellow
 start-sleep -Seconds 1
-$ErrorActionPreference = "SilentlyContinue"
-$Credential = Get-Credential -Message "Global Administrator/Reader without MFA Control"
-if ($null -eq $Credential){
-Write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; write-Host("ACTION STOPPED BY USER") -ForegroundColor Red
-Pause;Break}
-try {
-Connect-AzureAD -Credential $Credential | Out-Null
-Get-AzureADTenantDetail | Out-Null 
-} catch {
-Write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; write-Host("USER/PASSWORD NOT VALID OR MFA ACTIVED") -ForegroundColor Red
-Pause;Break} 
+Connect-MgGraph -Scopes Directory.Read.All,RoleManagement.ReadWrite.Directory,User.ReadWrite.All,Group.ReadWrite.All,Application.Readwrite.All,UserAuthenticationMethod.ReadWrite.All,Policy.Read.All,Policy.ReadWrite.ConditionalAccess,AuditLog.Read.All,UserAuthenticationMethod.Read.All | Out-Null
 
-#TENANT DETAIL
-Connect-MsolService -Credential $Credential | Out-Null
+#GRAPH
 #TENANT NAME
-$TenantName = (Get-MsolDomain | Where-Object { $_.IsDefault -eq $true }).Name
+$TenantName = (Get-MgDomain | Where-Object { $_.IsDefault -eq $true }).Id
 #AZUREADEDITION
-if (((Get-MsolAccountSku | Where-Object { $_.ActiveUnits -ne "0" }| Select-Object -ExpandProperty ServiceStatus).ServicePlan).ServiceName -match "AAD_PREMIUM_P2")
+if (((Get-MgSubscribedSku | Where-Object { $_.CapabilityStatus -eq "Enabled" }).ServicePlans).ServicePlanName -match "AAD_PREMIUM_P2")
 { $TenantEdition = "Azure AD Premium P2"} 
-elseif (((Get-MsolAccountSku | Where-Object { $_.ActiveUnits -ne "0" } | Select-Object -ExpandProperty ServiceStatus).ServicePlan).ServiceName -match "AAD_PREMIUM")
+elseif (((Get-MgSubscribedSku | Where-Object { $_.CapabilityStatus -eq "Enabled" }).ServicePlans).ServicePlanName -match "AAD_PREMIUM")
 { $TenantEdition = "Azure AD Premium P1"} 
-elseif (((Get-MsolAccountSku | Where-Object { $_.ActiveUnits -ne "0" } | Select-Object -ExpandProperty ServiceStatus).ServicePlan).ServiceName -match "AAD_BASIC")
+elseif (((Get-MgSubscribedSku | Where-Object { $_.CapabilityStatus -eq "Enabled" }).ServicePlans).ServicePlanName -match "AAD_BASIC")
 { $TenantEdition = "Azure AD Basic"} 
+else
+{ $TenantEdition = "Azure AD Free" }
 #OFFICE365ATP
-if (((Get-MsolAccountSku | Where-Object { $_.ActiveUnits -ne "0" } | Select-Object -ExpandProperty ServiceStatus).ServicePlan).ServiceName -match "THREAT_INTELLIGENCE")
+if (((Get-MgSubscribedSku | Where-Object { $_.CapabilityStatus -eq "Enabled" }).ServicePlans).ServicePlanName -match "THREAT_INTELLIGENCE")
     { $O365ATP = "Defender for Office365 P2" }   
-elseif (((Get-MsolAccountSku | Where-Object { $_.ActiveUnits -ne "0" } | Select-Object -ExpandProperty ServiceStatus).ServicePlan).ServiceName -match "ATP_ENTERPRISE")
+elseif (((Get-MgSubscribedSku | Where-Object { $_.CapabilityStatus -eq "Enabled" }).ServicePlans).ServicePlanName -match "ATP_ENTERPRISE")
     { $O365ATP = "Defender for Office365 P1" }  
-elseif (((Get-MsolAccountSku | Where-Object { $_.ActiveUnits -ne "0" } | Select-Object -ExpandProperty ServiceStatus).ServicePlan).ServiceName -match "EOP_ENTERPRISE")
+elseif (((Get-MgSubscribedSku | Where-Object { $_.CapabilityStatus -eq "Enabled" }).ServicePlans).ServicePlanName -match "EOP_ENTERPRISE")
     { $O365ATP = "Exchange Online Protection" }  
+else
+{ $TenantEdition = "Azure AD Free" }
 
 
 ## RUN MAIN MENU
-MainMenu -Credential $Credential -TenantName $TenantName -TenantEdition $TenantEdition -O365ATP $O365ATP
+MainMenu -TenantName $TenantName -TenantEdition $TenantEdition -O365ATP $O365ATP
 

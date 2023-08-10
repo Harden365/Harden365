@@ -21,7 +21,6 @@ $allModulesPathList = @(
     'Harden365.AuditApplications'
     'Harden365.ConnectAllM365Services'
     'Harden365.AzureADAudit'
-    'Harden365.EXOAudit'
     'Harden365.MSOLAudit'
     'Harden365.SPOAudit'
     'Harden365.ExchangeOnline'
@@ -42,9 +41,8 @@ $allModulesPathList = @(
     'Harden365.DeviceScriptImport'
     'Harden365.DeviceCatalogImport'
     'Harden365.DeviceConfigImport'
-    'Harden365.MDERemoveDevice'
-    'Get-AADRolesAudit'
-    'Get-MSOAuditUsers'
+    'Harden365.Identity.Roles'
+    'Harden365.Identity.Users'
 
 
 )
@@ -113,7 +111,7 @@ function Test-AllPrerequisites {
         [int]$OperationTotal
     )
     Write-LogSection 'PREREQUISITES' -NoHostOutput
-    $numberOfPrerequisitesCheck = 10
+    $numberOfPrerequisitesCheck = 11
     $currentCountOfPrerequisitesCheck = 0
 
     Update-ProgressionBarOuterLoop -Activity 'Prerequisites check' -Status 'In progress' -OperationCount $OperationCount -OperationTotal $OperationTotal
@@ -151,7 +149,9 @@ function Test-AllPrerequisites {
     $currentCountOfPrerequisitesCheck++
     Test-PowerShellModule -ModuleName 'MicrosoftTeams' -ModuleVersion '4.2.0' -OperationCount $currentCountOfPrerequisitesCheck -OperationTotal $numberOfPrerequisitesCheck
     $currentCountOfPrerequisitesCheck++
-    Test-PowerShellModule -ModuleName 'ORCA' -ModuleVersion '2.1' -OperationCount $currentCountOfPrerequisitesCheck -OperationTotal $numberOfPrerequisitesCheck
+    Test-PowerShellModule -ModuleName 'ORCA' -ModuleVersion '2.5' -OperationCount $currentCountOfPrerequisitesCheck -OperationTotal $numberOfPrerequisitesCheck
+    $currentCountOfPrerequisitesCheck++
+    Test-PowerShellModule -ModuleName 'Microsoft.Graph' -ModuleVersion '2.1.0' -OperationCount $currentCountOfPrerequisitesCheck -OperationTotal $numberOfPrerequisitesCheck
     $currentCountOfPrerequisitesCheck++
     Update-ProgressionBarInnerLoop -Activity 'Prerequisite check' -Status 'Complete' -OperationCount $currentCountOfPrerequisitesCheck -OperationTotal $numberOfPrerequisitesCheck
 

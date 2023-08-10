@@ -1,0 +1,23 @@
+﻿# Disable JavaScript on Adobe Acrobat DC
+if ((Get-ChildItem -Path 'HKLM:\SOFTWARE\Policies\').Name -contains "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Adobe"){
+    if ((Get-ChildItem -Path 'HKLM:\SOFTWARE\Policies\Adobe\').Name -contains "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Adobe\Adobe Acrobat"){
+        if ($(Get-ItemProperty -Path "Registry::HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Adobe\Adobe Acrobat\DC\FeatureLockDown") -ne $null){
+            if (-not $(Get-ItemProperty -Path "Registry::HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Adobe\Adobe Acrobat\DC\FeatureLockDown").bDisableJavaScript) {
+            New-ItemProperty -Path 'HKLM:\SOFTWARE\Policies\Adobe\Adobe Acrobat\DC\FeatureLockDown' -Name 'bDisableJavaScript' -Value "1" -PropertyType DWORD -Force }
+        }else{
+            New-Item –Path 'HKLM:\SOFTWARE\Policies\Adobe\Adobe Acrobat\DC\FeatureLockDown'
+            New-ItemProperty -Path 'HKLM:\SOFTWARE\Policies\Adobe\Adobe Acrobat\DC\FeatureLockDown' -Name 'bDisableJavaScript' -Value "1" -PropertyType DWORD -Force
+            }
+    }
+}
+
+# Disable JavaScript on Adobe Reader DC
+if ((Get-ChildItem -Path 'HKLM:\SOFTWARE\Policies\').Name -contains "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Adobe"){
+    if ((Get-ChildItem -Path 'HKLM:\SOFTWARE\Policies\Adobe\').Name -contains "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Adobe\Acrobat Reader"){
+        if ($(Get-ItemProperty -Path "Registry::HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Adobe\Acrobat Reader\DC\FeatureLockDown") -ne $null){
+            if (-not $(Get-ItemProperty -Path "Registry::HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Adobe\Acrobat Reader\DC\FeatureLockDown").bDisableJavaScript) {
+            New-ItemProperty -Path 'HKLM:\SOFTWARE\Policies\Adobe\Acrobat Reader\DC\FeatureLockDown' -Name 'bDisableJavaScript' -Value "1" -PropertyType DWORD -Force }
+        }
+    }
+}
+
