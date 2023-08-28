@@ -94,10 +94,11 @@ $Users = Get-MgUser -all -Property UserPrincipalName, PasswordPolicies, DisplayN
 Write-LogInfo "$($Users.count) users imported"
 Write-LogInfo "Generating report"
 $Report = [System.Collections.Generic.List[Object]]::new()
+$i = 0
 ForEach ($user in $Users) {
     # LICENSES
-    If (Get-MgUserLicenseDetail -USerId $User.id) {
     $licenses = $null
+    If (Get-MgUserLicenseDetail -USerId $User.id) {
     $licenses = (Get-MgUserLicenseDetail -UserId $User.id).SkuPartNumber -join ", "
     ForEach ($item in $licenseHashTable.Values) {
         if ($Licenses -match $item.skupartnumber) {
@@ -180,6 +181,8 @@ ForEach ($user in $Users) {
             Authentication           = $methods
         }
     $report.Add($obj)
+    $i++
+    write-progress -Activity "Processing report..." -Status "Users: $i of $($Users.Count)" -percentComplete (($i / $Users.Count)  * 100)
     } 
 
 
