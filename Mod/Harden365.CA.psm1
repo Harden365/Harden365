@@ -191,7 +191,7 @@ Function Start-LegacyAuthPolicy {
 
 #SCRIPT
 $DomainOnM365=(Get-MgDomain | Where-Object { $_.IsInitial -eq $true }).Id
-$ExcludeCAGroup = (Get-MgGroup | Where-Object { $_.DisplayName -eq $GroupExclude }).Id
+$ExcludeCAGroup = (Get-MgGroup -All | Where-Object { $_.DisplayName -eq $GroupExclude }).Id
 $CondAccPol=Get-MgIdentityConditionalAccessPolicy -Filter "DisplayName eq '$name'"
 $idBriceGlass = (Get-MgUser -All | Where-Object { $_.UserPrincipalName -eq "brice.glass@$domainOnM365" }).Id
 $idBriceDouglass = (Get-MgUser -All | Where-Object { $_.UserPrincipalName -eq "brice.douglass@$domainOnM365" }).Id
@@ -364,7 +364,7 @@ Function Start-MFAUsers {
 
 
 #SCRIPT
-$ExcludeCAGroup = (Get-MgGroup | Where-Object { $_.DisplayName -eq $GroupExclude }).Id
+$ExcludeCAGroup = (Get-MgGroup -All | Where-Object { $_.DisplayName -eq $GroupExclude }).Id
 $DomainOnM365=(Get-MgDomain | Where-Object { $_.IsInitial -eq $true }).Id
 $CondAccPol=Get-MgIdentityConditionalAccessPolicy -Filter "DisplayName eq '$name'"
 $idBriceGlass = (Get-MgUser -All | Where-Object { $_.UserPrincipalName -eq "brice.glass@$domainOnM365" }).Id
@@ -472,7 +472,7 @@ Function Start-MFAGuests {
 
 
 #SCRIPT
-$ExcludeCAGroup = (Get-MgGroup | Where-Object { $_.DisplayName -eq $GroupExclude }).Id
+$ExcludeCAGroup = (Get-MgGroup -All | Where-Object { $_.DisplayName -eq $GroupExclude }).Id
 $DomainOnM365=(Get-MgDomain | Where-Object { $_.IsInitial -eq $true }).Id
 $CondAccPol=Get-MgIdentityConditionalAccessPolicy -Filter "DisplayName eq '$name'"
 $idBriceGlass = (Get-MgUser -All | Where-Object { $_.UserPrincipalName -eq "brice.glass@$domainOnM365" }).Id
@@ -558,7 +558,7 @@ Function Start-UnsupportedDevicePlatforms {
 
 
 #SCRIPT
-$ExcludeCAGroup = (Get-MgGroup | Where-Object { $_.DisplayName -eq $GroupExclude }).Id
+$ExcludeCAGroup = (Get-MgGroup -All | Where-Object { $_.DisplayName -eq $GroupExclude }).Id
 $DomainOnM365=(Get-MgDomain | Where-Object { $_.IsInitial -eq $true }).Id
 $CondAccPol=Get-MgIdentityConditionalAccessPolicy -Filter "DisplayName eq '$name'"
 $idBriceGlass = (Get-MgUser -All | Where-Object { $_.UserPrincipalName -eq "brice.glass@$domainOnM365" }).Id
