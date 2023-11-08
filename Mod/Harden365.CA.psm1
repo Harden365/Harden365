@@ -193,8 +193,8 @@ Function Start-LegacyAuthPolicy {
 $DomainOnM365=(Get-MgDomain | Where-Object { $_.IsInitial -eq $true }).Id
 $ExcludeCAGroup = (Get-MgGroup | Where-Object { $_.DisplayName -eq $GroupExclude }).Id
 $CondAccPol=Get-MgIdentityConditionalAccessPolicy -Filter "DisplayName eq '$name'"
-$idBriceGlass = (Get-MgUser | Where-Object { $_.UserPrincipalName -eq "brice.glass@$domainOnM365" }).Id
-$idBriceDouglass = (Get-MgUser | Where-Object { $_.UserPrincipalName -eq "brice.douglass@$domainOnM365" }).Id
+$idBriceGlass = (Get-MgUser -All | Where-Object { $_.UserPrincipalName -eq "brice.glass@$domainOnM365" }).Id
+$idBriceDouglass = (Get-MgUser -All | Where-Object { $_.UserPrincipalName -eq "brice.douglass@$domainOnM365" }).Id
     if (-not $CondAccPol){
         Try {
             $params = @{
@@ -282,8 +282,8 @@ $CARoles = @(
 
 $DomainOnM365=(Get-MgDomain | Where-Object { $_.IsInitial -eq $true }).Id
 $CondAccPol=Get-MgIdentityConditionalAccessPolicy -Filter "DisplayName eq '$name'"
-$idBriceGlass = (Get-MgUser | Where-Object { $_.UserPrincipalName -eq "brice.glass@$domainOnM365" }).Id
-$idBriceDouglass = (Get-MgUser | Where-Object { $_.UserPrincipalName -eq "brice.douglass@$domainOnM365" }).Id
+$idBriceGlass = (Get-MgUser -All | Where-Object { $_.UserPrincipalName -eq "brice.glass@$domainOnM365" }).Id
+$idBriceDouglass = (Get-MgUser -All | Where-Object { $_.UserPrincipalName -eq "brice.douglass@$domainOnM365" }).Id
     if (-not $CondAccPol){
         Try {
             $params = @{
@@ -367,8 +367,8 @@ Function Start-MFAUsers {
 $ExcludeCAGroup = (Get-MgGroup | Where-Object { $_.DisplayName -eq $GroupExclude }).Id
 $DomainOnM365=(Get-MgDomain | Where-Object { $_.IsInitial -eq $true }).Id
 $CondAccPol=Get-MgIdentityConditionalAccessPolicy -Filter "DisplayName eq '$name'"
-$idBriceGlass = (Get-MgUser | Where-Object { $_.UserPrincipalName -eq "brice.glass@$domainOnM365" }).Id
-$idBriceDouglass = (Get-MgUser | Where-Object { $_.UserPrincipalName -eq "brice.douglass@$domainOnM365" }).Id
+$idBriceGlass = (Get-MgUser -All | Where-Object { $_.UserPrincipalName -eq "brice.glass@$domainOnM365" }).Id
+$idBriceDouglass = (Get-MgUser -All | Where-Object { $_.UserPrincipalName -eq "brice.douglass@$domainOnM365" }).Id
 $CARoles = @(
 (Get-MgDirectoryRoleTemplate | Where-Object {$_.DisplayName -eq "Global Administrator"}).Id,
 (Get-MgDirectoryRoleTemplate | Where-Object {$_.DisplayName -eq "Global Reader"}).Id,
@@ -475,8 +475,8 @@ Function Start-MFAGuests {
 $ExcludeCAGroup = (Get-MgGroup | Where-Object { $_.DisplayName -eq $GroupExclude }).Id
 $DomainOnM365=(Get-MgDomain | Where-Object { $_.IsInitial -eq $true }).Id
 $CondAccPol=Get-MgIdentityConditionalAccessPolicy -Filter "DisplayName eq '$name'"
-$idBriceGlass = (Get-MgUser | Where-Object { $_.UserPrincipalName -eq "brice.glass@$domainOnM365" }).Id
-$idBriceDouglass = (Get-MgUser | Where-Object { $_.UserPrincipalName -eq "brice.douglass@$domainOnM365" }).Id
+$idBriceGlass = (Get-MgUser -All | Where-Object { $_.UserPrincipalName -eq "brice.glass@$domainOnM365" }).Id
+$idBriceDouglass = (Get-MgUser -All | Where-Object { $_.UserPrincipalName -eq "brice.douglass@$domainOnM365" }).Id
 
     if (-not $CondAccPol){
         Try {
@@ -561,8 +561,8 @@ Function Start-UnsupportedDevicePlatforms {
 $ExcludeCAGroup = (Get-MgGroup | Where-Object { $_.DisplayName -eq $GroupExclude }).Id
 $DomainOnM365=(Get-MgDomain | Where-Object { $_.IsInitial -eq $true }).Id
 $CondAccPol=Get-MgIdentityConditionalAccessPolicy -Filter "DisplayName eq '$name'"
-$idBriceGlass = (Get-MgUser | Where-Object { $_.UserPrincipalName -eq "brice.glass@$domainOnM365" }).Id
-$idBriceDouglass = (Get-MgUser | Where-Object { $_.UserPrincipalName -eq "brice.douglass@$domainOnM365" }).Id
+$idBriceGlass = (Get-MgUser -All | Where-Object { $_.UserPrincipalName -eq "brice.glass@$domainOnM365" }).Id
+$idBriceDouglass = (Get-MgUser -All | Where-Object { $_.UserPrincipalName -eq "brice.douglass@$domainOnM365" }).Id
     if (-not $CondAccPol){
         Try {
             $params = @{
@@ -646,8 +646,8 @@ Function Start-MobileDeviceAccessRequirements {
 #SCRIPT
 $DomainOnM365=(Get-MgDomain | Where-Object { $_.IsInitial -eq $true }).Id
 $CondAccPol=Get-MgIdentityConditionalAccessPolicy -Filter "DisplayName eq '$name'"
-$idBriceGlass = (Get-MgUser | Where-Object { $_.UserPrincipalName -eq "brice.glass@$domainOnM365" }).Id
-$idBriceDouglass = (Get-MgUser | Where-Object { $_.UserPrincipalName -eq "brice.douglass@$domainOnM365" }).Id
+$idBriceGlass = (Get-MgUser -All | Where-Object { $_.UserPrincipalName -eq "brice.glass@$domainOnM365" }).Id
+$idBriceDouglass = (Get-MgUser -All | Where-Object { $_.UserPrincipalName -eq "brice.douglass@$domainOnM365" }).Id
     if (-not $CondAccPol){
         Try {
                $params = @{
@@ -719,8 +719,8 @@ Function Start-MobileAppsandDesktopClients {
 #SCRIPT
 $DomainOnM365=(Get-MgDomain | Where-Object { $_.IsInitial -eq $true }).Id
 $CondAccPol=Get-MgIdentityConditionalAccessPolicy -Filter "DisplayName eq '$name'"
-$idBriceGlass = (Get-MgUser | Where-Object { $_.UserPrincipalName -eq "brice.glass@$domainOnM365" }).Id
-$idBriceDouglass = (Get-MgUser | Where-Object { $_.UserPrincipalName -eq "brice.douglass@$domainOnM365" }).Id
+$idBriceGlass = (Get-MgUser -All | Where-Object { $_.UserPrincipalName -eq "brice.glass@$domainOnM365" }).Id
+$idBriceDouglass = (Get-MgUser -All | Where-Object { $_.UserPrincipalName -eq "brice.douglass@$domainOnM365" }).Id
 $idTeamsService = (Get-MgServicePrincipal -Filter "DisplayName eq 'Microsoft Teams Services'").AppId
     if (-not $CondAccPol){
         Try {
@@ -799,8 +799,8 @@ if (((Get-MgSubscribedSku | Where-Object { $_.CapabilityStatus -eq "Enabled" }).
     { 
 $DomainOnM365=(Get-MgDomain | Where-Object { $_.IsInitial -eq $true }).Id
 $CondAccPol=Get-MgIdentityConditionalAccessPolicy -Filter "DisplayName eq '$name'"
-$idBriceGlass = (Get-MgUser | Where-Object { $_.UserPrincipalName -eq "brice.glass@$domainOnM365" }).Id
-$idBriceDouglass = (Get-MgUser | Where-Object { $_.UserPrincipalName -eq "brice.douglass@$domainOnM365" }).Id
+$idBriceGlass = (Get-MgUser -All | Where-Object { $_.UserPrincipalName -eq "brice.glass@$domainOnM365" }).Id
+$idBriceDouglass = (Get-MgUser -All | Where-Object { $_.UserPrincipalName -eq "brice.douglass@$domainOnM365" }).Id
 
     if (-not $CondAccPol){
         Try {
@@ -876,8 +876,8 @@ if (((Get-MgSubscribedSku | Where-Object { $_.CapabilityStatus -eq "Enabled" }).
     { 
 $DomainOnM365=(Get-MgDomain | Where-Object { $_.IsInitial -eq $true }).Id
 $CondAccPol=Get-MgIdentityConditionalAccessPolicy -Filter "DisplayName eq '$name'"
-$idBriceGlass = (Get-MgUser | Where-Object { $_.UserPrincipalName -eq "brice.glass@$domainOnM365" }).Id
-$idBriceDouglass = (Get-MgUser | Where-Object { $_.UserPrincipalName -eq "brice.douglass@$domainOnM365" }).Id
+$idBriceGlass = (Get-MgUser -All | Where-Object { $_.UserPrincipalName -eq "brice.glass@$domainOnM365" }).Id
+$idBriceDouglass = (Get-MgUser -All | Where-Object { $_.UserPrincipalName -eq "brice.douglass@$domainOnM365" }).Id
 
     if (-not $CondAccPol){
         Try {
