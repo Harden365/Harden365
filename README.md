@@ -22,9 +22,12 @@ Feel free to use it and adapt following your needs!
 
 ## PREREQUISITES
 Powershell version 5.1 required
+
 Required Disable Default Security
+
 https://docs.microsoft.com/en-us/azure/active-directory/fundamentals/concept-fundamentals-security-defaults
 
 ## INFOS
 Unblock the zip file before extracting
+
 After running debug.log trace modifications
