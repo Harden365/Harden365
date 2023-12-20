@@ -26,6 +26,8 @@ Powershell version 5.1 required
 Required Disable Default Security
 https://docs.microsoft.com/en-us/azure/active-directory/fundamentals/concept-fundamentals-security-defaults
 
+Keepass Default master password : Harden365
+
 ## INFOS
 Unblock the zip file before extracting
 
