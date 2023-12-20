@@ -64,7 +64,7 @@ $currentCountOfOperations++
 
 ## CREDENTIALS
 write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline
-Write-Host("PLEASE CONNECT TO GRAPH WITH GLOBAL ADMIN OR GLOBAL READER") -ForegroundColor Yellow
+Write-Host("PLEASE CONNECT TO GRAPH WITH GLOBAL ADMINISTRATOR") -ForegroundColor Yellow
 start-sleep -Seconds 1
 Connect-MgGraph -ContextScope Process -Scopes Directory.Read.All,RoleManagement.ReadWrite.Directory,User.ReadWrite.All,Group.ReadWrite.All,Application.Readwrite.All,UserAuthenticationMethod.ReadWrite.All,Policy.Read.All,Policy.ReadWrite.ConditionalAccess,AuditLog.Read.All,UserAuthenticationMethod.Read.All,PrivilegedAccess.ReadWrite.AzureADGroup,PrivilegedEligibilitySchedule.ReadWrite.AzureADGroup | Out-Null
 
