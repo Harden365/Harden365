@@ -47,7 +47,7 @@ Function Start-DefenderO365P1AntiPhishingPolicy {
     [Boolean]$EnableOrganizationDomainsProtection = $true,
     [String]$TargetedDomainProtectionAction = "Quarantine",
     [Boolean]$EnableUnusualCharactersSafetyTips = $true,
-    [String]$PhishThresholdLevel = "2",
+    [String]$PhishThresholdLevel = "3",
 	[String]$Priority = "0"
 )
 
