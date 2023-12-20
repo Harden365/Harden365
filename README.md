@@ -28,5 +28,6 @@ Required Disable Default Security
 https://docs.microsoft.com/en-us/azure/active-directory/fundamentals/concept-fundamentals-security-defaults
 
 ## INFOS
+Unblock the zip file before extracting
 
 After running debug.log trace modifications
