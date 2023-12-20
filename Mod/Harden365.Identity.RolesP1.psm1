@@ -1,32 +1,18 @@
-
+﻿
 ###################################################################
-## Get-MSOAuditUsers                                             ##
+## Get-AADRolesAudit                                             ##
 ## ---------------------------                                   ##
-## This function will audit users details in AAD                 ##
-## and export result in html and csv                             ##
+## This function will audit roles adminsitation in AAD           ##
+## and export result in html                                     ##
 ##                                                               ##
 ## Version: 01.00.000                                            ##
 ##  Author: contact@harden365.net                                ##
 ###################################################################
-Function Get-MSOAuditUsers {
-     <#
-        .Synopsis
-         Audit Users Details
-        
-        .Description
-         ## This function will audit users details in AAD and export result in html and csv
-        
-        .Notes
-         Version: 01.00 -- 
-         
-    #>
-
-Write-LogSection 'AUDIT USERS' -NoHostOutput
+Function Get-AADRolesAudit {
 
 #SCRIPT
-
+Write-LogSection 'AUDIT ROLES' -NoHostOutput
 $DomainOnM365 = (Get-MgDomain | Where-Object { $_.IsDefault -eq $true }).Id
-
 
 $header = @"
 <img src="https://hardenad.net/wp-content/uploads/2021/12/Logo-HARDEN-365-Horizontal-RVB@4x-300x85.png" alt="logoHarden365" class="centerImage" alt="CH Logo" height="85" width="300">
@@ -38,12 +24,6 @@ $header = @"
         text-align:center;
     }
     h2 {
-        font-family: Arial, Helvetica, sans-serif;
-        color: #000099;
-        font-size: 16px;
-        text-align:right;
-    }
-    h3 {
         font-family: Arial, Helvetica, sans-serif;
         color: #000099;
         font-size: 16px;
@@ -72,10 +52,16 @@ $header = @"
     tbody tr:nth-child(even) {
         background: #f0f0f2;
     }
+    .footer
+    { color:green;
+    margin-left:25px;
+    font-family:Tahoma;
+    font-size:8pt;
+    }
 </style>
 "@
 
-######################################################################
+#####################################################
 
 
 #IMPORT LICENSE SKU
@@ -89,6 +75,20 @@ $licenseHashTable = @{}
         "DisplayName" = $_.Product_Display_Name
     }
 }
+
+#IMPORT ROLE MEMBER
+Write-LogInfo "Import Assigned Roles"
+$roles = Get-MgDirectoryRole
+$rolemembers = [System.Collections.Generic.List[Object]]::new()
+foreach ($role in $roles) {
+        $obj = [pscustomobject][ordered]@{
+        "roleDisplayName" = $role.DisplayName
+        "roleId" = $role.id
+        "membersid" = (Get-MgDirectoryRoleMember -DirectoryRoleId $role.id).Id
+        }
+        $rolemembers.Add($obj)
+        }
+
 Write-LogInfo "Import All Users"
 $Users = Get-MgUser -all -Property UserPrincipalName, PasswordPolicies, DisplayName, id,OnPremisesSyncEnabled,lastPasswordChangeDateTime,SignInActivity,Authentication
 Write-LogInfo "$($Users.count) users imported"
@@ -97,8 +97,8 @@ $Report = [System.Collections.Generic.List[Object]]::new()
 $i = 0
 ForEach ($user in $Users) {
     # LICENSES
-    $licenses = $null
     If (Get-MgUserLicenseDetail -USerId $User.id) {
+    $licenses = $null
     $licenses = (Get-MgUserLicenseDetail -UserId $User.id).SkuPartNumber -join ", "
     ForEach ($item in $licenseHashTable.Values) {
         if ($Licenses -match $item.skupartnumber) {
@@ -106,6 +106,16 @@ ForEach ($user in $Users) {
             }
             }
     }
+
+    # ROLES
+    $AffectedRoles = $null
+    ForEach ($item in $rolemembers) {
+        if ($item.membersid -like $user.id) {
+            if ($AffectedRoles -eq $null) {
+            $AffectedRoles = $item.roleDisplayName} else {
+            $AffectedRoles = $AffectedRoles,$item.roleDisplayName -join ", "}
+            }
+            }
 
     # METHODS
                 try {
@@ -173,6 +183,7 @@ ForEach ($user in $Users) {
     $obj = [pscustomobject][ordered]@{
             DisplayName              = $user.DisplayName
             UserPrincipalName        = $user.UserPrincipalName
+            Roles                    = $affectedRoles
             Licenses                 = $licenses
             Sync                     = if ($user.OnPremisesSyncEnabled) {"true"} else {"false"}
             passwordneverExpires     = ($user | Select-Object @{N="PasswordNeverExpires";E={$_.PasswordPolicies -contains "DisablePasswordExpiration"}}).PasswordNeverExpires
@@ -188,24 +199,23 @@ ForEach ($user in $Users) {
     } 
 
 
-######################################################################
+
+#####################################################
 
 
-     
 $dateFileString = Get-Date -Format "FileDateTimeUniversal"
 mkdir -Force ".\Audit" | Out-Null
-$Report | Sort-Object  UserPrincipalName | Select-object DisplayName,UserPrincipalName,Licenses,Sync,passwordneverExpires,LastSignInDate,LastPasswordChange ,Authentication `
- | Export-Csv -Path ".\Audit\AuditUsersDetails$dateFileString.csv" -Delimiter ';' -Encoding UTF8 -NoTypeInformation
+$Report | Where-Object {$_.Roles -ne $null} | Sort-Object  UserPrincipalName | Select-object DisplayName,UserPrincipalName,Roles,Licenses,Sync,passwordneverExpires,LastSignInDate,LastPasswordChange ,Authentication `
+ | Export-Csv -Path ".\Audit\AuditAdminsDetails$dateFileString.csv" -Delimiter ';' -Encoding UTF8 -NoTypeInformation
 
 
 #GENERATE HTML
-$Report | Sort-Object  UserPrincipalName | Select-object DisplayName,UserPrincipalName,Licenses,Sync,passwordneverExpires,LastSignInDate,LastPasswordChange ,Authentication `
- | ConvertTo-Html -Property DisplayName,UserPrincipalName,Licenses,Sync,passwordneverExpires,LastSignInDate,LastPasswordChange ,Authentication `
-    -PreContent "<h1>Audit Identity Users</h1>" "<h2>$DomainOnM365</h2>" -Head $Header -PostContent "<h2>$(Get-Date)</h2>"`
-    | Out-File .\Audit\Harden365-AuditUsersDetails$dateFileString.html
+$Report | Where-Object {$_.Roles -ne $null} | Sort-Object  UserPrincipalName | Select-object DisplayName,UserPrincipalName,Roles,Licenses,Sync,passwordneverExpires,LastSignInDate,LastPasswordChange ,Authentication `
+ | ConvertTo-Html -Property DisplayName,UserPrincipalName,Roles,Licenses,Sync,passwordneverExpires,LastSignInDate,LastPasswordChange ,Authentication `
+    -PreContent "<h1>Audit Identity Admins</h1>" "<h2>$DomainOnM365</h2>" -Head $Header -PostContent "<h2>$(Get-Date)</h2>"`
+    | Out-File .\Audit\Harden365-AuditAdminsDetails$dateFileString.html
 
-Invoke-Expression .\Audit\Harden365-AuditUsersDetails$dateFileString.html 
-Write-LogInfo "Audit Identity Users generated in folder .\Audit"
+Invoke-Expression .\Audit\Harden365-AuditAdminsDetails$dateFileString.html 
+Write-LogInfo "Audit Identity Admins generated in folder .\Audit"
 Write-LogSection '' -NoHostOutput 
 }
-

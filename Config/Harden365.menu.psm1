@@ -114,7 +114,6 @@ $MainMenu = CreateMenu -TenantName $TenantName -TenantEdition $TenantEdition -Te
       DeviceMenu
       }
     5{
-      Disconnect-MgGraph
       Break
       }
     Default{
@@ -146,13 +145,19 @@ $AuditMenu = CreateMenu -MenuTitle "HARDEN 365 - AUDIT" -MenuOptions @("Audit Mi
                 write-host $FrontStyle -ForegroundColor Red
                 write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; write-host("AUDIT ADMINISTRATION ROLES") -ForegroundColor Red
                 write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; Write-host ('Connected to Graph') -ForegroundColor Green
-                $scriptFunctions=(Get-ChildItem function: | Where-Object { $_.source -match 'Harden365.Identity.Roles'})
+                if ( $TenantEdition = "Azure AD Premium P2"){
+                    $scriptFunctions=(Get-ChildItem function: | Where-Object { $_.source -match 'Harden365.Identity.RolesP2'})
+                    }
+                else {
+                    $scriptFunctions=(Get-ChildItem function: | Where-Object { $_.source -match 'Harden365.Identity.RolesP1'})
+                    }
                 $scriptFunctions | ForEach-Object {
                 Try { 
                 & $_.Name -ErrorAction:SilentlyContinue | Out-Null } Catch {}
                 }
                 Read-Host -Prompt "Press Enter to return_"
-                AuditMenu -Credential $Credential
+                Clear-Host
+                AuditMenu
       }
     2{
                 write-host $FrontStyle -ForegroundColor Red

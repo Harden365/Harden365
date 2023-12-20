@@ -100,13 +100,17 @@ $MailboxCollection = Get-Mailbox -ResultSize Unlimited
 
 $Permissions = @()
 $Permissions = Get-Mailbox -ResultSize Unlimited | where-object {$_.RecipientTypeDetails -ne 'DiscoveryMailbox'} | ForEach-Object { Get-MailboxPermission -Identity $_.UserPrincipalName | where-object {$_.User -ne 'NT AUTHORITY\SELF'} | select-object Identity,AccessRights,User}
-
+$i = 0
 foreach ($item in $Permissions) {
     foreach ($obj in $item) {
         $obj | Add-Member -MemberType NoteProperty -Name 'Type' -Value ($MailboxCollection | Where-Object { $_.Name -eq $obj.Identity }).RecipientTypeDetails
         $obj | Add-Member -MemberType NoteProperty -Name 'Name' -Value ($MailboxCollection | Where-Object { $_.Name -eq $obj.Identity }).Name
         $obj | Add-Member -MemberType NoteProperty -Name 'UserPrincipalName' -Value ($MailboxCollection | Where-Object { $_.Name -eq $obj.Identity }).UserPrincipalName
         }
+        $i++
+        $percentComplete = [math]::Round(($i/$Permissions.count)*100,2)
+        write-progress -Activity "Processing report..." -Status "Mailboxes: $i of $($Permissions.Count)" -percentComplete $percentComplete
+        write-progress -Activity "Processing report..." -status "Mailboxes: $i" -Completed
         }
 
 

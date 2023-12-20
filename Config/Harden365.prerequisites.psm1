@@ -41,7 +41,8 @@ $allModulesPathList = @(
     'Harden365.DeviceScriptImport'
     'Harden365.DeviceCatalogImport'
     'Harden365.DeviceConfigImport'
-    'Harden365.Identity.Roles'
+    'Harden365.Identity.RolesP1'
+    'Harden365.Identity.RolesP2'
     'Harden365.Identity.Users'
 
 
