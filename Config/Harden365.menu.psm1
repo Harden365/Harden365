@@ -33,7 +33,7 @@ $FrontStyle = "    _____________________________________________________________
     if ($TenantDetail -eq $True) {
         write-Host "    Tenant               = " -NoNewline -ForegroundColor Red
         write-Host "$TenantName" -ForegroundColor Yellow
-        write-Host "    AzureAD Edition      = " -NoNewline -ForegroundColor Red
+        write-Host "    Entra Edition        = " -NoNewline -ForegroundColor Red
         write-Host "$TenantEdition"
         write-Host "    DefenderO365 Edition = " -NoNewline -ForegroundColor Red
         write-Host "$O365ATP"
@@ -99,7 +99,7 @@ function MainMenu(){
 $MainMenu = CreateMenu -TenantName $TenantName -TenantEdition $TenantEdition -TenantDetail $true -O365ATP $O365ATP -MenuOptions @("Audit","Identity","Messaging","Application","Device","Quit")
     switch($MainMenu){
     0{
-      AuditMenu
+      AuditMenu -TenantEdition $TenantEdition
       }
     1{
       IdentityMenu
@@ -124,7 +124,9 @@ $MainMenu = CreateMenu -TenantName $TenantName -TenantEdition $TenantEdition -Te
 
 function AuditMenu(){
     Param(
-        [System.Management.Automation.PSCredential]$Credential
+        [System.Management.Automation.PSCredential]$Credential,
+        [String]$TenantEdition
+
     )
 
 $AuditMenu = CreateMenu -MenuTitle "HARDEN 365 - AUDIT" -MenuOptions @("Audit Microsoft Defender for O365 with ORCA","Audit Administration Roles","Audit Identity Users","Audit Autoforwarding","Audit Mailbox Permissions","Check DNS Records","<- Return")
@@ -145,11 +147,12 @@ $AuditMenu = CreateMenu -MenuTitle "HARDEN 365 - AUDIT" -MenuOptions @("Audit Mi
                 write-host $FrontStyle -ForegroundColor Red
                 write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; write-host("AUDIT ADMINISTRATION ROLES") -ForegroundColor Red
                 write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; Write-host ('Connected to Graph') -ForegroundColor Green
-                if ( $TenantEdition = "Azure AD Premium P2"){
-                    $scriptFunctions=(Get-ChildItem function: | Where-Object { $_.source -match 'Harden365.Identity.RolesP2'})
+                write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; Write-host ("EntraID Edition : $TenantEdition") -ForegroundColor Green
+                if ( $TenantEdition -eq "Entra ID P2"){
+                    $scriptFunctions=(Get-ChildItem function: | Where-Object { $_.Name -match 'Get-AADRolesAuditP2'})
                     }
                 else {
-                    $scriptFunctions=(Get-ChildItem function: | Where-Object { $_.source -match 'Harden365.Identity.RolesP1'})
+                    $scriptFunctions=(Get-ChildItem function: | Where-Object { $_.Name -match 'Get-AADRolesAuditP1'})
                     }
                 $scriptFunctions | ForEach-Object {
                 Try { 

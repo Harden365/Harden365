@@ -80,13 +80,13 @@ if ($null -eq $context) {
 $TenantName = (Get-MgDomain | Where-Object { $_.IsDefault -eq $true }).Id
 #AZUREADEDITION
 if (((Get-MgSubscribedSku | Where-Object { $_.CapabilityStatus -eq "Enabled" }).ServicePlans).ServicePlanName -match "AAD_PREMIUM_P2")
-{ $TenantEdition = "Azure AD Premium P2"} 
+{ $TenantEdition = "Entra ID P2"} 
 elseif (((Get-MgSubscribedSku | Where-Object { $_.CapabilityStatus -eq "Enabled" }).ServicePlans).ServicePlanName -match "AAD_PREMIUM")
-{ $TenantEdition = "Azure AD Premium P1"} 
+{ $TenantEdition = "Entra ID P1"} 
 elseif (((Get-MgSubscribedSku | Where-Object { $_.CapabilityStatus -eq "Enabled" }).ServicePlans).ServicePlanName -match "AAD_BASIC")
-{ $TenantEdition = "Azure AD Basic"} 
+{ $TenantEdition = "Entra ID  Basic"} 
 else
-{ $TenantEdition = "Azure AD Free" }
+{ $TenantEdition = "Entra ID  Free" }
 #OFFICE365ATP
 if (((Get-MgSubscribedSku | Where-Object { $_.CapabilityStatus -eq "Enabled" }).ServicePlans).ServicePlanName -match "THREAT_INTELLIGENCE")
     { $O365ATP = "Defender for Office365 P2" }   
@@ -95,7 +95,7 @@ elseif (((Get-MgSubscribedSku | Where-Object { $_.CapabilityStatus -eq "Enabled"
 elseif (((Get-MgSubscribedSku | Where-Object { $_.CapabilityStatus -eq "Enabled" }).ServicePlans).ServicePlanName -match "EOP_ENTERPRISE")
     { $O365ATP = "Exchange Online Protection" }  
 else
-{ $TenantEdition = "Azure AD Free" }
+{ $O365ATP = "No protection" }
 
 
 ## RUN MAIN MENU
