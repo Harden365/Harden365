@@ -202,7 +202,8 @@ $idBriceDouglass = (Get-MgUser -All | Where-Object { $_.UserPrincipalName -eq "b
 	                state = "disabled"
 	                conditions = @{
 		                clientAppTypes = @(
-                            "all"
+                            		"exchangeActiveSync",
+			      		"other"
 		                )
 		                applications = @{
 			                includeApplications = @(
