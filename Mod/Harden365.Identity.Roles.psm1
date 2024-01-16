@@ -66,7 +66,7 @@ $header = @"
 
 
 #IMPORT LICENSE SKU
-Write-LogInfo "import all Sku/productNames Licensing"
+Write-LogInfo "Import all Sku/productNames Licensing"
 $licenseCsvURL = 'https://download.microsoft.com/download/e/3/e/e3e9faf2-f28b-490a-9ada-c6089a1fc5b0/Product%20names%20and%20service%20plan%20identifiers%20for%20licensing.csv'
 $licenseHashTable = @{}
 (Invoke-WebRequest -Uri $licenseCsvURL).ToString() | ConvertFrom-Csv | ForEach-Object {
@@ -205,19 +205,19 @@ ForEach ($user in $Users) {
 
 
 $dateFileString = Get-Date -Format "FileDateTimeUniversal"
-mkdir -Force ".\Audit" | Out-Null
+
 $Report | Where-Object {$null -ne $_.Roles} | Sort-Object  UserPrincipalName | Select-object DisplayName,UserPrincipalName,Roles,Licenses,Sync,passwordneverExpires,LastSignInDate,LastPasswordChange ,Authentication `
- | Export-Csv -Path ".\Audit\AuditAdminsDetails$dateFileString.csv" -Delimiter ';' -Encoding UTF8 -NoTypeInformation
+ | Export-Csv -Path ".\$DomainOnM365\AuditAdminsDetails$dateFileString.csv" -Delimiter ';' -Encoding UTF8 -NoTypeInformation
 
 
 #GENERATE HTML
 $Report | Where-Object {$null -ne $_.Roles} | Sort-Object  UserPrincipalName | Select-object DisplayName,UserPrincipalName,Roles,Licenses,Sync,passwordneverExpires,LastSignInDate,LastPasswordChange ,Authentication `
  | ConvertTo-Html -Property DisplayName,UserPrincipalName,Roles,Licenses,Sync,passwordneverExpires,LastSignInDate,LastPasswordChange ,Authentication `
     -PreContent "<h1>Audit Identity Admins</h1>" "<h2>$DomainOnM365</h2>" -Head $Header -PostContent "<h2>$(Get-Date)</h2>"`
-    | Out-File .\Audit\Harden365-AuditAdminsDetails$dateFileString.html
+    | Out-File .\$DomainOnM365\Harden365-AuditAdminsDetails$dateFileString.html
 
-Invoke-Expression .\Audit\Harden365-AuditAdminsDetails$dateFileString.html 
-Write-LogInfo "Audit Identity Admins generated in folder .\Audit"
+Invoke-Expression .\$DomainOnM365\Harden365-AuditAdminsDetails$dateFileString.html 
+Write-LogInfo "Audit Identity Admins generated in folder .\$DomainOnM365"
 Write-LogSection '' -NoHostOutput 
 }
 
@@ -278,7 +278,7 @@ $header = @"
 
 
 #IMPORT LICENSE SKU
-Write-LogInfo "import all Sku/productNames Licensing"
+Write-LogInfo "Import all Sku/productNames Licensing"
 $licenseCsvURL = 'https://download.microsoft.com/download/e/3/e/e3e9faf2-f28b-490a-9ada-c6089a1fc5b0/Product%20names%20and%20service%20plan%20identifiers%20for%20licensing.csv'
 $licenseHashTable = @{}
 (Invoke-WebRequest -Uri $licenseCsvURL).ToString() | ConvertFrom-Csv | ForEach-Object {
@@ -497,18 +497,18 @@ ForEach ($user in $Users) {
 
 
 $dateFileString = Get-Date -Format "FileDateTimeUniversal"
-mkdir -Force ".\Audit" | Out-Null
+
 $Report | Where-Object {$null -ne $_.Roles} | Sort-Object  UserPrincipalName | Select-object DisplayName,UserPrincipalName,Roles,RolesType,RolesEndDate,Licenses,Sync,passwordneverExpires,LastSignInDate,LastPasswordChange ,Authentication `
- | Export-Csv -Path ".\Audit\AuditAdminsDetails$dateFileString.csv" -Delimiter ';' -Encoding UTF8 -NoTypeInformation
+ | Export-Csv -Path ".\$DomainOnM365\AuditAdminsDetails$dateFileString.csv" -Delimiter ';' -Encoding UTF8 -NoTypeInformation
 
 
 #GENERATE HTML
 $Report | Where-Object {$null -ne $_.Roles} | Sort-Object  UserPrincipalName | Select-object DisplayName,UserPrincipalName,Roles,RolesType,RolesEndDate,Licenses,Sync,passwordneverExpires,LastSignInDate,LastPasswordChange ,Authentication `
  | ConvertTo-Html -Property DisplayName,UserPrincipalName,Roles,RolesType,RolesEndDate,Licenses,Sync,LastSignInDate,Authentication `
     -PreContent "<h1>Audit Identity Admins</h1>" "<h2>$DomainOnM365</h2>" -Head $Header -PostContent "<h2>$(Get-Date)</h2>"`
-    | Out-File .\Audit\Harden365-AuditAdminsDetails$dateFileString.html
+    | Out-File .\$DomainOnM365\Harden365-AuditAdminsDetails$dateFileString.html
 
-Invoke-Expression .\Audit\Harden365-AuditAdminsDetails$dateFileString.html 
-Write-LogInfo "Audit Identity Admins generated in folder .\Audit"
+Invoke-Expression .\$DomainOnM365\Harden365-AuditAdminsDetails$dateFileString.html 
+Write-LogInfo "Audit Identity Admins generated in folder .\$DomainOnM365"
 Write-LogSection '' -NoHostOutput 
 }

@@ -39,12 +39,10 @@ Function Start-AuditSPFDKIMDMARC {
 Write-LogSection 'SPF - DKIM - DMARC' -NoHostOutput
 
 #SCRIPT
-
+$DomainOnM365 = (Get-MgDomain | Where-Object { $_.IsDefault -eq $true }).Id
 $dateFileString = Get-Date -Format 'FileDateTimeUniversal'
-$debugFolderPath = Join-Path $pwd 'Audit'
-if (!(Test-Path -Path $debugFolderPath)) {
-    New-Item -Path $pwd -Name 'Audit' -ItemType Directory > $null
-}
+$debugFolderPath = Join-Path $pwd "$DomainOnM365"
+
 $debugFileFullPath = Join-Path $debugFolderPath "CheckDNS$dateFileString.log"
 "$(Get-Date -UFormat "%m-%d-%Y %T ") **** SPF - DKIM - DMARC" | Out-File "$debugFileFullPath" -Append
 
@@ -78,7 +76,7 @@ foreach ($Domain in $Domains) {
             Write-LogInfo "$Domain : Check DMARC - $DMARCResultesStrings"
         }
           }
-Write-LogInfo "Audit file generated in folder .\Audit"   
+Write-LogInfo "Audit file generated in folder .\$DomainOnM365"   
 }
 
 
@@ -101,7 +99,7 @@ Function Start-DKIMConfig {
 )
 
 #SCRIPT DKIM
-
+$DomainOnM365 = (Get-MgDomain | Where-Object { $_.IsDefault -eq $true }).Id
 $Domains=(Get-AcceptedDomain | Where-Object { $_.DomainName -notmatch "onmicrosoft.com"}).Name
 $DKIMResults = @()
 foreach ($Domain in $Domains){
@@ -110,7 +108,7 @@ foreach ($Domain in $Domains){
                                 $exportconfig = $true
                                 New-DkimSigningConfig -DomainName $Domain -Enabled $false
                                 Write-LogInfo "$Domain : Setting DKIM configuration"
-                                Write-LogInfo "$Domain : Please get file csv in folder .\Output and insert records in Domain Registrar"
+                                Write-LogInfo "$Domain : Please get file csv in folder .\$DomainOnM365 and add records in Domain Registrar"
                                 }
                                 else {
                              if ((Get-DkimSigningConfig -Identity $Domain).Status -eq "Valid"){
@@ -124,12 +122,12 @@ foreach ($Domain in $Domains){
                                 
                              if ($null -ne $DKIMResults){
                                 $exportconfig = $true
-                                Write-LogWarning "Please get file csv in folder .\Output and insert records in Domain Registrar for $DKIMResults"
+                                Write-LogWarning "Please get file csv in folder .\$DomainOnM365 and add records in Domain Registrar for $DKIMResults"
                                 }
                                 
 
                     if ($exportconfig -eq $true) {
-                    mkdir -Force ".\Output" | Out-Null
+
                     $DKIMRecords=(Get-DkimSigningConfig | Where-Object { $_.Identity -notmatch "onmicrosoft.com"} | Select-object Domain,Selector1CNAME,Selector2CNAME)
                     $Export = foreach ($DKIMRecords in $DKIMRecords) {
                     [PSCustomObject]@{
@@ -139,7 +137,7 @@ foreach ($Domain in $Domains){
                     Value2 = $DKIMRecords.Selector2CNAME
                     }
                     }
-                    $Export | Select-object "CNAME1","Value1","CNAME2","Value2" | Export-Csv -Path `.\Output\DNSRecord_DKIM.csv -Delimiter ';' -Encoding UTF8 -NoTypeInformation
+                    $Export | Select-object "CNAME1","Value1","CNAME2","Value2" | Export-Csv -Path ".\$DomainOnM365\DNSRecord_DKIM.csv" -Delimiter ';' -Encoding UTF8 -NoTypeInformation
                     }
           
 
@@ -150,13 +148,13 @@ foreach ($Domain in $Domains) {
         If ($Null -eq $DMARCResultes){
             $exportcsvdmarc = $true
             Write-LogInfo "$Domain : No DMARC - Export csv"
-            Write-LogWarning "$Domain : Please get file csv in folder .\Output and insert records in Domain Registrar"
+            Write-LogWarning "$Domain : Please get file csv in folder .\$DomainOnM365 and insert records in Domain Registrar"
             $DMARCRecords.Add("_dmarc.$Domain","v=DMARC1; p=none; pct=100; rua=mailto:d@$Domain; fo=1")
                         }
         }
 if ($exportcsvdmarc -eq $true) {
-mkdir -Force ".\Output" | Out-Null
-$DMARCRecords.keys | Select-Object @{l='Record';e={$_}},@{l='Value';e={$DMARCRecords.$_}} | Export-Csv -Path `.\Output\DNSRecord_DMARC.csv -Delimiter ';' -Encoding UTF8 -NoTypeInformation}
+
+$DMARCRecords.keys | Select-Object @{l='Record';e={$_}},@{l='Value';e={$DMARCRecords.$_}} | Export-Csv -Path ".\$DomainOnM365\DNSRecord_DMARC.csv" -Delimiter ';' -Encoding UTF8 -NoTypeInformation}
 else {
 Write-LogInfo "$Domain : DMARC - Already created"}
         

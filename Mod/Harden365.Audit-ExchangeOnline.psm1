@@ -39,10 +39,9 @@ Function Start-EOPCheckAutoForward {
 #SCRIPT
 
             $dateFileString = Get-Date -Format 'FileDateTimeUniversal'
-            $debugFolderPath = Join-Path $pwd 'Audit'
-            if (!(Test-Path -Path $debugFolderPath)) {
-              New-Item -Path $pwd -Name 'Audit' -ItemType Directory > $null
-            }
+            $DomainOnM365 = (Get-MgDomain | Where-Object { $_.IsDefault -eq $true }).Id
+            $debugFolderPath = Join-Path $pwd "$DomainOnM365"
+
             $debugFileFullPath = Join-Path $debugFolderPath "CheckAutoforward$dateFileString.log"
             "$(Get-Date -UFormat "%m-%d-%Y %T ") **** AUTOFORWARDING" | Out-File "$debugFileFullPath" -Append
 
@@ -74,7 +73,7 @@ Function Start-EOPCheckAutoForward {
             "$(Get-Date -UFormat "%m-%d-%Y %T ") - Mailbox '$($rule.MailboxOwnerId)' forward to '$($rule.ForwardTo)$($rule.RedirectTo)'" | Out-File "$debugFileFullPath" -Append
             Write-LogWarning "Mailbox '$($rule.MailboxOwnerId)' forward to '$($rule.ForwardTo)$($rule.RedirectTo)'"
             }
-Write-LogInfo "Audit file generated in folder .\Audit"            
+Write-LogInfo "Audit file generated in folder .\$DomainOnM365"            
 }
 
 
@@ -95,6 +94,7 @@ Function Start-EOPCheckPermissionsMailbox {
 )
 
 #SCRIPT
+$DomainOnM365 = (Get-MgDomain | Where-Object { $_.IsDefault -eq $true }).Id
 $MailboxCollection = @()
 $MailboxCollection = Get-Mailbox -ResultSize Unlimited
 
@@ -118,9 +118,8 @@ foreach ($item in $Permissions) {
 # Export CSV
 Write-Loginfo "Check permissions in all mailbox"
 $dateFileString = Get-Date -Format "FileDateTimeUniversal"
-mkdir -Force ".\Audit" | Out-Null
-$Permissions | Select-Object Name,UserprincipalName,Type,AccessRights,User | Export-Csv -Path ".\Audit\AuditMailboxPermission$dateFileString.csv" -Delimiter ';' -Encoding UTF8 -NoTypeInformation
-Write-LogInfo "Audit file generated in folder .\Audit"      
+$Permissions | Select-Object Name,UserprincipalName,Type,AccessRights,User | Export-Csv -Path ".\$DomainOnM365\AuditMailboxPermission$dateFileString.csv" -Delimiter ';' -Encoding UTF8 -NoTypeInformation
+Write-LogInfo "Audit file generated in folder .\$DomainOnM365"      
 }
 
 
@@ -141,6 +140,7 @@ Function Start-EOPCheckPermissionsCalendar {
 )
 
 #SCRIPT
+$DomainOnM365 = (Get-MgDomain | Where-Object { $_.IsDefault -eq $true }).Id
 $CalendarPermissions=Get-Mailbox -ResultSize Unlimited | where-object {$_.RecipientTypeDetails -ne 'DiscoveryMailbox'} | ForEach-Object {
         Get-MailboxFolderPermission -Identity "$($_.PrimarySMTPAddress):\Calendrier"  -WarningAction:SilentlyContinue | Where-Object {$_.User.DisplayName -ne "Par Défaut" -and $_.User.DisplayName -ne "Anonyme"}
         Write-LogInfo " Check calendar permission for $_"
@@ -150,8 +150,8 @@ $CalendarPermissions=Get-Mailbox -ResultSize Unlimited | where-object {$_.Recipi
 Write-Loginfo "Check permissions in all Calendars"
 $dateFileString = Get-Date -Format "FileDateTimeUniversal"
 mkdir -Force ".\Audit" | Out-Null
-$CalendarPermissions | Select-Object Identity,User,AccessRights | Export-Csv -Path ".\Audit\AuditCalendarPermission$dateFileString.csv" -Delimiter ';' -Encoding UTF8 -NoTypeInformation
-Write-LogInfo "Audit file generated in folder .\Audit"      
+$CalendarPermissions | Select-Object Identity,User,AccessRights | Export-Csv -Path ".\$DomainOnM365\AuditCalendarPermission$dateFileString.csv" -Delimiter ';' -Encoding UTF8 -NoTypeInformation
+Write-LogInfo "Audit file generated in folder .\$DomainOnM365"      
 }
 
 
@@ -172,6 +172,7 @@ Function Start-EOPCheckPermissionsContacts {
 )
 
 #SCRIPT
+$DomainOnM365 = (Get-MgDomain | Where-Object { $_.IsDefault -eq $true }).Id
 $ContactPermissions=Get-Mailbox -ResultSize Unlimited | where-object {$_.RecipientTypeDetails -ne 'DiscoveryMailbox'} | ForEach-Object {
         Get-MailboxFolderPermission -Identity "$($_.PrimarySMTPAddress):\Contacts"  -WarningAction:SilentlyContinue | Where-Object {$_.User.DisplayName -ne "Par Défaut" -and $_.User.DisplayName -ne "Anonyme"}
         Write-LogInfo " Check contacts permission for $_"
@@ -181,6 +182,6 @@ $ContactPermissions=Get-Mailbox -ResultSize Unlimited | where-object {$_.Recipie
 Write-Loginfo "Check permissions in all Contacts"
 $dateFileString = Get-Date -Format "FileDateTimeUniversal"
 mkdir -Force ".\Audit" | Out-Null
-$ContactPermissions | Select-Object Identity,User,AccessRights | Export-Csv -Path ".\Audit\AuditContactPermission$dateFileString.csv" -Delimiter ';' -Encoding UTF8 -NoTypeInformation
-Write-LogInfo "Audit file generated in folder .\Audit"      
+$ContactPermissions | Select-Object Identity,User,AccessRights | Export-Csv -Path ".\$DomainOnM365\AuditContactPermission$dateFileString.csv" -Delimiter ';' -Encoding UTF8 -NoTypeInformation
+Write-LogInfo "Audit file generated in folder .\$DomainOnM365"      
 }

@@ -93,12 +93,13 @@ Function Start-OUTCheckAddIns {
 Write-LogSection 'OUTLOOK' -NoHostOutput
 
 #SCRIPT
-mkdir -Force ".\Audit" | Out-Null
+$DomainOnM365 = (Get-MgDomain | Where-Object { $_.IsDefault -eq $true }).Id
+
 $dateFileString = Get-Date -Format "FileDateTimeUniversal"
     Get-Mailbox -ResultSize Unlimited | where-object {$_.RecipientTypeDetails -ne 'DiscoveryMailbox'} | ForEach-Object {
         (Get-App -Mailbox $_.PrimarySMTPAddress  | where-object {($_.Type -eq 'MarketPlace') -and ($_.Enabled -eq $true)} | Select-Object MailboxOwnerId,DisplayName,Appversion)
-    } | Export-Csv -Path ".\Audit\AuditOutlookAddIns$dateFileString.csv" -Delimiter ';' -Encoding UTF8 -NoTypeInformation 
-Write-LogInfo "Audit Outlook AddIns generated in folder .\Audit"      
+    } | Export-Csv -Path ".\$DomainOnM365\AuditOutlookAddIns$dateFileString.csv" -Delimiter ';' -Encoding UTF8 -NoTypeInformation 
+Write-LogInfo "Audit Outlook AddIns generated in folder .\$DomainOnM365"      
 }
 
 Function Start-TEAAudit {
@@ -115,7 +116,8 @@ Function Start-TEAAudit {
     #>
 
 Write-LogInfo "**** AUDIT APPLICATION TEAMS"
-
+try { Get-CsTenant -Erroraction Stop | Out-Null 
+             } catch { Connect-MicrosoftTeams -Erroraction silentlyContinue | Out-Null }
 
 <#LEGACY AUTHENTIFICATION
 if ($(Get-CsOAuthConfiguration).ClientAdalAuthOverride -eq "Disallowed") { 
@@ -222,8 +224,14 @@ else {Write-LogInfo "Standard users already disabled to create trial/developer s
 #>
 
 #BLOCKPAYABLESUBSCRIPTION
-Connect-MSCommerce
+try {Get-MSCommerceProductPolicies -PolicyId AllowSelfServicePurchase -ErrorAction Stop}
+catch {
+    Connect-MSCommerce | Out-Null
+    }
+
 $Products = Get-MSCommerceProductPolicies -PolicyId AllowSelfServicePurchase
+
+
 ForEach ($Product in $Products) {
         $productName = $Product.ProductName
     if ($Product.PolicyValue -eq "Enabled") {

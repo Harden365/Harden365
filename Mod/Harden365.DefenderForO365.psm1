@@ -35,6 +35,7 @@ Function Start-DefenderO365P1AntiPhishingPolicy {
 	[Parameter(Mandatory = $false)]
 	[String]$PolicyName = "Harden365 - AntiPhishing Policy",
     [String]$RuleName = "Harden365 - AntiPhishing Rule",
+    [Boolean]$Enabled = $false,
     [Boolean]$EnableFirstContactSafetyTips = $true,
     [Boolean]$EnableMailboxIntelligenceProtection = $true,
     [Boolean]$EnableMailboxIntelligence = $true,
@@ -61,7 +62,7 @@ Write-LogSection 'MICROSOFT DEFENDER FOR OFFICE365' -NoHostOutput
             $WarningActionPreference = "SilentlyContinue"
             Set-AntiPhishPolicy -Identity "Office365 AntiPhish Default" -EnableMailboxIntelligenceProtection $EnableMailboxIntelligenceProtection -EnableMailboxIntelligence $EnableMailboxIntelligenceProtection -MailboxIntelligenceProtectionAction $MailboxIntelligenceProtectionAction -EnableFirstContactSafetyTips $EnableFirstContactSafetyTips -EnableSimilarDomainsSafetyTips $EnableSimilarDomainsSafetyTips -EnableSimilarUsersSafetyTips $EnableSimilarUsersSafetyTips -TargetedUserProtectionAction $TargetedUserProtectionAction -EnableTargetedUserProtection $EnableTargetedUserProtection -EnableTargetedDomainsProtection $EnableTargetedDomainsProtection -EnableOrganizationDomainsProtection $EnableOrganizationDomainsProtection -TargetedDomainProtectionAction $TargetedDomainProtectionAction -EnableUnusualCharactersSafetyTips $EnableUnusualCharactersSafetyTips -PhishThresholdLevel $PhishThresholdLevel
             New-AntiPhishPolicy -Name $PolicyName -AdminDisplayName $PolicyName -TargetedDomainsToProtect ((Get-AcceptedDomain).Name) -EnableMailboxIntelligenceProtection $EnableMailboxIntelligenceProtection -EnableFirstContactSafetyTips $EnableFirstContactSafetyTips -EnableMailboxIntelligence $EnableMailboxIntelligence -MailboxIntelligenceProtectionAction $MailboxIntelligenceProtectionAction -EnableSimilarDomainsSafetyTips $EnableSimilarDomainsSafetyTips -EnableSimilarUsersSafetyTips $EnableSimilarUsersSafetyTips -TargetedUserProtectionAction $TargetedUserProtectionAction -EnableTargetedUserProtection $EnableTargetedUserProtection -EnableTargetedDomainsProtection $EnableTargetedDomainsProtection -EnableOrganizationDomainsProtection $EnableOrganizationDomainsProtection -TargetedDomainProtectionAction $TargetedDomainProtectionAction -EnableUnusualCharactersSafetyTips $EnableUnusualCharactersSafetyTips -PhishThresholdLevel $PhishThresholdLevel
-            New-AntiPhishRule -Name $RuleName -AntiPhishPolicy $PolicyName -Priority $Priority -RecipientDomainIs ((Get-AcceptedDomain).Name)
+            New-AntiPhishRule -Name $RuleName -AntiPhishPolicy $PolicyName -Priority $Priority -Enabled $Enabled -RecipientDomainIs ((Get-AcceptedDomain).Name)
             Write-LogInfo "$PolicyName created"  
         } Catch {
                 Write-LogError "$PolicyName not created!" }
@@ -89,7 +90,7 @@ Function Start-DefenderO365P1SafeAttachments {
 	[String]$PolicyName = "Harden365 - SafeAttachments Policy",
     [String]$RuleName = "Harden365 - SafeAttachments Rule",
     [String]$Alias = "AlertsMailbox",
-    [Boolean]$Enable = $true,
+    [Boolean]$Enable = $false,
     [String]$Action = "Block",
     [Boolean]$Redirect = $true,
     [Boolean]$EnableSafeDocs = $true,
@@ -132,7 +133,7 @@ Function Start-DefenderO365P1SafeLinks {
 	[Parameter(Mandatory = $false)]
 	[String]$PolicyName = "Harden365 - SafeLinks Policy",
     [String]$RuleName = "Harden365 - SafeLinks Rule",
-    [Boolean]$IsEnabled = $true,
+    [Boolean]$IsEnabled = $false,
     [Boolean]$EnableSafeLinksForTeams = $true,
     [Boolean]$EnableSafeLinksForEmail = $true,
     [Boolean]$ScanUrls = $true,

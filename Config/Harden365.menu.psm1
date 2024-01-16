@@ -18,13 +18,34 @@ Function CreateMenu (){
     $Selection = 0
     $EnterPressed = $False
 
+#TENANT NAME
+$TenantName = (Get-MgDomain | Where-Object { $_.IsDefault -eq $true }).Id
+#AZUREADEDITION
+if (((Get-MgSubscribedSku | Where-Object { $_.CapabilityStatus -eq "Enabled" }).ServicePlans).ServicePlanName -match "AAD_PREMIUM_P2")
+{ $TenantEdition = "Entra ID P2"} 
+elseif (((Get-MgSubscribedSku | Where-Object { $_.CapabilityStatus -eq "Enabled" }).ServicePlans).ServicePlanName -match "AAD_PREMIUM")
+{ $TenantEdition = "Entra ID P1"} 
+elseif (((Get-MgSubscribedSku | Where-Object { $_.CapabilityStatus -eq "Enabled" }).ServicePlans).ServicePlanName -match "AAD_BASIC")
+{ $TenantEdition = "Entra ID  Basic"} 
+else
+{ $TenantEdition = "Entra ID  Free" }
+#OFFICE365ATP
+if (((Get-MgSubscribedSku | Where-Object { $_.CapabilityStatus -eq "Enabled" }).ServicePlans).ServicePlanName -match "THREAT_INTELLIGENCE")
+    { $O365ATP = "Defender for Office365 P2" }   
+elseif (((Get-MgSubscribedSku | Where-Object { $_.CapabilityStatus -eq "Enabled" }).ServicePlans).ServicePlanName -match "ATP_ENTERPRISE")
+    { $O365ATP = "Defender for Office365 P1" }  
+elseif (((Get-MgSubscribedSku | Where-Object { $_.CapabilityStatus -eq "Enabled" }).ServicePlans).ServicePlanName -match "EOP_ENTERPRISE")
+    { $O365ATP = "Exchange Online Protection" }  
+else
+{ $O365ATP = "No protection" }
+
 $FrontStyle = "    _________________________________________________________________________________________            
             "
     
     Clear-Host
 
     While($EnterPressed -eq $False){
-    $LogoData = Get-Content (".\Config\Harden365.logo")
+    $LogoData = Get-Content (".\Config\Harden365s.logo")
         foreach ($line in $LogoData){Write-Host $line}
  
         Write-Host "    $MenuTitle" -ForegroundColor Red
@@ -99,7 +120,7 @@ function MainMenu(){
 $MainMenu = CreateMenu -TenantName $TenantName -TenantEdition $TenantEdition -TenantDetail $true -O365ATP $O365ATP -MenuOptions @("Audit","Identity","Messaging","Application","Device","Quit")
     switch($MainMenu){
     0{
-      AuditMenu -TenantEdition $TenantEdition
+      AuditMenu -TenantEdition $TenantEdition -TenantName $TenantName
       }
     1{
       IdentityMenu
@@ -125,7 +146,8 @@ $MainMenu = CreateMenu -TenantName $TenantName -TenantEdition $TenantEdition -Te
 function AuditMenu(){
     Param(
         [System.Management.Automation.PSCredential]$Credential,
-        [String]$TenantEdition
+        [String]$TenantEdition,
+        [String]$TenantName
 
     )
 
@@ -134,12 +156,11 @@ $AuditMenu = CreateMenu -MenuTitle "HARDEN 365 - AUDIT" -MenuOptions @("Audit Mi
     0{
                 write-host $FrontStyle -ForegroundColor Red
                 write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; Write-Host "Audit Messaging with ORCA"-ForegroundColor Red	
-                mkdir -Force ".\Audit" | Out-Null
                 write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; Write-host ('Connecting to ExchangeOnline Powershell') -ForegroundColor Green
                 try {Get-OrganizationConfig | Out-Null 
                 } catch {Connect-ExchangeOnline  -WarningAction:SilentlyContinue -ShowBanner:$false}
-                Invoke-ORCA -ExchangeEnvironmentName "O365Default" -Output HTML -OutputOptions @{HTML=@{OutputDirectory=".\Audit"}} -Connect $false -ShowSurvey $false
-                write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; Write-host ('Audit ORCA exported in folder .\Audit') -ForegroundColor Green
+                Invoke-ORCA -ExchangeEnvironmentName "O365Default" -Output HTML -OutputOptions @{HTML=@{OutputDirectory="$TenantName"}} -Connect $false -ShowSurvey $false
+                write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; Write-host ("Audit ORCA exported in folder .\$TenantName") -ForegroundColor Green
                 Read-Host -Prompt "Press Enter to return_"
                 AuditMenu
       }
@@ -234,7 +255,8 @@ $AuditMenu = CreateMenu -MenuTitle "HARDEN 365 - AUDIT" -MenuOptions @("Audit Mi
 
 function IdentityMenu(){
     Param(
-        [System.Management.Automation.PSCredential]$Credential
+        [System.Management.Automation.PSCredential]$Credential,
+        [String]$TenantName
     )
 $IdentityMenu = CreateMenu -MenuTitle "HARDEN 365 - IDENTITY" -MenuOptions @("Emergency Accounts","MFA per User","Conditionnal Access Models AAD","Export user configuration MFA","Import user configuration MFA","<- Return")
         switch($IdentityMenu){
@@ -251,7 +273,7 @@ $IdentityMenu = CreateMenu -MenuTitle "HARDEN 365 - IDENTITY" -MenuOptions @("Em
                     } Catch {
                     write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; write-host(" --> Harden365.TierModel module not working") -ForegroundColor Red}
                     }
-                    write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; Write-host ('Emergency Account credentials are saved in .\Keepass file') -ForegroundColor Green
+                    write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; Write-host ('Emergency Account credentials are saved in .\$TenantName ->Keepass file') -ForegroundColor Green
                     write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; Write-host ('Password Keepass is : ') -ForegroundColor Green -NoNewline ; Write-host ('Harden365') -ForegroundColor Red
                     Read-Host -Prompt "Press Enter to return_"
                     IdentityMenu
@@ -462,9 +484,17 @@ $ApplicationMenu = CreateMenu -MenuTitle "HARDEN 365 - APPLICATIONS" -MenuOption
              write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; Write-host ('Connecting to ExchangeOnline Powershell') -ForegroundColor Green
              try {Get-OrganizationConfig | Out-Null 
              } catch {Connect-ExchangeOnline -WarningAction:SilentlyContinue -ShowBanner:$false}
-             write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; Write-host ('Connecting to MSTeams Powershell') -ForegroundColor Green
-             try { Get-CsTenant | Out-Null 
-             } catch { Connect-MicrosoftTeams | Out-Null }
+             try { Get-CsTenant -Erroraction Stop | Out-Null 
+             } catch { 
+                      try { 
+                            write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; write-host("Connecting to MS Teams Powershell") -ForegroundColor green
+                            Connect-MicrosoftTeams -ErrorAction Stop > $null
+                           }
+                      catch {
+                              Connect-MicrosoftTeams | Out-Null
+                            }
+                      }
+             write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; Write-host ('Connecting to MSCommerce Powershell') -ForegroundColor Green
              $scriptFunctions=(Get-ChildItem function: | Where-Object { ($_.source -match 'Harden365.AuditApplications') -and ($_.Name -notmatch 'Start-OUTCheckAddIns')})
              $scriptFunctions | ForEach-Object {
              Try { 

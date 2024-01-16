@@ -16,16 +16,15 @@
 #>
 
 
-$dateFileString = Get-Date -Format 'FileDateTimeUniversal'
+$TenantName = (Get-MgDomain | Where-Object { $_.IsDefault -eq $true }).Id
+$dateString = Get-Date -Format 'FileDateTimeUniversal'
 
-$debugFolderPath = Join-Path $pwd 'Logs'
-
-if (!(Test-Path -Path $debugFolderPath)) {
-    New-Item -Path $pwd -Name 'Logs' -ItemType Directory > $null
+$tenantFolderPath = Join-Path $pwd "$TenantName" 
+if (!(Test-Path -Path $tenantFolderPath)) {
+    New-Item -Path $pwd -Name "$TenantName"  -ItemType Directory > $null
 }
 
-$debugFileFullPath = Join-Path $debugFolderPath "Debug$dateFileString.log"
-
+$debugFileFullPath = Join-Path $tenantFolderPath "Debug$dateString.log"
 New-Item -Path $debugFileFullPath -ItemType File > $null
 
 function Update-ProgressionBarOuterLoop {

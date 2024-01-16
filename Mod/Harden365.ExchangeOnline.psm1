@@ -48,19 +48,21 @@ Write-LogSection 'EXCHANGE ONLINE PROTECTION' -NoHostOutput
         if ((Get-OrganizationConfig).isDehydrated -eq $true)
     {
         Try { 
-            Enable-OrganizationCustomization -ErrorAction SilentlyContinue
+            Enable-OrganizationCustomization -ErrorAction Stop
             Set-AdminAuditLogConfig -UnifiedAuditLogIngestionEnabled $true -Force
             Write-LogInfo "Unified Audit Log enable"
         } Catch {
+                Write-LogError $_.Exception.Message
                 Write-LogError "Unified Audit Log not enabled!"
                 }
 
     } elseif ((Get-AdminAuditLogConfig).UnifiedAuditLogIngestionEnabled -eq $False)
     {
         Try { 
-            Set-AdminAuditLogConfig -UnifiedAuditLogIngestionEnabled $true -Force
+            Set-AdminAuditLogConfig -UnifiedAuditLogIngestionEnabled $true -Force -ErrorAction Stop
             Write-LogInfo "Unified Audit Log enable"
         } Catch {
+                Write-LogError $_.Exception.Message
                 Write-LogError "Unified Audit Log not enabled!"
                 }
     } else
@@ -347,14 +349,14 @@ Function Start-EOPAntiMalwarePolicy {
     [String]$Priority = "0"
 )
 
-$FileTypes=@("ace","ade","ani","app","bas","bat","chm","cmd","com","cpl","crt","exe","hlp","hta","inf","ins","isp","jar","js","jse","lnk","mda","mdb","mde","mdz","msc","msi","msp","mst","pcd","pif","reg","scr","sct","shs","url","vb","vbe","vbs","wsc","wsf","ws")
+$FileTypes=@("ace","ade","ani","app","appx","arj","bas","bat","chm","cmd","com","cpl","deb","dex","dll","exe","hlp","inf","ins","isp","jar","jnlp","js","jse","kext","lha","lib","library","lnk","lzh","macho","mda","mdb","mde","mdz","msc","msi","msix","msp","mst","pcd","pif","ppa","reg","rev","scf","scr","sct","shs","uif","url","vb","vbe","vbs","vxd","wsc","wsf","ws","xz","z")
 
 #SCRIPT
 $DomainOnM365=(Get-AcceptedDomain | Where-Object { $_.InitialDomain -match $true}).Name
     if ((Get-MalwareFilterRule).name -ne $RuleName)
     {
         Try { 
-            Set-MalwareFilterPolicy -Identity "Default" -EnableFileFilter $EnableFileFilter
+            #Set-MalwareFilterPolicy -Identity "Default" -EnableFileFilter $EnableFileFilter
             New-MalwareFilterPolicy -Name $PolicyName -EnableFileFilter $EnableFileFilter -ZapEnabled $ZapEnabled -EnableExternalSenderAdminNotifications $EnableExternalSenderAdminNotifications -ExternalSenderAdminAddress "$Alerts@$DomainOnM365" -EnableInternalSenderAdminNotifications $EnableInternalSenderAdminNotifications -InternalSenderAdminAddress "$Alerts@$DomainOnM365" -FileTypes $FileTypes
             Write-LogInfo "$PolicyName created"
             New-MalwareFilterRule -Name $RuleName -MalwareFilterPolicy $PolicyName -Priority $Priority -RecipientDomainIs ((Get-AcceptedDomain).Name)
@@ -375,7 +377,7 @@ Function Start-EOPAntiMacroRule {
          Create transport rules to warm user for Office files with macro.
         
         .Description
-         This function will create new AntiMacro Policy
+         This function will create new Prevent Potential Malware Policy
 
         .Notes
          Version: 01.00 -- 
@@ -384,7 +386,7 @@ Function Start-EOPAntiMacroRule {
 
 	param(
 	[Parameter(Mandatory = $false)]
-    [String]$RuleName = "Harden365 - Anti-ransomware warn users",
+    [String]$RuleName = "Harden365 - Prevent Potential Malware",
     [String]$Mode = "Enforce",
     [String]$RuleErrorAction = "Ignore",
     [String]$ApplyHtmlDisclaimerLocation = "Prepend",
@@ -430,8 +432,7 @@ $WarmDisclaimerFR="<table border=0 cellspacing=0 cellpadding=0 align=left width=
      }
      else{
       Try { 
-           New-TransportRule -Name $RuleName -Priority $Priority -Mode $Mode -RuleErrorAction $RuleErrorAction -AttachmentExtensionMatchesWords $AttachmentExtensionMatchesWords -ApplyHtmlDisclaimerLocation $ApplyHtmlDisclaimerLocation -ApplyHtmlDisclaimerText "$WarmDisclaimerFR" -ApplyHtmlDisclaimerFallbackAction $ApplyHtmlDisclaimerFallbackAction
-           Start-Sleep -Seconds 2
+           New-TransportRule -Name $RuleName -Priority $Priority -Mode $Mode -Enabled $false -RuleErrorAction $RuleErrorAction -AttachmentExtensionMatchesWords $AttachmentExtensionMatchesWords -ApplyHtmlDisclaimerLocation $ApplyHtmlDisclaimerLocation -ApplyHtmlDisclaimerText "$WarmDisclaimerFR" -ApplyHtmlDisclaimerFallbackAction $ApplyHtmlDisclaimerFallbackAction
            Write-LogInfo "$RuleName created"
            } Catch {
                 Write-LogError "$RuleName not created!"
@@ -455,7 +456,7 @@ Function Start-EOPBypassSpamByDomains {
 
 	param(
 	[Parameter(Mandatory = $false)]
-    [String]$RuleName = "Harden365 - Bypass Spam by Domains",
+    [String]$RuleName = "Harden365 - Whitelist AntiSpam with DMARC control",
     [String]$Mode = "Enforce",
     [String]$RuleErrorAction = "Ignore",
     [String]$SetSCL = '-1',
@@ -476,9 +477,7 @@ $HeaderContainsWords = @('dmarc=bestguesspass','dmarc=pass')
      }
      else{
       Try { 
-           New-TransportRule -Name $RuleName -Priority $Priority -Mode $Mode -RuleErrorAction $RuleErrorAction -SetSCL $SetSCL -SenderDomainIs $SenderDomainIs -SetHeaderName $SetHeaderName -SetHeaderValue $SetHeaderValue -HeaderContainsMessageHeader $HeaderContainsMessageHeader -HeaderContainsWords $HeaderContainsWords -FromScope $FromScope
-           Disable-TransportRule -Identity $RuleName -Confirm:$false
-           Start-Sleep -Seconds 2
+           New-TransportRule -Name $RuleName -Priority $Priority -Mode $Mode -Enabled $false -RuleErrorAction $RuleErrorAction -SetSCL $SetSCL -SenderDomainIs $SenderDomainIs -SetHeaderName $SetHeaderName -SetHeaderValue $SetHeaderValue -HeaderContainsMessageHeader $HeaderContainsMessageHeader -HeaderContainsWords $HeaderContainsWords -FromScope $FromScope
            Write-LogInfo "$RuleName created"
            } Catch {
                 Write-LogError "$RuleName not created!"

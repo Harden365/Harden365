@@ -19,10 +19,6 @@
 $allModulesPathList = @(
     'Harden365.Audit-ExchangeOnline'
     'Harden365.AuditApplications'
-    'Harden365.ConnectAllM365Services'
-    'Harden365.AzureADAudit'
-    'Harden365.MSOLAudit'
-    'Harden365.SPOAudit'
     'Harden365.ExchangeOnline'
     'Harden365.DefenderForO365'
     'Harden365.DKIM'
@@ -43,25 +39,7 @@ $allModulesPathList = @(
     'Harden365.DeviceConfigImport'
     'Harden365.Identity.Roles'
     'Harden365.Identity.Users'
-
-
 )
-
-function Add-AuditFolder {
-    param(
-        [Parameter(Mandatory = $true)]
-        [String]$ExportName
-    )
-    $auditPath = Join-Path $pwd 'Audit'
-    if (!(Test-Path -Path $auditPath)) {
-        New-Item -Path $pwd -Name 'Audit' -ItemType Directory > $null
-    }
-
-    $auditFullPath = Join-Path $auditPath $ExportName
-    if (!(Test-Path -Path $auditFullPath)) {
-        New-Item -Path $auditPath -Name $ExportName -ItemType Directory > $null
-    }
-}
 
 function Test-UserIsAdministrator {
     
@@ -111,31 +89,15 @@ function Test-AllPrerequisites {
         [int]$OperationTotal
     )
     Write-LogSection 'PREREQUISITES' -NoHostOutput
-    $numberOfPrerequisitesCheck = 11
+    $numberOfPrerequisitesCheck = 9
     $currentCountOfPrerequisitesCheck = 0
 
     Update-ProgressionBarOuterLoop -Activity 'Prerequisites check' -Status 'In progress' -OperationCount $OperationCount -OperationTotal $OperationTotal
     
     Update-ProgressionBarInnerLoop -Activity 'Check PowerShell version' -Status 'In progress' -OperationCount $currentCountOfPrerequisitesCheck -OperationTotal $numberOfPrerequisitesCheck
 
-    # CHECK POWERSHELL
-    if(($PSVersionTable.PSVersion.Major -lt 5) -or ($PSVersionTable.PSVersion.Major -eq 5 -and $PSVersionTable.PSVersion.Minor -eq 0)){
-        Write-LogError 'Please install Powershell version 5.1'
-        Write-LogError 'https://www.microsoft.com/en-us/download/details.aspx?id=54616'
-        break Script
-    } else {
-        Write-LogInfo 'Powershell Version OK'
-    }
-    # CHECK / INSTALL NUGET
-    if($(Get-PackageProvider).Name -notcontains 'NuGet'){
-        Write-LogWarning "NuGet Provider necessary"
-        Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force | Out-Null
-    }
-
     $currentCountOfPrerequisitesCheck++
     Test-PowerShellModule -ModuleName 'ExchangeOnlineManagement' -ModuleVersion '2.0.5' -OperationCount $currentCountOfPrerequisitesCheck -OperationTotal $numberOfPrerequisitesCheck
-    $currentCountOfPrerequisitesCheck++
-    Test-PowerShellModule -ModuleName 'AzureADPreview' -ModuleVersion '2.0' -OperationCount $currentCountOfPrerequisitesCheck -OperationTotal $numberOfPrerequisitesCheck
     $currentCountOfPrerequisitesCheck++
     Test-PowerShellModule -ModuleName 'MSOnline' -ModuleVersion '1.1' -OperationCount $currentCountOfPrerequisitesCheck -OperationTotal $numberOfPrerequisitesCheck
     $currentCountOfPrerequisitesCheck++
@@ -145,13 +107,11 @@ function Test-AllPrerequisites {
     $currentCountOfPrerequisitesCheck++
     Test-PowerShellModule -ModuleName 'Microsoft.PowerApps.PowerShell' -ModuleVersion '1.0.20' -OperationCount $currentCountOfPrerequisitesCheck -OperationTotal $numberOfPrerequisitesCheck
     $currentCountOfPrerequisitesCheck++ 
-    Test-PowerShellModule -ModuleName 'MSCommerce' -ModuleVersion '1.7' -OperationCount $currentCountOfPrerequisitesCheck -OperationTotal $numberOfPrerequisitesCheck
+    Test-PowerShellModule -ModuleName 'MSCommerce' -ModuleVersion '1.10' -OperationCount $currentCountOfPrerequisitesCheck -OperationTotal $numberOfPrerequisitesCheck
     $currentCountOfPrerequisitesCheck++
     Test-PowerShellModule -ModuleName 'MicrosoftTeams' -ModuleVersion '4.2.0' -OperationCount $currentCountOfPrerequisitesCheck -OperationTotal $numberOfPrerequisitesCheck
     $currentCountOfPrerequisitesCheck++
     Test-PowerShellModule -ModuleName 'ORCA' -ModuleVersion '2.8.1' -OperationCount $currentCountOfPrerequisitesCheck -OperationTotal $numberOfPrerequisitesCheck
-    $currentCountOfPrerequisitesCheck++
-    Test-PowerShellModule -ModuleName 'Microsoft.Graph' -ModuleVersion '2.1.0' -OperationCount $currentCountOfPrerequisitesCheck -OperationTotal $numberOfPrerequisitesCheck
     $currentCountOfPrerequisitesCheck++
     Update-ProgressionBarInnerLoop -Activity 'Prerequisite check' -Status 'Complete' -OperationCount $currentCountOfPrerequisitesCheck -OperationTotal $numberOfPrerequisitesCheck
 

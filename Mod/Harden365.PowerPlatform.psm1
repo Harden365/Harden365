@@ -40,7 +40,7 @@ Write-LogSection 'POWERPLATFORM' -NoHostOutput
 
 #SCRIPT
 try {
-Get-TenantSettings | Out-Null }
+Test-PowerAppsAccount }
 catch {}
 if ((Get-TenantSettings).powerPlatform.powerApps.disableShareWithEveryone -eq $false) {
     Write-LogWarning "User allow to share apps with everyone"
@@ -88,7 +88,12 @@ Function Start-BlockSubscriptionPayable {
 
 
 #SCRIPT
-Connect-MSCommerce
+#BLOCKPAYABLESUBSCRIPTION
+try {Get-MSCommerceProductPolicies -PolicyId AllowSelfServicePurchase -ErrorAction Stop}
+catch {
+    Connect-MSCommerce | Out-Null
+    }
+
 $Products = Get-MSCommerceProductPolicies -PolicyId AllowSelfServicePurchase
 ForEach ($Product in $Products) {
         $productName = $Product.ProductName

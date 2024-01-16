@@ -193,19 +193,19 @@ ForEach ($user in $Users) {
 
      
 $dateFileString = Get-Date -Format "FileDateTimeUniversal"
-mkdir -Force ".\Audit" | Out-Null
+
 $Report | Sort-Object  UserPrincipalName | Select-object DisplayName,UserPrincipalName,Licenses,Sync,passwordneverExpires,LastSignInDate,LastPasswordChange ,Authentication `
- | Export-Csv -Path ".\Audit\AuditUsersDetails$dateFileString.csv" -Delimiter ';' -Encoding UTF8 -NoTypeInformation
+ | Export-Csv -Path ".\$DomainOnM365\AuditUsersDetails$dateFileString.csv" -Delimiter ';' -Encoding UTF8 -NoTypeInformation
 
 
 #GENERATE HTML
 $Report | Sort-Object  UserPrincipalName | Select-object DisplayName,UserPrincipalName,Licenses,Sync,passwordneverExpires,LastSignInDate,LastPasswordChange ,Authentication `
  | ConvertTo-Html -Property DisplayName,UserPrincipalName,Licenses,Sync,passwordneverExpires,LastSignInDate,LastPasswordChange ,Authentication `
     -PreContent "<h1>Audit Identity Users</h1>" "<h2>$DomainOnM365</h2>" -Head $Header -PostContent "<h2>$(Get-Date)</h2>"`
-    | Out-File .\Audit\Harden365-AuditUsersDetails$dateFileString.html
+    | Out-File .\$DomainOnM365\Harden365-AuditUsersDetails$dateFileString.html
 
-Invoke-Expression .\Audit\Harden365-AuditUsersDetails$dateFileString.html 
-Write-LogInfo "Audit Identity Users generated in folder .\Audit"
+Invoke-Expression .\$DomainOnM365\Harden365-AuditUsersDetails$dateFileString.html 
+Write-LogInfo "Audit Identity Users generated in folder .\$DomainOnM365"
 Write-LogSection '' -NoHostOutput 
 }
 

@@ -55,7 +55,7 @@ if(!($HardenApp = Get-MgApplication -Filter "DisplayName eq '$($appName)'"  -Err
     "endDateTime" = (Get-Date).AddMonths(+12)
     }
   $ClientSecret = Add-MgApplicationPassword -ApplicationId $HardenApp.Id -PasswordCredential $passwordCred
-  Write-LogWarning "Please keep Harden365 App secret $($ClientSecret.SecretText)"
+  write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; Write-host ('Please keep Harden365 App secret : ') -ForegroundColor yellow -NoNewline ; Write-host $($ClientSecret.SecretText) -ForegroundColor Red
 }
 
 #endregion
@@ -110,6 +110,7 @@ $consentURL = "https://login.microsoftonline.com/$tenantID/adminconsent?client_i
 Write-LogInfo "Please wait for admin consent..."
 Start-sleep -Seconds 20
 Start-Process -FilePath "msedge.exe"  -ArgumentList "--inprivate $consentURL --start-fullscreen"
+Write-LogInfo "Installation complete"
 #endregion
 }
 

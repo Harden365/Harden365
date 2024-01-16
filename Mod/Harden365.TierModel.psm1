@@ -57,24 +57,24 @@ Write-LogSection 'EMERGENCY ACCOUNTS' -NoHostOutput
 try { Get-InstalledModule -Name PoShKeePass -ErrorAction Stop > $null}
     catch {  
                 Write-LogInfo "Installing PoshKeepass Module!"
-                Install-Module -Name PoShKeePass -Force
-                Import-Module -Name PoShKeePass
+                Install-Module -Name PoShKeePass -Force -WarningAction:SilentlyContinue
+                Import-Module -Name PoShKeePass -WarningAction:SilentlyContinue
                 }
 
 #SCRIPT
 $DomainOnM365=(Get-MgDomain | Where-Object { $_.IsInitial -match $true }).Id
+$dateString = Get-Date -Format "yyyyMMdd"
     if ((Get-MgUser).UserPrincipalName -eq "brice.glass@$DomainOnM365")
         {
         Write-LogWarning "User 'brice.glass@$DomainOnM365' already created!"      
     }
     else { 
             Try {
-            $WarningActionPreference = "SilentlyContinue"
             Remove-KeePassDatabaseConfiguration -DatabaseProfileName "Harden365_uadmin" -Confirm:$false
-            $WarningActionPreference = "SilentlyContinue"
-            New-KeePassDatabaseConfiguration -DatabaseProfileName "Harden365_uadmin" -DatabasePath ".\Keepass\Harden365.kdbx" -UseMasterKey
+            Copy-Item -Path ".\Config\Harden365.kp" -Destination "$DomainOnM365\Harden365-$dateString.kdbx"
+            New-KeePassDatabaseConfiguration -DatabaseProfileName "Harden365_uadmin" -DatabasePath ".\$DomainOnM365\Harden365-$dateString.kdbx" -UseMasterKey
             $SecureString128=ConvertTo-SecureString "Harden365" -AsPlainText -Force
-            if ((Get-KeePassEntry -DatabaseProfileName "Harden365_uadmin" -KeePassEntryGroupPath "Harden365" -Title $Title -MasterKey $SecureString128) -eq $null)
+            if ($null -eq (Get-KeePassEntry -DatabaseProfileName "Harden365_uadmin" -KeePassEntryGroupPath "Harden365" -Title $Title -MasterKey $SecureString128))
             {
             $Pass_uadmin = New-KeePassPassword -UpperCase:$UpperCase -LowerCase:$LowerCase -Digits:$Digits -SpecialCharacters:$SpecialCharacters  -ExcludeCharacters:$ExcludeCharacters -Length $Lengt
             $SecureString128=ConvertTo-SecureString "Harden365" -AsPlainText -Force
@@ -84,6 +84,7 @@ $DomainOnM365=(Get-MgDomain | Where-Object { $_.IsInitial -match $true }).Id
               ForceChangePasswordNextSignIn = $False
               }
             New-MgUser -DisplayName $Title -PasswordProfile $U_PasswordProfile -UserPrincipalName "brice.glass@$DomainOnM365" -AccountEnabled -MailNickName $Title
+            Import-Module Microsoft.Graph.Identity.Governance
             Remove-KeePassDatabaseConfiguration -DatabaseProfileName "Harden365_uadmin" -Confirm:$false
             $uadmin = Get-MgUser -UserId "brice.glass@$DomainOnM365"
             $globalAdmin = Get-MgRoleManagementDirectoryRoleDefinition -Filter "displayName eq 'Global Administrator'"
@@ -133,6 +134,7 @@ Function Start-EmergencyAccount2 {
 
 #SCRIPT
 $DomainOnM365=(Get-MgDomain | Where-Object { $_.IsInitial -match $true }).Id
+$dateString = Get-Date -Format "yyyyMMdd"
     if ((Get-MgUser).UserPrincipalName -eq "brice.douglass@$DomainOnM365")
         {
         Write-LogWarning "User 'brice.douglass@$DomainOnM365' already created!"      
@@ -140,9 +142,9 @@ $DomainOnM365=(Get-MgDomain | Where-Object { $_.IsInitial -match $true }).Id
     else { 
             Try {
             Remove-KeePassDatabaseConfiguration -DatabaseProfileName "Harden365_uadmin" -Confirm:$false
-            New-KeePassDatabaseConfiguration -DatabaseProfileName "Harden365_uadmin" -DatabasePath ".\Keepass\Harden365.kdbx" -UseMasterKey
+            New-KeePassDatabaseConfiguration -DatabaseProfileName "Harden365_uadmin" -DatabasePath ".\$DomainOnM365\Harden365-$dateString.kdbx" -UseMasterKey
             $SecureString128=ConvertTo-SecureString "Harden365" -AsPlainText -Force
-            if ((Get-KeePassEntry -DatabaseProfileName "Harden365_uadmin" -KeePassEntryGroupPath "Harden365" -Title $Title -MasterKey $SecureString128) -eq $null)
+            if ($null -eq (Get-KeePassEntry -DatabaseProfileName "Harden365_uadmin" -KeePassEntryGroupPath "Harden365" -Title $Title -MasterKey $SecureString128))
             {
             $Pass_uadmin = New-KeePassPassword -UpperCase:$UpperCase -LowerCase:$LowerCase -Digits:$Digits -SpecialCharacters:$SpecialCharacters  -ExcludeCharacters:$ExcludeCharacters -Length $Lengt
             $SecureString128=ConvertTo-SecureString "Harden365" -AsPlainText -Force
@@ -153,6 +155,7 @@ $DomainOnM365=(Get-MgDomain | Where-Object { $_.IsInitial -match $true }).Id
               }
             New-MgUser -DisplayName $Title -PasswordProfile $U_PasswordProfile -UserPrincipalName "brice.douglass@$DomainOnM365" -AccountEnabled -MailNickName $Title
             Remove-KeePassDatabaseConfiguration -DatabaseProfileName "Harden365_uadmin" -Confirm:$false
+            Import-Module Microsoft.Graph.Identity.Governance
             $uadmin = Get-MgUser -UserId "brice.douglass@$DomainOnM365"
             $globalAdmin = Get-MgRoleManagementDirectoryRoleDefinition -Filter "displayName eq 'Global Administrator'"
             Start-Sleep -Seconds 10
@@ -225,13 +228,41 @@ $DomainOnM365=(Get-MgDomain | Where-Object { $_.IsInitial -match $true }).Id
           Write-LogWarning "User 'brice.douglass@$DomainOnM365' not exist"
           }
 
+}
+  
+Function Start-TiersAdminNoSSPR {
+     <#
+        .Synopsis
+         This function disable SSPR for admins
+        
+        .Description
+         This function disable SSPR for admins
 
+        .Notes
+         Version: 01.00 -- 
+         
+    #>
+
+	param(
+	[Parameter(Mandatory = $false)]
+	[String]$Name = "Harden365 - Disable SSPR for Admins Account"
+)
+
+
+#SCRIPT
+$DomainOnM365=(Get-MgDomain | Where-Object { $_.IsInitial -match $true }).Id
+
+
+     if ((Get-MgPolicyAuthorizationPolicy).AllowedToUseSspr -eq $true)
+        {
+         Write-LogWarning "SSPR is enable for Admin Accounts"
+         Update-MgPolicyAuthorizationPolicy -AllowedToUseSspr:$false
+         Write-LogInfo "SSPR for Admin Accounts disabled"
+        }
+    
  Write-LogSection '' -NoHostOutput
 
 }
-
-  
-
 
 
 
