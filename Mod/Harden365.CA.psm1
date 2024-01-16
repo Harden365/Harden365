@@ -202,8 +202,7 @@ $idBriceDouglass = (Get-MgUser -All | Where-Object { $_.UserPrincipalName -eq "b
 	                state = "disabled"
 	                conditions = @{
 		                clientAppTypes = @(
-                            "exchangeActiveSync",
-                            "other"
+                            "all"
 		                )
 		                applications = @{
 			                includeApplications = @(
@@ -681,9 +680,7 @@ $idBriceDouglass = (Get-MgUser -All | Where-Object { $_.UserPrincipalName -eq "b
 	                grantControls = @{
 		                 operator = "OR"
 		                 builtInControls = @(
-                         "approvedApplication",
-                         "compliantApplication"
-
+                         "approvedApplication"
                          )
 	                }
             }
@@ -905,7 +902,6 @@ $idBriceDouglass = (Get-MgUser -All | Where-Object { $_.UserPrincipalName -eq "b
 		                }
 		                SignInRiskLevels = @(
                             "High"
-                            "Medium"
 		                )
 	                }
 	                grantControls = @{
