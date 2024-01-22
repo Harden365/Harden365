@@ -35,8 +35,9 @@ param(
     [switch]$reloadModules
 )
 
-﻿## Unblock files
-Get-ChildItem -Path $pwdt -Recurse -File | Unblock-File
+# Unblock files
+try { Get-ChildItem -Path $pwdt -Recurse -File | Unblock-File -ErrorAction:SilentlyContinue}
+catch {}
 
 $totalCountofOperations = 2
 $currentCountOfOperations = 0

@@ -120,13 +120,13 @@ function MainMenu(){
 $MainMenu = CreateMenu -TenantName $TenantName -TenantEdition $TenantEdition -TenantDetail $true -O365ATP $O365ATP -MenuOptions @("Audit","Identity","Messaging","Application","Device","Quit")
     switch($MainMenu){
     0{
-      AuditMenu -TenantEdition $TenantEdition -TenantName $TenantName
+      AuditMenu -TenantEdition $TenantEdition -TenantName $TenantName -O365ATP $O365ATP
       }
     1{
-      IdentityMenu
+      IdentityMenu -TenantEdition $TenantEdition -TenantName $TenantName -O365ATP $O365ATP
       }
     2{
-      MessagingMenu
+      MessagingMenu  -TenantEdition $TenantEdition -TenantName $TenantName -O365ATP $O365ATP
       }
     3{
       ApplicationMenu
@@ -145,13 +145,13 @@ $MainMenu = CreateMenu -TenantName $TenantName -TenantEdition $TenantEdition -Te
 
 function AuditMenu(){
     Param(
-        [System.Management.Automation.PSCredential]$Credential,
+        [String]$TenantName,
         [String]$TenantEdition,
-        [String]$TenantName
+        [String]$O365ATP
 
     )
 
-$AuditMenu = CreateMenu -MenuTitle "HARDEN 365 - AUDIT" -MenuOptions @("Audit Microsoft Defender for O365 with ORCA","Audit Administration Roles","Audit Identity Users","Audit Autoforwarding","Audit Mailbox Permissions","Check DNS Records","<- Return")
+$AuditMenu = CreateMenu -TenantName $TenantName -TenantEdition $TenantEdition -O365ATP $O365ATP -MenuTitle "HARDEN 365 - AUDIT" -MenuOptions @("Audit Microsoft Defender for O365 with ORCA","Audit Administration Roles","Audit Identity Users","Audit Autoforwarding","Audit Mailbox Permissions","Check DNS Records","<- Return")
     switch($AuditMenu){
     0{
                 write-host $FrontStyle -ForegroundColor Red
@@ -162,7 +162,7 @@ $AuditMenu = CreateMenu -MenuTitle "HARDEN 365 - AUDIT" -MenuOptions @("Audit Mi
                 Invoke-ORCA -ExchangeEnvironmentName "O365Default" -Output HTML -OutputOptions @{HTML=@{OutputDirectory="$TenantName"}} -Connect $false -ShowSurvey $false
                 write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; Write-host ("Audit ORCA exported in folder .\$TenantName") -ForegroundColor Green
                 Read-Host -Prompt "Press Enter to return_"
-                AuditMenu
+                AuditMenu  -TenantName $TenantName -TenantEdition $TenantEdition -O365ATP $O365ATP
       }
     1{
                 write-host $FrontStyle -ForegroundColor Red
@@ -181,7 +181,7 @@ $AuditMenu = CreateMenu -MenuTitle "HARDEN 365 - AUDIT" -MenuOptions @("Audit Mi
                 }
                 Read-Host -Prompt "Press Enter to return_"
                 Clear-Host
-                AuditMenu
+                AuditMenu  -TenantName $TenantName -TenantEdition $TenantEdition -O365ATP $O365ATP
       }
     2{
                 write-host $FrontStyle -ForegroundColor Red
@@ -195,7 +195,7 @@ $AuditMenu = CreateMenu -MenuTitle "HARDEN 365 - AUDIT" -MenuOptions @("Audit Mi
                 } Catch {}
                 }
                 Read-Host -Prompt "Press Enter to return_"
-                AuditMenu
+                AuditMenu  -TenantName $TenantName -TenantEdition $TenantEdition -O365ATP $O365ATP
       }
     3{
                 write-host $FrontStyle -ForegroundColor Red
@@ -211,7 +211,7 @@ $AuditMenu = CreateMenu -MenuTitle "HARDEN 365 - AUDIT" -MenuOptions @("Audit Mi
                 } Catch {}
                 }
                 Read-Host -Prompt "Press Enter to return_"
-                AuditMenu
+                AuditMenu -TenantName $TenantName -TenantEdition $TenantEdition -O365ATP $O365ATP
       }
     4{
                 write-host $FrontStyle -ForegroundColor Red
@@ -227,7 +227,7 @@ $AuditMenu = CreateMenu -MenuTitle "HARDEN 365 - AUDIT" -MenuOptions @("Audit Mi
                 } Catch {}
                 }
                 Read-Host -Prompt "Press Enter to return_"
-                AuditMenu
+                AuditMenu -TenantName $TenantName -TenantEdition $TenantEdition -O365ATP $O365ATP
       }
     5{
              write-host $FrontStyle -ForegroundColor Red
@@ -242,13 +242,13 @@ $AuditMenu = CreateMenu -MenuTitle "HARDEN 365 - AUDIT" -MenuOptions @("Audit Mi
              write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; write-host("ERROR --> Harden365.DKIM module not working") -ForegroundColor Red}
              }
              Read-Host -Prompt "Press Enter to return_"
-             AuditMenu -Credential $Credential
+             AuditMenu -TenantName $TenantName -TenantEdition $TenantEdition -O365ATP $O365ATP
       }
     6{
        MainMenu -TenantName $TenantName -TenantEdition $TenantEdition -O365ATP $O365ATP
       }
     Default{
-      AuditMenu
+      AuditMenu -TenantName $TenantName -TenantEdition $TenantEdition -O365ATP $O365ATP
       }
     }
 }
@@ -256,9 +256,11 @@ $AuditMenu = CreateMenu -MenuTitle "HARDEN 365 - AUDIT" -MenuOptions @("Audit Mi
 function IdentityMenu(){
     Param(
         [System.Management.Automation.PSCredential]$Credential,
-        [String]$TenantName
+        [String]$TenantName,
+        [String]$TenantEdition,
+        [String]$O365ATP
     )
-$IdentityMenu = CreateMenu -MenuTitle "HARDEN 365 - IDENTITY" -MenuOptions @("Emergency Accounts","MFA per User","Conditionnal Access Models AAD","Export user configuration MFA","Import user configuration MFA","<- Return")
+$IdentityMenu = CreateMenu -TenantName $TenantName -TenantEdition $TenantEdition -O365ATP $O365ATP -MenuTitle "HARDEN 365 - IDENTITY" -MenuOptions @("Emergency Accounts","MFA per User","Conditionnal Access Models AAD","Export user configuration MFA","Import user configuration MFA","<- Return")
         switch($IdentityMenu){
     0{
                 write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; write-host("Do you want to create Emergency Accounts (Y/N) : ") -NoNewline -ForegroundColor Yellow ; $QID0 = Read-Host
@@ -273,12 +275,12 @@ $IdentityMenu = CreateMenu -MenuTitle "HARDEN 365 - IDENTITY" -MenuOptions @("Em
                     } Catch {
                     write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; write-host(" --> Harden365.TierModel module not working") -ForegroundColor Red}
                     }
-                    write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; Write-host ('Emergency Account credentials are saved in .\$TenantName ->Keepass file') -ForegroundColor Green
+                    write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; Write-host ("Emergency Account credentials are saved in .\$TenantName ->Keepass file") -ForegroundColor Green
                     write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; Write-host ('Password Keepass is : ') -ForegroundColor Green -NoNewline ; Write-host ('Harden365') -ForegroundColor Red
                     Read-Host -Prompt "Press Enter to return_"
-                    IdentityMenu
+                    IdentityMenu  -TenantName $TenantName -TenantEdition $TenantEdition -O365ATP $O365ATP
                 }
-                else {IdentityMenu}
+                else { IdentityMenu  -TenantName $TenantName -TenantEdition $TenantEdition -O365ATP $O365ATP}
                 }
     1{
                 write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; write-host("Do you want to configure Legacy MFA (Y/N) : ") -NoNewline -ForegroundColor Yellow ; $QID1 = Read-Host
@@ -296,9 +298,9 @@ $IdentityMenu = CreateMenu -MenuTitle "HARDEN 365 - IDENTITY" -MenuOptions @("Em
                     write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; write-host(" --> Harden365.MFAperUser module not working") -ForegroundColor Red}
                     }
                     Read-Host -Prompt "Press Enter to return_"
-                    IdentityMenu
+                    IdentityMenu -TenantName $TenantName -TenantEdition $TenantEdition -O365ATP $O365ATP
                 }
-                else {IdentityMenu}
+                else {IdentityMenu -TenantName $TenantName -TenantEdition $TenantEdition -O365ATP $O365ATP}
                 }
     2{
                 write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; write-host("Do you want to create Conditionnal Access Templates (Y/N) : ") -NoNewline -ForegroundColor Yellow ; $QID2 = Read-Host
@@ -315,9 +317,9 @@ $IdentityMenu = CreateMenu -MenuTitle "HARDEN 365 - IDENTITY" -MenuOptions @("Em
                     }
                     write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; Write-host ('All CA Template created is disable by default') -ForegroundColor Green
                     Read-Host -Prompt "Press Enter to return_"
-                    IdentityMenu
+                    IdentityMenu -TenantName $TenantName -TenantEdition $TenantEdition -O365ATP $O365ATP
                     }
-                else {IdentityMenu}
+                else {IdentityMenu -TenantName $TenantName -TenantEdition $TenantEdition  -O365ATP $O365ATP}
       }
     3{
                 write-host $FrontStyle -ForegroundColor Red
@@ -332,7 +334,7 @@ $IdentityMenu = CreateMenu -MenuTitle "HARDEN 365 - IDENTITY" -MenuOptions @("Em
                 } Catch {}
                 }
                 Read-Host -Prompt "Press Enter to return_"
-                IdentityMenu
+                IdentityMenu  -TenantName $TenantName -TenantEdition $TenantEdition -O365ATP $O365ATP
       }
     4{
                 write-host $FrontStyle -ForegroundColor Red
@@ -345,22 +347,24 @@ $IdentityMenu = CreateMenu -MenuTitle "HARDEN 365 - IDENTITY" -MenuOptions @("Em
                 } Catch {}
                 }
                 Read-Host -Prompt "Press Enter to return_"
-                IdentityMenu
+                IdentityMenu -TenantName $TenantName -TenantEdition $TenantEdition -O365ATP $O365ATP
       }
     5{
       MainMenu -TenantName $TenantName -TenantEdition $TenantEdition -O365ATP $O365ATP
       }
     Default{
-      IdentityMenu
+      IdentityMenu -TenantName $TenantName -TenantEdition $TenantEdition -O365ATP $O365ATP
       }
     }
 }
 
 function MessagingMenu(){
     Param(
-        [System.Management.Automation.PSCredential]$Credential
+        [String]$TenantName,
+        [String]$TenantEdition,
+        [String]$O365ATP
     )
-$MessagingMenu = CreateMenu -MenuTitle "HARDEN 365 - MESSAGING" -MenuOptions @("Exchange Online Protection","Defender for Office365","Check Autoforward","Check DNS Records","DKIM Configuration","<- Return")
+$MessagingMenu = CreateMenu -TenantName $TenantName -TenantEdition $TenantEdition -O365ATP $O365ATP -MenuTitle "HARDEN 365 - MESSAGING" -MenuOptions @("Exchange Online Protection","Defender for Office365","Check Autoforward","Check DNS Records","DKIM Configuration","<- Return")
         switch($MessagingMenu){
     0{
              write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; write-host("Do you want to secure Exchange Online Protection (Y/N) : ") -NoNewline -ForegroundColor Yellow ; $QMS0 = Read-Host
@@ -378,9 +382,9 @@ $MessagingMenu = CreateMenu -MenuTitle "HARDEN 365 - MESSAGING" -MenuOptions @("
                 write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; write-host("ERROR --> Harden365.ExchangeOnline module not working") -ForegroundColor Red}
                 }
                 Read-Host -Prompt "Press Enter to return_"
-                MessagingMenu
+                MessagingMenu -TenantName $TenantName -TenantEdition $TenantEdition -O365ATP $O365ATP
                 }
-             else {MessagingMenu}
+             else {MessagingMenu -TenantName $TenantName -TenantEdition $TenantEdition -O365ATP $O365ATP}
              }
     1{
              write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; write-host("Do you want to secure Defender for Office365 (Y/N) : ") -NoNewline -ForegroundColor Yellow ; $QMS1 = Read-Host
@@ -405,9 +409,9 @@ $MessagingMenu = CreateMenu -MenuTitle "HARDEN 365 - MESSAGING" -MenuOptions @("
                 write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; write-host("ERROR --> Harden365.DefenderForO365 module not working") -ForegroundColor Red}
                 }
                 Read-Host -Prompt "Press Enter to return_"
-                MessagingMenu
+                MessagingMenu -TenantName $TenantName -TenantEdition $TenantEdition -O365ATP $O365ATP
                 }
-             else {MessagingMenu}
+             else {MessagingMenu -TenantName $TenantName -TenantEdition $TenantEdition -O365ATP $O365ATP}
              }
     2{
              write-host $FrontStyle -ForegroundColor Red
@@ -423,7 +427,7 @@ $MessagingMenu = CreateMenu -MenuTitle "HARDEN 365 - MESSAGING" -MenuOptions @("
              write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; write-host("ERROR --> Harden365.ExchangeOnline module not working") -ForegroundColor Red}
              }
              Read-Host -Prompt "Press Enter to return_"
-             MessagingMenu
+             MessagingMenu -TenantName $TenantName -TenantEdition $TenantEdition -O365ATP $O365ATP
       }
     3{
              write-host $FrontStyle -ForegroundColor Red
@@ -438,7 +442,7 @@ $MessagingMenu = CreateMenu -MenuTitle "HARDEN 365 - MESSAGING" -MenuOptions @("
              write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; write-host("ERROR --> Harden365.DKIM module not working") -ForegroundColor Red}
              }
              Read-Host -Prompt "Press Enter to return_"
-             MessagingMenu
+             MessagingMenu -TenantName $TenantName -TenantEdition $TenantEdition -O365ATP $O365ATP
       }
     4{
              write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; write-host("Do you want to configure DKIM (Y/N) : ") -NoNewline -ForegroundColor Yellow ; $QMS4 = Read-Host
@@ -456,24 +460,26 @@ $MessagingMenu = CreateMenu -MenuTitle "HARDEN 365 - MESSAGING" -MenuOptions @("
                 write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; write-host("ERROR --> Harden365.DKIM module not working") -ForegroundColor Red}
                 }
                 Read-Host -Prompt "Press Enter to return_"
-                MessagingMenu
+                MessagingMenu -TenantName $TenantName -TenantEdition $TenantEdition -O365ATP $O365ATP
                 }
-             else {MessagingMenu}
+             else {MessagingMenu -TenantName $TenantName -TenantEdition $TenantEdition -O365ATP $O365ATP}
              }
     5{
       MainMenu -TenantName $TenantName -TenantEdition $TenantEdition -O365ATP $O365ATP
       }
     Default{
-      MessagingMenu
+      MessagingMenu -TenantName $TenantName -TenantEdition $TenantEdition -O365ATP $O365ATP
       }
     }
 }
 
 function ApplicationMenu(){
     Param(
-        [System.Management.Automation.PSCredential]$Credential
+        [String]$TenantName,
+        [String]$TenantEdition,
+        [String]$O365ATP
     )
-$ApplicationMenu = CreateMenu -MenuTitle "HARDEN 365 - APPLICATIONS" -MenuOptions @("Audit Applications","Hardening Outlook","Hardening MS Teams","Hardening Sharepoint","Hardening PowerPlatform","<- Return")
+$ApplicationMenu = CreateMenu -TenantName $TenantName -TenantEdition $TenantEdition -O365ATP $O365ATP -MenuTitle "HARDEN 365 - APPLICATIONS" -MenuOptions @("Audit Applications","Hardening Outlook","Hardening MS Teams","Hardening Sharepoint","Hardening PowerPlatform","<- Return")
         switch($ApplicationMenu){
     0{
              write-host $FrontStyle -ForegroundColor Red
@@ -503,7 +509,7 @@ $ApplicationMenu = CreateMenu -MenuTitle "HARDEN 365 - APPLICATIONS" -MenuOption
              write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; write-host("ERROR --> Harden365.AuditApplications module not working") -ForegroundColor Red}
              }
              Read-Host -Prompt "Press Enter to return_"
-             ApplicationMenu
+             ApplicationMenu -TenantName $TenantName -TenantEdition $TenantEdition -O365ATP $O365ATP
       }
     1{
              write-host $FrontStyle -ForegroundColor Red
@@ -519,7 +525,7 @@ $ApplicationMenu = CreateMenu -MenuTitle "HARDEN 365 - APPLICATIONS" -MenuOption
              write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; write-host("ERROR --> Harden365.Teams module not working") -ForegroundColor Red}
              }
              Read-Host -Prompt "Press Enter to return_"
-             ApplicationMenu
+             ApplicationMenu -TenantName $TenantName -TenantEdition $TenantEdition -O365ATP $O365ATP
       }
     2{
              write-host $FrontStyle -ForegroundColor Red
@@ -535,7 +541,7 @@ $ApplicationMenu = CreateMenu -MenuTitle "HARDEN 365 - APPLICATIONS" -MenuOption
              write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; write-host("ERROR --> Harden365.Teams module not working") -ForegroundColor Red}
              }
              Read-Host -Prompt "Press Enter to return_"
-             ApplicationMenu
+             ApplicationMenu -TenantName $TenantName -TenantEdition $TenantEdition -O365ATP $O365ATP
       }
      3{
              write-host $FrontStyle -ForegroundColor Red
@@ -554,7 +560,7 @@ $ApplicationMenu = CreateMenu -MenuTitle "HARDEN 365 - APPLICATIONS" -MenuOption
              write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; write-host("ERROR --> Harden365.Sharepoint module not working") -ForegroundColor Red}
              }
              Read-Host -Prompt "Press Enter to return_"
-             ApplicationMenu
+             ApplicationMenu -TenantName $TenantName -TenantEdition $TenantEdition -O365ATP $O365ATP
       }
     4{
              write-host $FrontStyle -ForegroundColor Red
@@ -570,24 +576,26 @@ $ApplicationMenu = CreateMenu -MenuTitle "HARDEN 365 - APPLICATIONS" -MenuOption
              write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; write-host("ERROR --> Harden365.PowerPlatform module not working") -ForegroundColor Red}
              }
              Read-Host -Prompt "Press Enter to return_"
-             ApplicationMenu
+             ApplicationMenu -TenantName $TenantName -TenantEdition $TenantEdition -O365ATP $O365ATP
       }
 
       5{
       MainMenu -TenantName $TenantName -TenantEdition $TenantEdition -O365ATP $O365ATP
       }
     Default{
-      ApplicationMenu
+      ApplicationMenu -TenantName $TenantName -TenantEdition $TenantEdition -O365ATP $O365ATP
       }
     }
 }
 
 function DeviceMenu(){
     Param(
-        [System.Management.Automation.PSCredential]$Credential,
-        [String]$AccessSecret
+      [String]$TenantName,
+      [String]$TenantEdition,
+      [String]$O365ATP,
+      [String]$AccessSecret
     )
-$DeviceMenu = CreateMenu -MenuTitle "HARDEN 365 - DEVICE" -MenuOptions @("Install Harden365 App","Hardening Intune","<- Return")
+$DeviceMenu = CreateMenu -TenantName $TenantName -TenantEdition $TenantEdition -O365ATP $O365ATP -MenuTitle "HARDEN 365 - DEVICE" -MenuOptions @("Install Harden365 App","Hardening Intune","<- Return")
         switch($DeviceMenu){
     0{
                 write-host $FrontStyle -ForegroundColor Red
@@ -599,7 +607,7 @@ $DeviceMenu = CreateMenu -MenuTitle "HARDEN 365 - DEVICE" -MenuOptions @("Instal
                 & $_.Name -ErrorAction:SilentlyContinue | Out-Null } Catch {}
                 }
                 Read-Host -Prompt "Press Enter to return_"
-                DeviceMenu -AccessSecret $AccessSecret
+                DeviceMenu -TenantName $TenantName -TenantEdition $TenantEdition -O365ATP $O365ATP -AccessSecret $AccessSecret
       }
     1{
                 write-host $FrontStyle -ForegroundColor Red
@@ -614,13 +622,13 @@ $DeviceMenu = CreateMenu -MenuTitle "HARDEN 365 - DEVICE" -MenuOptions @("Instal
                 & $_.Name -Accesssecret $AccessSecret -ErrorAction:SilentlyContinue | Out-Null } Catch {}
                 }
                 Read-Host -Prompt "Press Enter to return_"
-                DeviceMenu -AccessSecret $AccessSecret
+                DeviceMenu -TenantName $TenantName -TenantEdition $TenantEdition -O365ATP $O365ATP -AccessSecret $AccessSecret
       }
     2{
       MainMenu -TenantName $TenantName -TenantEdition $TenantEdition -O365ATP $O365ATP
       }
     Default{
-      DeviceMenu -AccessSecret $AccessSecret
+      DeviceMenu -TenantName $TenantName -TenantEdition $TenantEdition -O365ATP $O365ATP
       }
     }
 }

@@ -256,7 +256,7 @@ Function Start-EOPAntispamPolicyStandard {
 #SCRIPT OUTBOUND
     if ((Get-HostedOutboundSpamFilterRule).name -eq $RuleOutboundName)
     {
-        Write-LogWarning "$PolicyInboundName already created!"
+        Write-LogWarning "$PolicyOutboundName already created!"
         
     } else
     {
@@ -267,7 +267,7 @@ Function Start-EOPAntispamPolicyStandard {
             New-HostedOutboundSpamFilterRule -Name $RuleOutboundName -HostedOutboundSpamFilterPolicy $PolicyOutboundName -Priority $PriorityOut -SenderDomainIs ((Get-AcceptedDomain).Name)
             Write-LogInfo "$RuleOutboundName created"
         } Catch {
-                Write-LogError "$PolicyInboundName not created!"
+                Write-LogError "$PolicyOutboundName not created!"
                 }
          }
 }
@@ -304,7 +304,7 @@ Function Start-EOPAntiForwardPolicy {
 #SCRIPT OUTBOUND
     if ((Get-HostedOutboundSpamFilterRule).name -eq $RuleOutboundName)
     {
-        Write-LogWarning "$PolicyInboundName already created!"
+        Write-LogWarning "$PolicyOutboundName already created!"
         
     } else
     {
@@ -314,7 +314,7 @@ Function Start-EOPAntiForwardPolicy {
             New-HostedOutboundSpamFilterRule -Name $RuleOutboundName -HostedOutboundSpamFilterPolicy $PolicyOutboundName -Priority $Priority -FromMemberOf $FromMemberOf
             Write-LogInfo "$RuleOutboundName created"
         } Catch {
-                Write-LogError "$PolicyInboundName not created!"
+                Write-LogError "$PolicyOutboundName not created!"
                 }
          }
 }
