@@ -159,7 +159,7 @@ $AuditMenu = CreateMenu -TenantName $TenantName -TenantEdition $TenantEdition -O
                 write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; Write-host ('Connecting to ExchangeOnline Powershell') -ForegroundColor Green
                 try {Get-OrganizationConfig | Out-Null 
                 } catch {Connect-ExchangeOnline  -WarningAction:SilentlyContinue -ShowBanner:$false}
-                Invoke-ORCA -ExchangeEnvironmentName "O365Default" -Output HTML -OutputOptions @{HTML=@{OutputDirectory="$TenantName"}} -Connect $false -ShowSurvey $false
+                Invoke-ORCA -ExchangeEnvironmentName "O365Default" -Output HTML -OutputOptions @{HTML=@{OutputDirectory="$TenantName"}} -Connect $false -ShowSurvey $false -SCC $false
                 write-host $(Get-Date -UFormat "%m-%d-%Y %T ") -NoNewline ; Write-host ("Audit ORCA exported in folder .\$TenantName") -ForegroundColor Green
                 Read-Host -Prompt "Press Enter to return_"
                 AuditMenu  -TenantName $TenantName -TenantEdition $TenantEdition -O365ATP $O365ATP
