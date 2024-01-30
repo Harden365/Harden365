@@ -48,12 +48,13 @@ function Test-UserIsAdministrator {
     if (!$isAdmin) {
         Write-LogError 'You must run this script as an administrator to update or install powershell module'
         Write-LogError 'Script execution cancelled'
-        Pause;Break
+        Pause; Break
     }
 }
 
 function Test-PowerShellModule {
     param(
+        [Array]$installedModule,
         [String]$ModuleName,
         [String]$ModuleVersion,
         [int]$OperationCount,
@@ -62,24 +63,25 @@ function Test-PowerShellModule {
 
     Update-ProgressionBarInnerLoop -Activity "Check $ModuleName Powershell module" -Status 'In progress' -OperationCount $OperationCount -OperationTotal $OperationTotal
 
-    $installedPSModule = Get-InstalledModule $ModuleName -ErrorAction Ignore
-    $installedPSModuleVersion = Get-InstalledModule $ModuleName -MinimumVersion $ModuleVersion -ErrorAction Ignore
-    if($null -eq $installedPSModule){
-        Write-LogWarning "$ModuleName Powershell Module necessary"
-        Test-UserIsAdministrator
-        [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-        Set-PSRepository -Name 'PSGallery' -InstallationPolicy Trusted
-        Write-LogInfo ("Installing $ModuleName Powershell Module")
-        Install-Module $ModuleName -AllowClobber
-        Set-PSRepository -Name 'PSGallery' -InstallationPolicy Untrusted
-    } elseif ($null -eq $installedPSModuleVersion) {
-        Write-LogInfo ("Updating $ModuleName Powershell Module")
-        Test-UserIsAdministrator
-        Pause
-        [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-        Update-Module $ModuleName 
-        Write-LogInfo "$ModuleName Powershell Module updated"
-    }
+    $installedCheckModule = $installedModule | where-object {$_.Name -eq $ModuleName}
+
+        if (!$installedCheckModule) {
+            Write-LogWarning "$ModuleName Powershell Module necessary"
+            Test-UserIsAdministrator
+            [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+            Set-PSRepository -Name 'PSGallery' -InstallationPolicy Trusted
+            Write-LogInfo ("Installing $ModuleName Powershell Module")
+            Install-Module $ModuleName -AllowClobber
+            Set-PSRepository -Name 'PSGallery' -InstallationPolicy Untrusted
+        }
+        elseif ([System.Version]$installedCheckModule.Version -lt [System.Version]$ModuleVersion) {
+            Write-LogInfo ("Updating $ModuleName Powershell Module")
+            Test-UserIsAdministrator
+            Pause
+            [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+            Update-Module $ModuleName 
+            Write-LogInfo "$ModuleName Powershell Module updated"
+        }
     Write-LogInfo "$ModuleName Powershell Module installed"
 }
 
@@ -95,23 +97,25 @@ function Test-AllPrerequisites {
     Update-ProgressionBarOuterLoop -Activity 'Prerequisites check' -Status 'In progress' -OperationCount $OperationCount -OperationTotal $OperationTotal
     
     Update-ProgressionBarInnerLoop -Activity 'Check PowerShell version' -Status 'In progress' -OperationCount $currentCountOfPrerequisitesCheck -OperationTotal $numberOfPrerequisitesCheck
+    
+    $installedModule = Get-InstalledModule
 
     $currentCountOfPrerequisitesCheck++
-    Test-PowerShellModule -ModuleName 'ExchangeOnlineManagement' -ModuleVersion '2.0.5' -OperationCount $currentCountOfPrerequisitesCheck -OperationTotal $numberOfPrerequisitesCheck
+    Test-PowerShellModule -ModuleName 'ExchangeOnlineManagement' -ModuleVersion '2.0.5' -installedModule $installedModule  -OperationCount $currentCountOfPrerequisitesCheck -OperationTotal $numberOfPrerequisitesCheck
     $currentCountOfPrerequisitesCheck++
-    Test-PowerShellModule -ModuleName 'MSOnline' -ModuleVersion '1.1' -OperationCount $currentCountOfPrerequisitesCheck -OperationTotal $numberOfPrerequisitesCheck
+    Test-PowerShellModule -ModuleName 'MSOnline' -ModuleVersion '1.1' -installedModule $installedModule -OperationCount $currentCountOfPrerequisitesCheck -OperationTotal $numberOfPrerequisitesCheck
     $currentCountOfPrerequisitesCheck++
-    Test-PowerShellModule -ModuleName 'Microsoft.Online.SharePoint.PowerShell' -ModuleVersion '16.0' -OperationCount $currentCountOfPrerequisitesCheck -OperationTotal $numberOfPrerequisitesCheck
+    Test-PowerShellModule -ModuleName 'Microsoft.Online.SharePoint.PowerShell' -ModuleVersion '16.0' -installedModule $installedModule -OperationCount $currentCountOfPrerequisitesCheck -OperationTotal $numberOfPrerequisitesCheck
     $currentCountOfPrerequisitesCheck++
-    Test-PowerShellModule -ModuleName 'Microsoft.PowerApps.Administration.PowerShell' -ModuleVersion '2.0.147' -OperationCount $currentCountOfPrerequisitesCheck -OperationTotal $numberOfPrerequisitesCheck
+    Test-PowerShellModule -ModuleName 'Microsoft.PowerApps.Administration.PowerShell' -ModuleVersion '2.0.147' -installedModule $installedModule -OperationCount $currentCountOfPrerequisitesCheck -OperationTotal $numberOfPrerequisitesCheck
     $currentCountOfPrerequisitesCheck++
-    Test-PowerShellModule -ModuleName 'Microsoft.PowerApps.PowerShell' -ModuleVersion '1.0.20' -OperationCount $currentCountOfPrerequisitesCheck -OperationTotal $numberOfPrerequisitesCheck
+    Test-PowerShellModule -ModuleName 'Microsoft.PowerApps.PowerShell' -ModuleVersion '1.0.20' -installedModule $installedModule -OperationCount $currentCountOfPrerequisitesCheck -OperationTotal $numberOfPrerequisitesCheck
     $currentCountOfPrerequisitesCheck++ 
-    Test-PowerShellModule -ModuleName 'MSCommerce' -ModuleVersion '1.10' -OperationCount $currentCountOfPrerequisitesCheck -OperationTotal $numberOfPrerequisitesCheck
+    Test-PowerShellModule -ModuleName 'MSCommerce' -ModuleVersion '1.10' -installedModule $installedModule -OperationCount $currentCountOfPrerequisitesCheck -OperationTotal $numberOfPrerequisitesCheck
     $currentCountOfPrerequisitesCheck++
-    Test-PowerShellModule -ModuleName 'MicrosoftTeams' -ModuleVersion '4.2.0' -OperationCount $currentCountOfPrerequisitesCheck -OperationTotal $numberOfPrerequisitesCheck
+    Test-PowerShellModule -ModuleName 'MicrosoftTeams' -ModuleVersion '4.2.0' -installedModule $installedModule -OperationCount $currentCountOfPrerequisitesCheck -OperationTotal $numberOfPrerequisitesCheck
     $currentCountOfPrerequisitesCheck++
-    Test-PowerShellModule -ModuleName 'ORCA' -ModuleVersion '2.8.1' -OperationCount $currentCountOfPrerequisitesCheck -OperationTotal $numberOfPrerequisitesCheck
+    Test-PowerShellModule -ModuleName 'ORCA' -ModuleVersion '2.8.1' -installedModule $installedModule -OperationCount $currentCountOfPrerequisitesCheck -OperationTotal $numberOfPrerequisitesCheck
     $currentCountOfPrerequisitesCheck++
     Update-ProgressionBarInnerLoop -Activity 'Prerequisite check' -Status 'Complete' -OperationCount $currentCountOfPrerequisitesCheck -OperationTotal $numberOfPrerequisitesCheck
 
