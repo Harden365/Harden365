@@ -39,6 +39,7 @@ $allModulesPathList = @(
     'Harden365.DeviceConfigImport'
     'Harden365.Identity.Roles'
     'Harden365.Identity.Users'
+    'Harden365.Identity.Applications'
 )
 
 function Test-UserIsAdministrator {

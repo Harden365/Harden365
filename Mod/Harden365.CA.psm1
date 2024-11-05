@@ -193,8 +193,8 @@ Function Start-LegacyAuthPolicy {
 $DomainOnM365=(Get-MgDomain | Where-Object { $_.IsInitial -eq $true }).Id
 $ExcludeCAGroup = (Get-MgGroup -All | Where-Object { $_.DisplayName -eq $GroupExclude }).Id
 $CondAccPol=Get-MgIdentityConditionalAccessPolicy -Filter "DisplayName eq '$name'"
-$idBriceGlass = (Get-MgUser -All | Where-Object { $_.UserPrincipalName -eq "brice.glass@$domainOnM365" }).Id
-$idBriceDouglass = (Get-MgUser -All | Where-Object { $_.UserPrincipalName -eq "brice.douglass@$domainOnM365" }).Id
+$admin1 = (Get-MgUser -All | Where-Object { $_.UserPrincipalName -like "admbg1*@$DomainOnM365" }).Id
+$admin2 = (Get-MgUser -All | Where-Object { $_.UserPrincipalName -like "admbg2*@$DomainOnM365" }).Id
     if (-not $CondAccPol){
         Try {
             $params = @{
@@ -215,8 +215,8 @@ $idBriceDouglass = (Get-MgUser -All | Where-Object { $_.UserPrincipalName -eq "b
 				            "All"
 			                )
                         excludeUsers = @(
-				            "$idBriceGlass"
-                            "$idBriceDouglass"
+				            "$admin1"
+                            "$admin2"
 			                )
                         excludeGroups = @(
                             "$ExcludeCAGroup"
@@ -282,8 +282,8 @@ $CARoles = @(
 
 $DomainOnM365=(Get-MgDomain | Where-Object { $_.IsInitial -eq $true }).Id
 $CondAccPol=Get-MgIdentityConditionalAccessPolicy -Filter "DisplayName eq '$name'"
-$idBriceGlass = (Get-MgUser -All | Where-Object { $_.UserPrincipalName -eq "brice.glass@$domainOnM365" }).Id
-$idBriceDouglass = (Get-MgUser -All | Where-Object { $_.UserPrincipalName -eq "brice.douglass@$domainOnM365" }).Id
+$admin1 = (Get-MgUser -All | Where-Object { $_.UserPrincipalName -like "admbg1*@$DomainOnM365" }).Id
+$admin2 = (Get-MgUser -All | Where-Object { $_.UserPrincipalName -like "admbg2*@$DomainOnM365" }).Id
     if (-not $CondAccPol){
         Try {
             $params = @{
@@ -302,8 +302,8 @@ $idBriceDouglass = (Get-MgUser -All | Where-Object { $_.UserPrincipalName -eq "b
 		                users = @{
                             includeRoles = $CARoles
                         excludeUsers = @(
-				            "$idBriceGlass"
-                            "$idBriceDouglass"
+				            "$admin1"
+                            "$admin2"
 			                )
 		                }
 	                }
@@ -367,8 +367,8 @@ Function Start-MFAUsers {
 $ExcludeCAGroup = (Get-MgGroup -All | Where-Object { $_.DisplayName -eq $GroupExclude }).Id
 $DomainOnM365=(Get-MgDomain | Where-Object { $_.IsInitial -eq $true }).Id
 $CondAccPol=Get-MgIdentityConditionalAccessPolicy -Filter "DisplayName eq '$name'"
-$idBriceGlass = (Get-MgUser -All | Where-Object { $_.UserPrincipalName -eq "brice.glass@$domainOnM365" }).Id
-$idBriceDouglass = (Get-MgUser -All | Where-Object { $_.UserPrincipalName -eq "brice.douglass@$domainOnM365" }).Id
+$admin1 = (Get-MgUser -All | Where-Object { $_.UserPrincipalName -like "admbg1*@$DomainOnM365" }).Id
+$admin2 = (Get-MgUser -All | Where-Object { $_.UserPrincipalName -like "admbg2*@$DomainOnM365" }).Id
 $CARoles = @(
 (Get-MgDirectoryRoleTemplate | Where-Object {$_.DisplayName -eq "Global Administrator"}).Id,
 (Get-MgDirectoryRoleTemplate | Where-Object {$_.DisplayName -eq "Global Reader"}).Id,
@@ -409,8 +409,8 @@ $CARoles = @(
                                 )
                             excludeUsers = @(
                                 "GuestsOrExternalUsers"
-				                "$idBriceGlass"
-                                "$idBriceDouglass"
+				                "$admin1"
+                                "$admin2"
 			                    )
                             excludeGroups = @(
                                 $ExcludeCAGroup
@@ -440,7 +440,7 @@ $CARoles = @(
                     }
             }
             New-MgIdentityConditionalAccessPolicy -BodyParameter $params
-            Write-LogInfo "Conditional Access '$Name' created"
+            Write-LogInfo "CA '$Name' created"
             }
                  Catch {
                         Write-LogError "CA '$Name' not created"
@@ -475,8 +475,8 @@ Function Start-MFAGuests {
 $ExcludeCAGroup = (Get-MgGroup -All | Where-Object { $_.DisplayName -eq $GroupExclude }).Id
 $DomainOnM365=(Get-MgDomain | Where-Object { $_.IsInitial -eq $true }).Id
 $CondAccPol=Get-MgIdentityConditionalAccessPolicy -Filter "DisplayName eq '$name'"
-$idBriceGlass = (Get-MgUser -All | Where-Object { $_.UserPrincipalName -eq "brice.glass@$domainOnM365" }).Id
-$idBriceDouglass = (Get-MgUser -All | Where-Object { $_.UserPrincipalName -eq "brice.douglass@$domainOnM365" }).Id
+$admin1 = (Get-MgUser -All | Where-Object { $_.UserPrincipalName -like "admbg1*@$DomainOnM365" }).Id
+$admin2 = (Get-MgUser -All | Where-Object { $_.UserPrincipalName -like "admbg2*@$DomainOnM365" }).Id
 
     if (-not $CondAccPol){
         Try {
@@ -498,8 +498,8 @@ $idBriceDouglass = (Get-MgUser -All | Where-Object { $_.UserPrincipalName -eq "b
                                 "GuestsOrExternalUsers"
                                 )
                             excludeUsers = @(
-				                "$idBriceGlass"
-                                "$idBriceDouglass"
+				                "$admin1"
+                                "$admin2"
 			                    )
                             excludeGroups = @(
                                 $ExcludeCAGroup
@@ -526,7 +526,7 @@ $idBriceDouglass = (Get-MgUser -All | Where-Object { $_.UserPrincipalName -eq "b
                     }
             }
             New-MgIdentityConditionalAccessPolicy -BodyParameter $params
-            Write-LogInfo "Conditional Access '$Name' created"
+            Write-LogInfo "CA '$Name' created"
             }
                  Catch {
                         Write-LogError "CA '$Name' not created"
@@ -561,8 +561,8 @@ Function Start-UnsupportedDevicePlatforms {
 $ExcludeCAGroup = (Get-MgGroup -All | Where-Object { $_.DisplayName -eq $GroupExclude }).Id
 $DomainOnM365=(Get-MgDomain | Where-Object { $_.IsInitial -eq $true }).Id
 $CondAccPol=Get-MgIdentityConditionalAccessPolicy -Filter "DisplayName eq '$name'"
-$idBriceGlass = (Get-MgUser -All | Where-Object { $_.UserPrincipalName -eq "brice.glass@$domainOnM365" }).Id
-$idBriceDouglass = (Get-MgUser -All | Where-Object { $_.UserPrincipalName -eq "brice.douglass@$domainOnM365" }).Id
+$admin1 = (Get-MgUser -All | Where-Object { $_.UserPrincipalName -like "admbg1*@$DomainOnM365" }).Id
+$admin2 = (Get-MgUser -All | Where-Object { $_.UserPrincipalName -like "admbg2*@$DomainOnM365" }).Id
     if (-not $CondAccPol){
         Try {
             $params = @{
@@ -584,8 +584,8 @@ $idBriceDouglass = (Get-MgUser -All | Where-Object { $_.UserPrincipalName -eq "b
                                 )
                             excludeUsers = @(
                                 "GuestsOrExternalUsers"
-				                "$idBriceGlass"
-                                "$idBriceDouglass"
+				                "$admin1"
+                                "$admin2"
 			                    )
                             excludeGroups = @(
                                 $ExcludeCAGroup
@@ -646,8 +646,8 @@ Function Start-MobileDeviceAccessRequirements {
 #SCRIPT
 $DomainOnM365=(Get-MgDomain | Where-Object { $_.IsInitial -eq $true }).Id
 $CondAccPol=Get-MgIdentityConditionalAccessPolicy -Filter "DisplayName eq '$name'"
-$idBriceGlass = (Get-MgUser -All | Where-Object { $_.UserPrincipalName -eq "brice.glass@$domainOnM365" }).Id
-$idBriceDouglass = (Get-MgUser -All | Where-Object { $_.UserPrincipalName -eq "brice.douglass@$domainOnM365" }).Id
+$admin1 = (Get-MgUser -All | Where-Object { $_.UserPrincipalName -like "admbg1*@$DomainOnM365" }).Id
+$admin2 = (Get-MgUser -All | Where-Object { $_.UserPrincipalName -like "admbg2*@$DomainOnM365" }).Id
     if (-not $CondAccPol){
         Try {
                $params = @{
@@ -667,8 +667,8 @@ $idBriceDouglass = (Get-MgUser -All | Where-Object { $_.UserPrincipalName -eq "b
                                 "All"
                                 )
                             excludeUsers = @(
-				                "$idBriceGlass"
-                                "$idBriceDouglass"
+				                "$admin1"
+                                "$admin2"
 			                    )
 		                }
                         platforms = @{
@@ -721,8 +721,8 @@ Function Start-MobileAppsandDesktopClients {
 #SCRIPT
 $DomainOnM365=(Get-MgDomain | Where-Object { $_.IsInitial -eq $true }).Id
 $CondAccPol=Get-MgIdentityConditionalAccessPolicy -Filter "DisplayName eq '$name'"
-$idBriceGlass = (Get-MgUser -All | Where-Object { $_.UserPrincipalName -eq "brice.glass@$domainOnM365" }).Id
-$idBriceDouglass = (Get-MgUser -All | Where-Object { $_.UserPrincipalName -eq "brice.douglass@$domainOnM365" }).Id
+$admin1 = (Get-MgUser -All | Where-Object { $_.UserPrincipalName -like "admbg1*@$DomainOnM365" }).Id
+$admin2 = (Get-MgUser -All | Where-Object { $_.UserPrincipalName -like "admbg2*@$DomainOnM365" }).Id
 $idTeamsService = (Get-MgServicePrincipal -Filter "DisplayName eq 'Microsoft Teams Services'").AppId
     if (-not $CondAccPol){
         Try {
@@ -746,8 +746,8 @@ $idTeamsService = (Get-MgServicePrincipal -Filter "DisplayName eq 'Microsoft Tea
                                 "All"
                                 )
                             excludeUsers = @(
-				                "$idBriceGlass"
-                                "$idBriceDouglass"
+				                "$admin1"
+                                "$admin2"
 			                    )
 		                }
                         platforms = @{
@@ -765,7 +765,7 @@ $idTeamsService = (Get-MgServicePrincipal -Filter "DisplayName eq 'Microsoft Tea
 	                }
             }
             New-MgIdentityConditionalAccessPolicy -BodyParameter $params
-            Write-LogInfo "Conditional Access '$Name' created"
+            Write-LogInfo "CA '$Name' created"
             }
                  Catch {
                         Write-LogError "CA '$Name' not created"
@@ -800,9 +800,8 @@ if (((Get-MgSubscribedSku | Where-Object { $_.CapabilityStatus -eq "Enabled" }).
     { 
 $DomainOnM365=(Get-MgDomain | Where-Object { $_.IsInitial -eq $true }).Id
 $CondAccPol=Get-MgIdentityConditionalAccessPolicy -Filter "DisplayName eq '$name'"
-$idBriceGlass = (Get-MgUser -All | Where-Object { $_.UserPrincipalName -eq "brice.glass@$domainOnM365" }).Id
-$idBriceDouglass = (Get-MgUser -All | Where-Object { $_.UserPrincipalName -eq "brice.douglass@$domainOnM365" }).Id
-
+$admin1 = (Get-MgUser -All | Where-Object { $_.UserPrincipalName -like "admbg1*@$DomainOnM365" }).Id
+$admin2 = (Get-MgUser -All | Where-Object { $_.UserPrincipalName -like "admbg2*@$DomainOnM365" }).Id
     if (-not $CondAccPol){
         Try {
             $params = @{
@@ -822,8 +821,8 @@ $idBriceDouglass = (Get-MgUser -All | Where-Object { $_.UserPrincipalName -eq "b
                                 "All"
                                 )
                             excludeUsers = @(
-				                "$idBriceGlass"
-                                "$idBriceDouglass"
+				                "$admin1"
+                                "$admin2"
 			                    )
 		                }
 		                UserRiskLevels = @(
@@ -877,8 +876,8 @@ if (((Get-MgSubscribedSku | Where-Object { $_.CapabilityStatus -eq "Enabled" }).
     { 
 $DomainOnM365=(Get-MgDomain | Where-Object { $_.IsInitial -eq $true }).Id
 $CondAccPol=Get-MgIdentityConditionalAccessPolicy -Filter "DisplayName eq '$name'"
-$idBriceGlass = (Get-MgUser -All | Where-Object { $_.UserPrincipalName -eq "brice.glass@$domainOnM365" }).Id
-$idBriceDouglass = (Get-MgUser -All | Where-Object { $_.UserPrincipalName -eq "brice.douglass@$domainOnM365" }).Id
+$admin1 = (Get-MgUser -All | Where-Object { $_.UserPrincipalName -like "admbg1*@$DomainOnM365" }).Id
+$admin2 = (Get-MgUser -All | Where-Object { $_.UserPrincipalName -like "admbg2*@$DomainOnM365" }).Id
 
     if (-not $CondAccPol){
         Try {
@@ -899,8 +898,8 @@ $idBriceDouglass = (Get-MgUser -All | Where-Object { $_.UserPrincipalName -eq "b
                                 "All"
                                 )
                             excludeUsers = @(
-				                "$idBriceGlass"
-                                "$idBriceDouglass"
+				                "$admin1"
+                                "$admin2"
 			                    )
 		                }
 		                SignInRiskLevels = @(

@@ -40,7 +40,7 @@ Function Start-EmergencyAccount1 {
     [Boolean]$SpecialCharacters = $true,
     [String]$ExcludeCharacters = "@",
     [String]$Lengt = "48",
-    [String]$Title = "Brice_Glass"
+    [String]$Title = "EmergencyAccount1"
 )
 
 Write-LogSection 'EMERGENCY ACCOUNTS' -NoHostOutput
@@ -62,31 +62,33 @@ try { Get-InstalledModule -Name PoShKeePass -ErrorAction Stop > $null}
                 }
 
 #SCRIPT
+$DomainDefault=(Get-MgDomain | Where-Object { $_.IsDefault -match $true }).Id
 $DomainOnM365=(Get-MgDomain | Where-Object { $_.IsInitial -match $true }).Id
 $dateString = Get-Date -Format "yyyyMMdd"
-    if ((Get-MgUser).UserPrincipalName -eq "brice.glass@$DomainOnM365")
+    if ((Get-MgUser).UserPrincipalName -like "admbg1*@$DomainOnM365")
         {
-        Write-LogWarning "User 'brice.glass@$DomainOnM365' already created!"      
+        Write-LogWarning "EmergencyAccount1 already created!"      
     }
     else { 
             Try {
+            $admbg1random = -join ((48..57) + (97..122) | Get-Random -Count 10 | % {[char]$_})
             Remove-KeePassDatabaseConfiguration -DatabaseProfileName "Harden365_uadmin" -Confirm:$false
-            Copy-Item -Path ".\Config\Harden365.kp" -Destination "$DomainOnM365\Harden365-$dateString.kdbx"
-            New-KeePassDatabaseConfiguration -DatabaseProfileName "Harden365_uadmin" -DatabasePath ".\$DomainOnM365\Harden365-$dateString.kdbx" -UseMasterKey
+            Copy-Item -Path ".\Config\Harden365.kp" -Destination ".\$DomainDefault\Harden365-$dateString.kdbx"
+            New-KeePassDatabaseConfiguration -DatabaseProfileName "Harden365_uadmin" -DatabasePath ".\$DomainDefault\Harden365-$dateString.kdbx" -UseMasterKey
             $SecureString128=ConvertTo-SecureString "Harden365" -AsPlainText -Force
             if ($null -eq (Get-KeePassEntry -DatabaseProfileName "Harden365_uadmin" -KeePassEntryGroupPath "Harden365" -Title $Title -MasterKey $SecureString128))
             {
             $Pass_uadmin = New-KeePassPassword -UpperCase:$UpperCase -LowerCase:$LowerCase -Digits:$Digits -SpecialCharacters:$SpecialCharacters  -ExcludeCharacters:$ExcludeCharacters -Length $Lengt
             $SecureString128=ConvertTo-SecureString "Harden365" -AsPlainText -Force
-            New-KeePassEntry -DatabaseProfileName "Harden365_uadmin" -KeePassEntryGroupPath "Harden365" -Title $Title -UserName "brice.glass@$DomainOnM365" -KeePassPassword $Pass_uadmin -MasterKey $SecureString128
+            New-KeePassEntry -DatabaseProfileName "Harden365_uadmin" -KeePassEntryGroupPath "Harden365" -Title $Title -UserName "admbg1$admbg1random@$DomainOnM365" -KeePassPassword $Pass_uadmin -MasterKey $SecureString128
             $U_PasswordProfile = @{
               Password = (Get-KeePassEntry -AsPlainText -DatabaseProfileName "Harden365_uadmin" -Title $Title -MasterKey $SecureString128).Password
               ForceChangePasswordNextSignIn = $False
               }
-            New-MgUser -DisplayName $Title -PasswordProfile $U_PasswordProfile -UserPrincipalName "brice.glass@$DomainOnM365" -AccountEnabled -MailNickName $Title
+            New-MgUser -DisplayName $Title -PasswordProfile $U_PasswordProfile -UserPrincipalName "admbg1$admbg1random@$DomainOnM365" -AccountEnabled -MailNickName $Title
             Import-Module Microsoft.Graph.Identity.Governance
             Remove-KeePassDatabaseConfiguration -DatabaseProfileName "Harden365_uadmin" -Confirm:$false
-            $uadmin = Get-MgUser -UserId "brice.glass@$DomainOnM365"
+            $uadmin = Get-MgUser -UserId "admbg1$admbg1random@$DomainOnM365"
             $globalAdmin = Get-MgRoleManagementDirectoryRoleDefinition -Filter "displayName eq 'Global Administrator'"
             Start-Sleep -Seconds 10
             $params = @{
@@ -96,12 +98,12 @@ $dateString = Get-Date -Format "yyyyMMdd"
             	DirectoryScopeId = "/"
             }
             New-MgRoleManagementDirectoryRoleAssignment -BodyParameter $params
-            Write-LogInfo "User 'brice.glass@$DomainOnM365' created"
+            Write-LogInfo "User 'admbg1$admbg1random@$DomainOnM365' created"
             } else {
-            Write-LogWarning "User 'brice.glass@$DomainOnM365' already created"}
+            Write-LogWarning "User 'admbg1$admbg1random@$DomainOnM365' already created"}
             }
                  Catch {
-                        Write-LogError "User 'brice.glass@$DomainOnM365' not created"
+                        Write-LogError "User 'admbg1$admbg1random@$DomainOnM365' not created"
                        }
           }
 }
@@ -128,35 +130,38 @@ Function Start-EmergencyAccount2 {
     [Boolean]$SpecialCharacters = $true,
     [String]$ExcludeCharacters = "@",
     [String]$Lengt = "48",
-    [String]$Title = "Brice_Douglass"
+    [String]$Title = "EmergencyAccount2"
 )
 
 
 #SCRIPT
+$DomainDefault=(Get-MgDomain | Where-Object { $_.IsDefault -match $true }).Id
 $DomainOnM365=(Get-MgDomain | Where-Object { $_.IsInitial -match $true }).Id
 $dateString = Get-Date -Format "yyyyMMdd"
-    if ((Get-MgUser).UserPrincipalName -eq "brice.douglass@$DomainOnM365")
+    if ((Get-MgUser).UserPrincipalName -like "admbg2*@$DomainOnM365")
         {
-        Write-LogWarning "User 'brice.douglass@$DomainOnM365' already created!"      
+        Write-LogWarning "EmergencyAccount2 already created!"      
     }
+
     else { 
             Try {
+            $admbg2random = -join ((48..57) + (97..122) | Get-Random -Count 10 | % {[char]$_})
             Remove-KeePassDatabaseConfiguration -DatabaseProfileName "Harden365_uadmin" -Confirm:$false
-            New-KeePassDatabaseConfiguration -DatabaseProfileName "Harden365_uadmin" -DatabasePath ".\$DomainOnM365\Harden365-$dateString.kdbx" -UseMasterKey
+            New-KeePassDatabaseConfiguration -DatabaseProfileName "Harden365_uadmin" -DatabasePath ".\$DomainDefault\Harden365-$dateString.kdbx" -UseMasterKey
             $SecureString128=ConvertTo-SecureString "Harden365" -AsPlainText -Force
             if ($null -eq (Get-KeePassEntry -DatabaseProfileName "Harden365_uadmin" -KeePassEntryGroupPath "Harden365" -Title $Title -MasterKey $SecureString128))
             {
             $Pass_uadmin = New-KeePassPassword -UpperCase:$UpperCase -LowerCase:$LowerCase -Digits:$Digits -SpecialCharacters:$SpecialCharacters  -ExcludeCharacters:$ExcludeCharacters -Length $Lengt
             $SecureString128=ConvertTo-SecureString "Harden365" -AsPlainText -Force
-            New-KeePassEntry -DatabaseProfileName "Harden365_uadmin" -KeePassEntryGroupPath "Harden365" -Title $Title -UserName "brice.douglass@$DomainOnM365" -KeePassPassword $Pass_uadmin -MasterKey $SecureString128
+            New-KeePassEntry -DatabaseProfileName "Harden365_uadmin" -KeePassEntryGroupPath "Harden365" -Title $Title -UserName "admbg2$admbg2random@$DomainOnM365" -KeePassPassword $Pass_uadmin -MasterKey $SecureString128
             $U_PasswordProfile = @{
               Password = (Get-KeePassEntry -AsPlainText -DatabaseProfileName "Harden365_uadmin" -Title $Title -MasterKey $SecureString128).Password
               ForceChangePasswordNextSignIn = $False
               }
-            New-MgUser -DisplayName $Title -PasswordProfile $U_PasswordProfile -UserPrincipalName "brice.douglass@$DomainOnM365" -AccountEnabled -MailNickName $Title
+            New-MgUser -DisplayName $Title -PasswordProfile $U_PasswordProfile -UserPrincipalName "admbg2$admbg2random@$DomainOnM365" -AccountEnabled -MailNickName $Title
             Remove-KeePassDatabaseConfiguration -DatabaseProfileName "Harden365_uadmin" -Confirm:$false
             Import-Module Microsoft.Graph.Identity.Governance
-            $uadmin = Get-MgUser -UserId "brice.douglass@$DomainOnM365"
+            $uadmin = Get-MgUser -UserId "admbg2$admbg2random@$DomainOnM365"
             $globalAdmin = Get-MgRoleManagementDirectoryRoleDefinition -Filter "displayName eq 'Global Administrator'"
             Start-Sleep -Seconds 10
             $params = @{
@@ -166,12 +171,12 @@ $dateString = Get-Date -Format "yyyyMMdd"
             	DirectoryScopeId = "/"
             }
             New-MgRoleManagementDirectoryRoleAssignment -BodyParameter $params
-            Write-LogInfo "User 'brice.douglass@$DomainOnM365' created"
+            Write-LogInfo "User 'admbg2$admbg2random@$DomainOnM365' created"
             } else {
-            Write-LogWarning "User 'brice.douglass@$DomainOnM365' already created"}
+            Write-LogWarning "User 'admbg2$admbg2random@$DomainOnM365' already created"}
             }
                  Catch {
-                        Write-LogError "User 'brice.douglass@$DomainOnM365' not created"
+                        Write-LogError "User 'admbg2$admbg2random@$DomainOnM365' not created"
                        }
           }
 }
@@ -196,36 +201,39 @@ Function Start-TiersAdminNoExpire {
 
 
 #SCRIPT
-$DomainOnM365=(Get-MgDomain | Where-Object { $_.IsInitial -match $true }).Id
+$DomainOnM365 = (Get-MgDomain | Where-Object { $_.IsInitial -match $true }).Id
+$admin1 = (Get-MgUser).UserPrincipalName -like "admbg1*@$DomainOnM365"
+$admin2 = (Get-MgUser).UserPrincipalName -like "admbg2*@$DomainOnM365"
 
-     if ((Get-MgUser).UserPrincipalName -eq "brice.glass@$DomainOnM365")
+    if ($admin1)
         {
          Try {
               Start-Sleep -Seconds 5
-              Update-MgUser -UserId "brice.glass@$DomainOnM365" -PasswordPolicies DisablePasswordExpiration
-              Write-LogInfo "User 'brice.glass@$DomainOnM365' never expires"
+
+              Update-MgUser -UserId $admin1 -PasswordPolicies DisablePasswordExpiration
+              Write-LogInfo "User $admin1' never expires"
               }
                  Catch {
-                        Write-LogError "User 'brice.glass@$DomainOnM365' not configured to never expire"
+                        Write-LogError "User $admin1 not configured to never expire"
                        }
         }
     else { 
-          Write-LogWarning "User 'brice.glass@$DomainOnM365' not exist"
+          Write-LogWarning "User $admin1 not exist"
           }
 
-     if ((Get-MgUser).UserPrincipalName -eq "brice.douglass@$DomainOnM365")
+     if ($admin2)
         {
          Try {
               Start-Sleep -Seconds 5
-              Update-MgUser -UserId "brice.douglass@$DomainOnM365" -PasswordPolicies DisablePasswordExpiration
-              Write-LogInfo "User 'brice.douglass@$DomainOnM365' never expires"
+              Update-MgUser -UserId $admin2 -PasswordPolicies DisablePasswordExpiration
+              Write-LogInfo "User $admin2 never expires"
               }
                  Catch {
-                        Write-LogError "User 'brice.douglass@$DomainOnM365' not configured to never expire"
+                        Write-LogError "User $admin2 not configured to never expire"
                        }
         }
     else { 
-          Write-LogWarning "User 'brice.douglass@$DomainOnM365' not exist"
+          Write-LogWarning "User $admin2 not exist"
           }
 
 }

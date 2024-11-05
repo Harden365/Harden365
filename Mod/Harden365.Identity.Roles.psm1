@@ -69,11 +69,12 @@ $header = @"
 Write-LogInfo "Import all Sku/productNames Licensing"
 $licenseCsvURL = 'https://download.microsoft.com/download/e/3/e/e3e9faf2-f28b-490a-9ada-c6089a1fc5b0/Product%20names%20and%20service%20plan%20identifiers%20for%20licensing.csv'
 $licenseHashTable = @{}
+$ProductDisplayName = "???Product_Display_Name"
 (Invoke-WebRequest -Uri $licenseCsvURL).ToString() | ConvertFrom-Csv | ForEach-Object {
-    $licenseHashTable[$_.Product_Display_Name] = @{
+    $licenseHashTable[$_.$ProductDisplayName] = @{
         "SkuId" = $_.GUID
         "SkuPartNumber" = $_.String_Id
-        "DisplayName" = $_.Product_Display_Name
+        "DisplayName" = $_.$ProductDisplayName
     }
 }
 
@@ -195,9 +196,9 @@ ForEach ($user in $Users) {
     $report.Add($obj)
     $i++
     $percentComplete = [math]::Round(($i/$Users.count)*100,2)
-    write-progress -Activity "Processing report..." -Status "Users: $i of $($Users.Count)" -percentComplete $percentComplete
-    write-progress -Activity "Processing report..." -status "Users: $i" -Completed
+    write-progress -Activity "Processing report..." -Status "Users: $i of $($Users.Count)" -percentComplete (($i / $users.Count)  * 100)
     } 
+    write-progress -Activity "Processing report..." -status "Users: $i" -Completed
 
 
 
@@ -281,11 +282,12 @@ $header = @"
 Write-LogInfo "Import all Sku/productNames Licensing"
 $licenseCsvURL = 'https://download.microsoft.com/download/e/3/e/e3e9faf2-f28b-490a-9ada-c6089a1fc5b0/Product%20names%20and%20service%20plan%20identifiers%20for%20licensing.csv'
 $licenseHashTable = @{}
+$ProductDisplayName = "???Product_Display_Name"
 (Invoke-WebRequest -Uri $licenseCsvURL).ToString() | ConvertFrom-Csv | ForEach-Object {
-    $licenseHashTable[$_.Product_Display_Name] = @{
+    $licenseHashTable[$_.$ProductDisplayName] = @{
         "SkuId" = $_.GUID
         "SkuPartNumber" = $_.String_Id
-        "DisplayName" = $_.Product_Display_Name
+        "DisplayName" = $_.$ProductDisplayName
     }
 }
 
@@ -340,6 +342,7 @@ foreach($Role in $AllAssignments){
         }
     }
 
+write-progress -Activity "Processing report..." -status "Roles: $i" -Completed
 
 Write-LogInfo "Import All Users"
 $Users = Get-MgUser -all -Property UserPrincipalName, PasswordPolicies, DisplayName, id,OnPremisesSyncEnabled,lastPasswordChangeDateTime,SignInActivity,Authentication
@@ -407,6 +410,8 @@ ForEach ($user in $Users) {
             }
          }
     }
+
+
 
     # METHODS
                 try {
@@ -487,10 +492,9 @@ ForEach ($user in $Users) {
     $report.Add($obj)
     $i++
     $percentComplete = [math]::Round(($i/$Users.count)*100,2)
-    write-progress -Activity "Processing report..." -Status "Users: $i of $($Users.Count)" -percentComplete $percentComplete
-    write-progress -Activity "Processing report..." -status "Users: $i" -Completed
+    write-progress -Activity "Processing report..." -Status "Users: $i of $($Users.Count)" -percentComplete (($i / $users.Count)  * 100)
     } 
-
+    write-progress -Activity "Processing report..." -status "Users: $i" -Completed
 
 
 #####################################################
